@@ -1,0 +1,48 @@
+name: Poll Gmail and refresh dashboard data
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: poll-inbox
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r spx_dashboard/pipeline/requirements.txt
+
+      - name: Poll inbox and parse latest file
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_FROM_FILTER: ${{ secrets.GMAIL_FROM_FILTER }}
+          ATTACHMENT_NAME: ${{ secrets.ATTACHMENT_NAME }}
+        run: python spx_dashboard/pipeline/run_pipeline.py
+
+      - name: Commit refreshed data (triggers Vercel redeploy)
+        run: |
+          if [ -n "$(git status --porcelain spx_dashboard/data/)" ]; then
+            git config user.name "spx-dashboard-bot"
+            git config user.email "actions@github.com"
+            git add spx_dashboard/data/dashboard.json spx_dashboard/data/.source_hash
+            git commit -m "data: refresh dashboard from new SPX_inputs.xlsx"
+            git push
+          else
+            echo "No data changes; nothing to deploy."
+          fi
