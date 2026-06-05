@@ -37,12 +37,12 @@ app/                      Next.js routes
   page.tsx                the dashboard (server component)
   login/page.tsx          login screen
   api/login, api/logout   auth endpoints
+app/category/[slug]/      per-category drill-down (one page per category)
 components/               DataTable, NtmPeTable, CategoriesTable, Sparkline, …
 lib/                      auth (JWT), data loaders + types, formatting, heatmap
 middleware.ts             server-side auth gate for every protected route
 data/
   dashboard.json          parsed data (committed; the site reads this)
-  commentary.json         per-table bullet commentary (edit + commit to update)
 pipeline/
   fetch_gmail.py          IMAP poll → download newest .xlsx
   parse_excel.py          Output sheet → dashboard.json
@@ -52,23 +52,21 @@ pipeline/
   poll-inbox.yml          scheduled poll + commit
 ```
 
-## Commentary
-
-Each table shows bullet commentary from `data/commentary.json`. These are
-placeholders today. Edit the strings, commit, and the site updates on redeploy.
-
 ## Tables
 
 `SPX Categories` (universe map) · `Stock Performance` · `Earnings Growth` ·
-`Estimate Revisions 2026` · `Estimate Revisions 2027` · `NTM P/E` · `Appendix`.
+`Estimate Revisions 2026` · `Estimate Revisions 2027` · `NTM P/E`.
 Each financial table also renders its "Share of S&P 500" companion, with
 green/red diverging heatmaps on Δ columns and blue sequential heatmaps on level
 columns. NTM P/E includes an inline P/E-history sparkline.
 
-> **GAAP appendix:** the current export carries **Adjusted** figures only — GAAP
-> is a toggle on the workbook's `Data` sheet (`Data!AL6`). The appendix section
-> auto-populates if GAAP-titled tables ever appear on the `Output` sheet; until
-> then it shows an explanatory note. See "Adding the GAAP appendix" below.
+## Category drill-down
+
+On the home page each category card links to `/category/<slug>`. That page shows
+the **same metrics broken out per stock** (Stock Performance, Earnings Growth,
+Estimate Revisions 2026/2027, NTM P/E with a per-stock P/E-history sparkline).
+The per-stock figures come from the workbook's `Data` sheet — the category rows
+on the `Output` sheet are sums of these, and the totals reconcile exactly.
 
 ---
 
@@ -175,17 +173,9 @@ within each table come from the fixed template:
 | SPX Categories                | `AI Capex Beneficiaries` (exact)       | Z–AL grid | ticker lists |
 | NTM P/E                       | `NTM P/E`                              | AN        | AP/AR/AT + AV–AY avg + BA–BD Δ + BF… history |
 
-Only the `Output` sheet is read; the raw `Data` sheet is never touched. The raw
-workbook is git-ignored and never committed.
-
-# Adding the GAAP appendix
-
-The workbook produces a single set of `Output` tables; GAAP vs Adjusted is a
-toggle (`Data!AL6`: 1 = GAAP, 2 = Adjusted). To publish a GAAP appendix, add
-GAAP-titled copies of the Earnings Growth / 2026 / 2027 tables to the `Output`
-sheet (e.g. a title containing "GAAP"). `parse_excel.py:parse_appendix` detects
-the `GAAP` keyword and the appendix will populate automatically. Alternatively,
-maintain a second GAAP-mode export and extend the pipeline to merge both.
+The `Output` sheet feeds the summary tables; the `Data` sheet feeds the
+per-stock category drill-down. The raw workbook is git-ignored and never
+committed.
 
 # Security
 

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 import sys
 from typing import Any
 
@@ -252,6 +253,111 @@ def parse_ntm_pe(ws) -> dict:
 
 
 # --------------------------------------------------------------------------- #
+# Per-stock universe (the Data sheet) — powers the category drill-down pages
+# --------------------------------------------------------------------------- #
+# The `Data` sheet carries one row per S&P 500 constituent. The category rows
+# on the `Output` sheet are sums of these per-stock rows, so we read the same
+# metric blocks here (calendarized adj. net income, matching the Output tables)
+# and key them by company name to attach to each category.
+def _slug(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def _sub(a: float | None, b: float | None) -> float | None:
+    return None if (a is None or b is None) else a - b
+
+
+def _growth(a: float | None, b: float | None) -> float | None:
+    """Change from b to a, as a fraction of |b| (YoY growth / revision)."""
+    return None if (a is None or b is None or b == 0) else (a - b) / abs(b)
+
+
+def _scaled(ws, row: int, col: str, div: float = 1.0) -> float | None:
+    v = _num(_cell(ws, row, col))
+    return None if v is None else v / div
+
+
+def _series_cols(ws, start_letter: str) -> list[int]:
+    """Walk a horizontal date-headed block (row 10 holds the dates, row 9 the
+    block title only on the first column) and return its column indices."""
+    cols: list[int] = []
+    start = cidx(start_letter)
+    c = start
+    while True:
+        d = ws.cell(row=10, column=c).value
+        if not isinstance(d, (dt.datetime, dt.date)):
+            break
+        if c != start and ws.cell(row=9, column=c).value:
+            break  # ran into the next block
+        cols.append(c)
+        c += 1
+    return cols
+
+
+def parse_stock_universe(ws) -> dict[str, dict]:
+    """Read the Data sheet into {company name -> per-stock metrics}."""
+    ni_cols = _series_cols(ws, "CT")    # NTM net income estimate history ($m)
+    mkt_cols = _series_cols(ws, "DR")   # market cap history ($b), same dates
+    n = min(len(ni_cols), len(mkt_cols))
+
+    def _est(r: int, c0: str, c1: str, c2: str) -> dict:
+        vv = [_scaled(ws, r, c, 1000) for c in (c0, c1, c2)]
+        return {
+            "values": vv,
+            "delta_abs": [_sub(vv[2], vv[0]), _sub(vv[2], vv[1])],
+            "delta_pct": [_growth(vv[2], vv[0]), _growth(vv[2], vv[1])],
+        }
+
+    universe: dict[str, dict] = {}
+    for r in range(11, ws.max_row + 1):
+        name = _text(_cell(ws, r, "C"))
+        if not name:
+            continue
+
+        # Performance: market cap ($b) at 3 dates, $Δ (YTD/QTD), return % (YTD/QTD)
+        perf = {
+            "values": [_num(_cell(ws, r, c)) for c in ("AA", "AB", "AC")],
+            "delta_abs": [_num(_cell(ws, r, c)) for c in ("AE", "AF")],
+            "delta_pct": [_num(_cell(ws, r, c)) for c in ("AH", "AI")],
+        }
+
+        # Earnings growth: calendarized adj. net income ($b), 2024..2027 + YoY Δ
+        ev = [_scaled(ws, r, c, 1000) for c in ("BO", "BP", "BT", "BX")]
+        earnings = {
+            "values": ev,
+            "delta_abs": [_sub(ev[i + 1], ev[i]) for i in range(3)],
+            "delta_pct": [_growth(ev[i + 1], ev[i]) for i in range(3)],
+        }
+
+        # NTM P/E: current + quarterly history (market cap / NTM net income)
+        ni_hist = [_num(ws.cell(row=r, column=c).value) for c in ni_cols[:n]]
+        mkt_hist = [_num(ws.cell(row=r, column=c).value) for c in mkt_cols[:n]]
+        pe_series = [
+            (mkt_hist[i] * 1000 / ni_hist[i])
+            if (mkt_hist[i] is not None and ni_hist[i])
+            else None
+            for i in range(n)
+        ]
+        ntm_ni = ni_hist[0] if ni_hist else None
+
+        universe[name] = {
+            "name": name,
+            "ticker": _text(_cell(ws, r, "B")),
+            "performance": perf,
+            "earnings": earnings,
+            "est_2026": _est(r, "BR", "BS", "BT"),
+            "est_2027": _est(r, "BV", "BW", "BX"),
+            "pe": {
+                "mkt_cap": perf["values"][2],
+                "ntm_ni": None if ntm_ni is None else ntm_ni / 1000,
+                "ntm_pe": pe_series[0] if pe_series else None,
+                "series": pe_series,
+            },
+        }
+    return universe
+
+
+# --------------------------------------------------------------------------- #
 # SPX Categories — the universe map
 # --------------------------------------------------------------------------- #
 KNOWN_CATEGORIES = {
@@ -286,7 +392,7 @@ GROUP_NAME_COLS = {
 }
 
 
-def parse_categories(ws) -> dict:
+def parse_categories(ws, universe: dict | None = None) -> dict:
     pos = _find_title(ws, "AI Capex Beneficiaries", exact=True)
     if pos is None:
         raise ValueError("Could not find 'AI Capex Beneficiaries' map")
@@ -339,7 +445,16 @@ def parse_categories(ws) -> dict:
     groups: dict[str, list[dict]] = {}
     for cat in order:
         g = parent.get(cat, "Other")
-        groups.setdefault(g, []).append({"category": cat, "members": categories[cat]})
+        members = categories[cat]
+        stocks = [universe[m] for m in members if universe and m in universe]
+        groups.setdefault(g, []).append(
+            {
+                "category": cat,
+                "slug": _slug(cat),
+                "members": members,
+                "stocks": stocks,
+            }
+        )
 
     group_order = ["AI Capex Beneficiaries", "Software", "AI Buildout Funders", "Other"]
     return {
@@ -351,29 +466,6 @@ def parse_categories(ws) -> dict:
 
 
 # --------------------------------------------------------------------------- #
-# GAAP appendix (optional)
-# --------------------------------------------------------------------------- #
-def parse_appendix(ws) -> dict:
-    """
-    The appendix mirrors the Earnings Growth / 2026 / 2027 tables but on a GAAP
-    basis. In the standard export the workbook's GAAP/Adjusted switch produces a
-    single set of tables, so dedicated GAAP tables are usually absent. We detect
-    them by title and populate only if present.
-    """
-    present = _find_title(ws, "GAAP") is not None
-    return {
-        "present": present,
-        "note": (
-            "GAAP appendix tables were not found in this export. The workbook's "
-            "GAAP/Adjusted toggle (Data!AL6) regenerates the same Output tables; "
-            "to publish a GAAP appendix, add GAAP-titled copies of the Earnings "
-            "Growth / 2026 / 2027 tables to the Output sheet, or send a GAAP-mode "
-            "export. The parser will pick them up automatically."
-        ),
-    }
-
-
-# --------------------------------------------------------------------------- #
 # Main
 # --------------------------------------------------------------------------- #
 def parse_workbook(path: str) -> dict:
@@ -381,6 +473,7 @@ def parse_workbook(path: str) -> dict:
     if "Output" not in wb.sheetnames:
         raise ValueError("Workbook has no 'Output' sheet")
     ws = wb["Output"]
+    universe = parse_stock_universe(wb["Data"]) if "Data" in wb.sheetnames else {}
 
     stock_perf = parse_three_date_table(
         ws, "YTD Stock Performance", "Market cap ($b)"
@@ -399,8 +492,7 @@ def parse_workbook(path: str) -> dict:
             ),
             "earnings_growth": parse_growth_table(ws),
             "ntm_pe": parse_ntm_pe(ws),
-            "categories": parse_categories(ws),
-            "appendix": parse_appendix(ws),
+            "categories": parse_categories(ws, universe),
         },
     }
 

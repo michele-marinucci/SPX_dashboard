@@ -1,5 +1,4 @@
 import dashboard from "@/data/dashboard.json";
-import commentary from "@/data/commentary.json";
 
 // ---- Types mirroring pipeline/parse_excel.py output ----------------------- //
 export interface FinancialRow {
@@ -47,9 +46,33 @@ export interface NtmPeTableData {
   rows: NtmPeRow[];
 }
 
+// ---- Per-stock metrics (the Data sheet) ----------------------------------- //
+export interface StockMetric {
+  values: (number | null)[];
+  delta_abs: (number | null)[];
+  delta_pct: (number | null)[];
+}
+export interface StockPe {
+  mkt_cap: number | null;
+  ntm_ni: number | null;
+  ntm_pe: number | null;
+  series: (number | null)[];
+}
+export interface CategoryStock {
+  name: string;
+  ticker: string;
+  performance: StockMetric;
+  earnings: StockMetric;
+  est_2026: StockMetric;
+  est_2027: StockMetric;
+  pe: StockPe;
+}
+
 export interface CategoryEntry {
   category: string;
+  slug: string;
   members: string[];
+  stocks: CategoryStock[];
 }
 export interface CategoryGroup {
   group: string;
@@ -70,7 +93,6 @@ export interface DashboardData {
     earnings_growth: GrowthTable;
     ntm_pe: NtmPeTableData;
     categories: CategoriesTableData;
-    appendix: { present: boolean; note: string };
   };
 }
 
@@ -78,10 +100,30 @@ export function getDashboard(): DashboardData {
   return dashboard as unknown as DashboardData;
 }
 
-export type CommentaryMap = Record<string, string[]>;
+export interface ResolvedCategory {
+  group: string;
+  category: CategoryEntry;
+}
 
-export function getCommentary(key: string): string[] {
-  const map = commentary as unknown as CommentaryMap;
-  const v = map[key];
-  return Array.isArray(v) ? v : [];
+export function getCategoryBySlug(slug: string): ResolvedCategory | null {
+  const { groups } = getDashboard().tables.categories;
+  for (const g of groups) {
+    for (const c of g.categories) {
+      if (c.slug === slug) return { group: g.group, category: c };
+    }
+  }
+  return null;
+}
+
+// Slugs of categories that actually have per-stock detail (skip placeholders
+// like "Miscellaneous → All remaining 428 stocks").
+export function getCategorySlugs(): string[] {
+  const { groups } = getDashboard().tables.categories;
+  const slugs: string[] = [];
+  for (const g of groups) {
+    for (const c of g.categories) {
+      if ((c.stocks?.length ?? 0) > 0) slugs.push(c.slug);
+    }
+  }
+  return slugs;
 }

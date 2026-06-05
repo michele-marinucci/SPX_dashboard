@@ -1,14 +1,8 @@
 import { Column, DataTable, TableRow } from "@/components/DataTable";
 import { CategoriesTable } from "@/components/CategoriesTable";
 import { NtmPeTable } from "@/components/NtmPeTable";
-import { Commentary } from "@/components/Commentary";
 import { LogoutButton } from "@/components/LogoutButton";
-import {
-  getCommentary,
-  getDashboard,
-  GrowthTable,
-  ThreeDateTable,
-} from "@/lib/data";
+import { getDashboard, GrowthTable, ThreeDateTable } from "@/lib/data";
 
 // --- column builders ------------------------------------------------------- //
 function threeDateColumns(t: ThreeDateTable, digits: number): Column[] {
@@ -133,18 +127,15 @@ function growthRows(t: GrowthTable): TableRow[] {
 function Section({
   id,
   title,
-  commentaryKey,
   children,
 }: {
   id: string;
   title: string;
-  commentaryKey: string;
   children: React.ReactNode;
 }) {
   return (
     <section id={id} className="section">
       <h2 className="section-title">{title}</h2>
-      <Commentary bullets={getCommentary(commentaryKey)} />
       {children}
     </section>
   );
@@ -174,18 +165,13 @@ export default function DashboardPage() {
         <a href="#rev2026">Revisions 2026</a>
         <a href="#rev2027">Revisions 2027</a>
         <a href="#pe">NTM P/E</a>
-        <a href="#appendix">Appendix</a>
       </nav>
 
-      <Section id="categories" title={t.categories.title} commentaryKey="categories">
+      <Section id="categories" title={t.categories.title}>
         <CategoriesTable data={t.categories} />
       </Section>
 
-      <Section
-        id="performance"
-        title="Stock Performance"
-        commentaryKey="stock_performance"
-      >
+      <Section id="performance" title="Stock Performance">
         <DataTable
           columns={threeDateColumns(t.stock_performance, 0)}
           rows={threeDateRows(t.stock_performance)}
@@ -197,7 +183,7 @@ export default function DashboardPage() {
         />
       </Section>
 
-      <Section id="growth" title="Earnings Growth" commentaryKey="earnings_growth">
+      <Section id="growth" title="Earnings Growth">
         <DataTable
           columns={growthColumns(t.earnings_growth)}
           rows={growthRows(t.earnings_growth)}
@@ -228,11 +214,7 @@ export default function DashboardPage() {
         />
       </Section>
 
-      <Section
-        id="rev2026"
-        title="Estimate Revisions 2026"
-        commentaryKey="est_rev_2026"
-      >
+      <Section id="rev2026" title="Estimate Revisions 2026">
         <DataTable
           columns={threeDateColumns(t.est_rev_2026, 1)}
           rows={threeDateRows(t.est_rev_2026)}
@@ -244,11 +226,7 @@ export default function DashboardPage() {
         />
       </Section>
 
-      <Section
-        id="rev2027"
-        title="Estimate Revisions 2027"
-        commentaryKey="est_rev_2027"
-      >
+      <Section id="rev2027" title="Estimate Revisions 2027">
         <DataTable
           columns={threeDateColumns(t.est_rev_2027, 1)}
           rows={threeDateRows(t.est_rev_2027)}
@@ -260,16 +238,8 @@ export default function DashboardPage() {
         />
       </Section>
 
-      <Section id="pe" title="NTM P/E" commentaryKey="ntm_pe">
+      <Section id="pe" title="NTM P/E">
         <NtmPeTable data={t.ntm_pe} />
-      </Section>
-
-      <Section id="appendix" title="Appendix — GAAP" commentaryKey="appendix">
-        {t.appendix.present ? (
-          <p className="muted">GAAP appendix tables detected (rendered above).</p>
-        ) : (
-          <p className="muted note-box">{t.appendix.note}</p>
-        )}
       </Section>
 
       <footer className="page-footer">
