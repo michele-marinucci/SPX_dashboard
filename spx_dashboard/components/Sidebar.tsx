@@ -114,7 +114,7 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
         className={cx("seg-btn", compoundersOnly && "seg-btn-on")}
         title="Show only stocks flagged as compounders"
       >
-        <span className="seg-label">SPX Compounders only</span>
+        <span className="seg-label">SPX compounders</span>
         <span className="seg-count">{totalCompounders}</span>
       </button>
 
