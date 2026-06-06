@@ -65,8 +65,6 @@ export function DataTable({
   // tables this is the compounder roll-up; for per-stock tables it's the
   // compounder-only subset of stocks.
   altRows?: TableRow[];
-  // Optional unit note shown in the top-left corner (e.g. "$ in billions").
-  unitLabel?: string;
 }) {
   const [sort, setSort] = useState(NO_SORT);
   const { on: compoundersOnly } = useCompounders();
@@ -104,9 +102,7 @@ export function DataTable({
         <thead>
           {hasGroups && (
             <tr className="group-row">
-              <th className="row-head">
-                {unitLabel && <span className="unit-label">{unitLabel}</span>}
-              </th>
+              <th className="row-head" />
               {groupSpans(columns).map((g, i) => (
                 <th key={i} colSpan={g.span} className="group-th">
                   {g.label}
@@ -120,9 +116,6 @@ export function DataTable({
               onClick={() => setSort((s) => nextSort(s, LABEL_KEY))}
               title="Sort by name"
             >
-              {!hasGroups && unitLabel && (
-                <span className="unit-label">{unitLabel}</span>
-              )}
               {sortGlyph(sort, LABEL_KEY)}
             </th>
             {columns.map((c, ci) => (

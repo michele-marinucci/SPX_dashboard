@@ -106,7 +106,6 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       <section className="section">
         <h2 className="section-title">Stock Performance</h2>
         <DataTable
-          unitLabel="$ in billions"
           columns={perfColumns(t.stock_performance.dates)}
           rows={metricRows(stocks, (s) => s.performance)}
           altRows={metricRows(comp, (s) => s.performance)}
@@ -116,7 +115,6 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       <section className="section">
         <h2 className="section-title">Earnings Growth</h2>
         <DataTable
-          unitLabel="$ in billions"
           columns={earnColumns(t.earnings_growth.years, t.earnings_growth.delta_years)}
           rows={metricRows(stocks, (s) => s.earnings)}
           altRows={metricRows(comp, (s) => s.earnings)}
@@ -126,7 +124,6 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       <section className="section">
         <h2 className="section-title">Estimate Revisions 2026</h2>
         <DataTable
-          unitLabel="$ in billions"
           columns={estColumns(t.est_rev_2026.dates, "Consensus Adj. NI ($b)")}
           rows={metricRows(stocks, (s) => s.est_2026)}
           altRows={metricRows(comp, (s) => s.est_2026)}
@@ -136,7 +133,6 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       <section className="section">
         <h2 className="section-title">Estimate Revisions 2027</h2>
         <DataTable
-          unitLabel="$ in billions"
           columns={estColumns(t.est_rev_2027.dates, "Consensus Adj. NI ($b)")}
           rows={metricRows(stocks, (s) => s.est_2027)}
           altRows={metricRows(comp, (s) => s.est_2027)}
