@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { NavGroup } from "@/lib/data";
 import { cx } from "@/lib/format";
 import { useCompounders } from "./CompoundersContext";
+import { useSidebarState } from "./SidebarStateContext";
 
 // Left rail: toggle between the aggregate SPX view and each category's
 // per-stock breakdown. Highlights whichever route is active. Collapsible —
@@ -13,7 +14,7 @@ import { useCompounders } from "./CompoundersContext";
 export function Sidebar({ nav }: { nav: NavGroup[] }) {
   const pathname = usePathname();
   const { on: compoundersOnly, set: setCompounders } = useCompounders();
-  const [collapsed, setCollapsed] = useState(false);
+  const { collapsed, setCollapsed, toggle: toggleSidebar } = useSidebarState();
   const [isMobile, setIsMobile] = useState(false);
 
   // Totals for the two top buttons, summed from the same per-category counts
@@ -38,7 +39,6 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  const toggleSidebar = () => setCollapsed((c) => !c);
   // Read the media query directly at click time so we never act on stale state.
   const handleSelect = () => {
     if (window.matchMedia("(max-width: 820px)").matches) setCollapsed(true);
