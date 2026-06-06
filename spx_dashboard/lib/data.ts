@@ -61,6 +61,7 @@ export interface StockPe {
 export interface CategoryStock {
   name: string;
   ticker: string;
+  is_compounder?: boolean;
   performance: StockMetric;
   earnings: StockMetric;
   est_2026: StockMetric;
@@ -83,24 +84,36 @@ export interface CategoriesTableData {
   groups: CategoryGroup[];
 }
 
+// The aggregate tables, minus the per-stock categories map (which never has a
+// compounder-only variant — those pages filter their own rows client-side).
+export interface AggregateTables {
+  stock_performance: ThreeDateTable;
+  est_rev_2026: ThreeDateTable;
+  est_rev_2027: ThreeDateTable;
+  earnings_growth: GrowthTable;
+  ntm_pe: NtmPeTableData;
+}
+
 export interface DashboardData {
   generated_at: string;
   // ISO yyyy-mm-dd date the workbook was refreshed/emailed (may be absent on
   // data produced before this field existed).
   refreshed_date?: string | null;
   latest_date: string;
-  tables: {
-    stock_performance: ThreeDateTable;
-    est_rev_2026: ThreeDateTable;
-    est_rev_2027: ThreeDateTable;
-    earnings_growth: GrowthTable;
-    ntm_pe: NtmPeTableData;
+  tables: AggregateTables & {
     categories: CategoriesTableData;
   };
+  // Compounders-only roll-ups of every aggregate table (Data!D="yes").
+  tables_compounders?: AggregateTables;
 }
 
 export function getDashboard(): DashboardData {
   return dashboard as unknown as DashboardData;
+}
+
+// The compounder-only aggregate tables, if present in the data file.
+export function getCompounderTables(): AggregateTables | null {
+  return getDashboard().tables_compounders ?? null;
 }
 
 export interface ResolvedCategory {

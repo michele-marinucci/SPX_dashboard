@@ -5,6 +5,7 @@ import { CategoryStock } from "@/lib/data";
 import { cellStyle, computeScale } from "@/lib/heatmap";
 import { fmtMoney, fmtNum } from "@/lib/format";
 import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
+import { useCompounders } from "./CompoundersContext";
 import { Sparkline } from "./Sparkline";
 
 const LABEL_KEY = "__label__";
@@ -20,8 +21,13 @@ function accessor(s: CategoryStock, key: string): number | string | null {
 // Per-stock NTM P/E table (current level + quarterly history sparkline).
 export function StockPeTable({ stocks }: { stocks: CategoryStock[] }) {
   const [sort, setSort] = useState(NO_SORT);
-  const peScale = useMemo(() => computeScale(stocks.map((s) => s.pe.ntm_pe)), [stocks]);
-  const rows = useMemo(() => sortRows(stocks, sort, accessor), [stocks, sort]);
+  const { on: compoundersOnly } = useCompounders();
+  const eff = useMemo(
+    () => (compoundersOnly ? stocks.filter((s) => s.is_compounder) : stocks),
+    [stocks, compoundersOnly],
+  );
+  const peScale = useMemo(() => computeScale(eff.map((s) => s.pe.ntm_pe)), [eff]);
+  const rows = useMemo(() => sortRows(eff, sort, accessor), [eff, sort]);
 
   const th = (key: string, label: string) => (
     <th

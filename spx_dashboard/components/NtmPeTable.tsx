@@ -5,6 +5,7 @@ import { NtmPeRow, NtmPeTableData } from "@/lib/data";
 import { cellStyle, computeScale } from "@/lib/heatmap";
 import { cx, fmtMoney, fmtNum, fmtPct } from "@/lib/format";
 import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
+import { useCompounders } from "./CompoundersContext";
 import { Sparkline } from "./Sparkline";
 
 const LABEL_KEY = "__label__";
@@ -19,30 +20,38 @@ function accessor(r: NtmPeRow, key: string): number | string | null {
   return null;
 }
 
-export function NtmPeTable({ data }: { data: NtmPeTableData }) {
+export function NtmPeTable({
+  data,
+  altData,
+}: {
+  data: NtmPeTableData;
+  altData?: NtmPeTableData;
+}) {
   const [sort, setSort] = useState(NO_SORT);
+  const { on: compoundersOnly } = useCompounders();
+  const eff = compoundersOnly && altData ? altData : data;
 
-  const catRows = useMemo(() => data.rows.filter((r) => !r.is_total), [data.rows]);
+  const catRows = useMemo(() => eff.rows.filter((r) => !r.is_total), [eff.rows]);
 
   const peScale = useMemo(() => computeScale(catRows.map((r) => r.ntm_pe)), [catRows]);
   const avgScales = useMemo(
-    () => data.avg_dates.map((_, i) => computeScale(catRows.map((r) => r.avg_since[i] ?? null))),
-    [catRows, data.avg_dates],
+    () => eff.avg_dates.map((_, i) => computeScale(catRows.map((r) => r.avg_since[i] ?? null))),
+    [catRows, eff.avg_dates],
   );
   const deltaScales = useMemo(
-    () => data.avg_dates.map((_, i) => computeScale(catRows.map((r) => r.delta_vs_avg[i] ?? null))),
-    [catRows, data.avg_dates],
+    () => eff.avg_dates.map((_, i) => computeScale(catRows.map((r) => r.delta_vs_avg[i] ?? null))),
+    [catRows, eff.avg_dates],
   );
 
   // Only the rows above the first subtotal ("Total AI Capex Beneficiaries")
   // reorder; everything from that subtotal down keeps its original position.
   const displayRows = useMemo(() => {
-    if (!sort.key) return data.rows;
-    const firstTotalIdx = data.rows.findIndex((r) => r.is_total);
-    const splitAt = firstTotalIdx === -1 ? data.rows.length : firstTotalIdx;
-    const head = sortRows(data.rows.slice(0, splitAt), sort, accessor);
-    return [...head, ...data.rows.slice(splitAt)];
-  }, [data.rows, sort]);
+    if (!sort.key) return eff.rows;
+    const firstTotalIdx = eff.rows.findIndex((r) => r.is_total);
+    const splitAt = firstTotalIdx === -1 ? eff.rows.length : firstTotalIdx;
+    const head = sortRows(eff.rows.slice(0, splitAt), sort, accessor);
+    return [...head, ...eff.rows.slice(splitAt)];
+  }, [eff.rows, sort]);
 
   const sortableTh = (key: string, label: React.ReactNode) => (
     <th
@@ -64,10 +73,10 @@ export function NtmPeTable({ data }: { data: NtmPeTableData }) {
             <th className="group-th">Mkt cap</th>
             <th className="group-th">NTM NI</th>
             <th className="group-th">NTM P/E</th>
-            <th className="group-th" colSpan={data.avg_dates.length}>
+            <th className="group-th" colSpan={eff.avg_dates.length}>
               Avg P/E since
             </th>
-            <th className="group-th" colSpan={data.avg_dates.length}>
+            <th className="group-th" colSpan={eff.avg_dates.length}>
               Current vs avg since
             </th>
             <th className="group-th">History</th>
@@ -82,9 +91,9 @@ export function NtmPeTable({ data }: { data: NtmPeTableData }) {
             </th>
             {sortableTh("mkt_cap", "$b")}
             {sortableTh("ntm_ni", "$b")}
-            {sortableTh("ntm_pe", data.current_label.replace(/[()]/g, ""))}
-            {data.avg_dates.map((d, i) => sortableTh(`avg${i}`, d))}
-            {data.avg_dates.map((d, i) => sortableTh(`delta${i}`, d))}
+            {sortableTh("ntm_pe", eff.current_label.replace(/[()]/g, ""))}
+            {eff.avg_dates.map((d, i) => sortableTh(`avg${i}`, d))}
+            {eff.avg_dates.map((d, i) => sortableTh(`delta${i}`, d))}
             <th className="num-th">since &apos;20</th>
           </tr>
         </thead>

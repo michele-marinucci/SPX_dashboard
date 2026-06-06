@@ -14,3 +14,7 @@ _source/
 # Misc
 .DS_Store
 *.local
+
+# Python
+__pycache__/
+*.pyc

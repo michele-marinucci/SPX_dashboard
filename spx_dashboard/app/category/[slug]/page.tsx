@@ -79,6 +79,9 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
   const d = getDashboard();
   const t = d.tables;
   const stocks = category.stocks;
+  // Compounder-only subset for the "Compounders only" filter (per-stock pages
+  // simply hide the non-compounder rows).
+  const comp = stocks.filter((s) => s.is_compounder);
   // P/E for the catch-all "Other" bucket is intentionally omitted for now.
   const showPe = category.slug !== "miscellaneous";
 
@@ -92,6 +95,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         <DataTable
           columns={perfColumns(t.stock_performance.dates)}
           rows={metricRows(stocks, (s) => s.performance)}
+          altRows={metricRows(comp, (s) => s.performance)}
         />
       </section>
 
@@ -100,6 +104,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         <DataTable
           columns={earnColumns(t.earnings_growth.years, t.earnings_growth.delta_years)}
           rows={metricRows(stocks, (s) => s.earnings)}
+          altRows={metricRows(comp, (s) => s.earnings)}
         />
       </section>
 
@@ -108,6 +113,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         <DataTable
           columns={estColumns(t.est_rev_2026.dates, "Consensus Adj. NI ($b)")}
           rows={metricRows(stocks, (s) => s.est_2026)}
+          altRows={metricRows(comp, (s) => s.est_2026)}
         />
       </section>
 
@@ -116,6 +122,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         <DataTable
           columns={estColumns(t.est_rev_2027.dates, "Consensus Adj. NI ($b)")}
           rows={metricRows(stocks, (s) => s.est_2027)}
+          altRows={metricRows(comp, (s) => s.est_2027)}
         />
       </section>
 

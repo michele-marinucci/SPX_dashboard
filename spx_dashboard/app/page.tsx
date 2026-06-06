@@ -1,7 +1,12 @@
 import { Column, DataTable, TableRow } from "@/components/DataTable";
 import { NtmPeTable } from "@/components/NtmPeTable";
 import { DashboardFrame } from "@/components/DashboardFrame";
-import { getDashboard, GrowthTable, ThreeDateTable } from "@/lib/data";
+import {
+  getCompounderTables,
+  getDashboard,
+  GrowthTable,
+  ThreeDateTable,
+} from "@/lib/data";
 
 // --- column builders ------------------------------------------------------- //
 function threeDateColumns(t: ThreeDateTable, digits: number): Column[] {
@@ -110,6 +115,7 @@ function Section({
 export default function DashboardPage() {
   const d = getDashboard();
   const t = d.tables;
+  const tc = getCompounderTables();
 
   return (
     <DashboardFrame
@@ -120,6 +126,7 @@ export default function DashboardPage() {
         <DataTable
           columns={threeDateColumns(t.stock_performance, 0)}
           rows={threeDateRows(t.stock_performance)}
+          altRows={tc ? threeDateRows(tc.stock_performance) : undefined}
         />
       </Section>
 
@@ -127,6 +134,7 @@ export default function DashboardPage() {
         <DataTable
           columns={growthColumns(t.earnings_growth)}
           rows={growthRows(t.earnings_growth)}
+          altRows={tc ? growthRows(tc.earnings_growth) : undefined}
         />
       </Section>
 
@@ -134,6 +142,7 @@ export default function DashboardPage() {
         <DataTable
           columns={threeDateColumns(t.est_rev_2026, 1)}
           rows={threeDateRows(t.est_rev_2026)}
+          altRows={tc ? threeDateRows(tc.est_rev_2026) : undefined}
         />
       </Section>
 
@@ -141,11 +150,12 @@ export default function DashboardPage() {
         <DataTable
           columns={threeDateColumns(t.est_rev_2027, 1)}
           rows={threeDateRows(t.est_rev_2027)}
+          altRows={tc ? threeDateRows(tc.est_rev_2027) : undefined}
         />
       </Section>
 
       <Section id="pe" title="NTM P/E">
-        <NtmPeTable data={t.ntm_pe} />
+        <NtmPeTable data={t.ntm_pe} altData={tc?.ntm_pe} />
       </Section>
 
       <footer className="page-footer">

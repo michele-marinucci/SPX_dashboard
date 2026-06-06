@@ -207,6 +207,7 @@ def parse_ntm_pe(ws) -> dict:
     avg_cols = ["AV", "AW", "AX", "AY"]
     delta_cols = ["BA", "BB", "BC", "BD"]
     avg_dates = [_fmt_date(_cell(ws, hdr, c)) for c in avg_cols]
+    avg_dates_iso = [_iso_date(_cell(ws, hdr, c)) for c in avg_cols]
 
     # historical quarterly series spans BF.. to the last non-empty header cell
     series_cols: list[str] = []
@@ -247,6 +248,7 @@ def parse_ntm_pe(ws) -> dict:
         "title": "NTM P/E",
         "current_label": current_label,
         "avg_dates": avg_dates,
+        "avg_dates_iso": avg_dates_iso,
         "series_dates": series_dates,
         "rows": rows,
     }
@@ -343,6 +345,7 @@ def parse_stock_universe(ws) -> dict[str, dict]:
         universe[name] = {
             "name": name,
             "ticker": _text(_cell(ws, r, "B")),
+            "is_compounder": _text(_cell(ws, r, "D")).lower() == "yes",
             "performance": perf,
             "earnings": earnings,
             "est_2026": _est(r, "BR", "BS", "BT"),
@@ -480,6 +483,295 @@ def parse_categories(ws, universe: dict | None = None) -> dict:
 
 
 # --------------------------------------------------------------------------- #
+# Subset roll-ups (e.g. "compounders only")
+# --------------------------------------------------------------------------- #
+# Every aggregate row on the Output sheet is a SUMIFS over the Data sheet,
+# filtered by a flag column: P = AI-capex sub-category, G/F/H/I/J = the broad
+# buckets, all rows = Total SPX. Restricting to compounders simply adds the
+# Data!D="yes" criterion to each sum. We replicate that here so any subset can
+# be rolled up with the exact same arithmetic the workbook uses.
+_LABEL_SELECTOR: dict[str, tuple[str, str | None]] = {
+    "Total AI Capex Beneficiaries": ("FLAG", "G"),
+    "AI Buildout Funders": ("FLAG", "F"),
+    "Infrastructure software": ("FLAG", "H"),
+    "Application software": ("FLAG", "I"),
+    "Other": ("FLAG", "J"),
+    "Total SPX": ("ALL", None),
+}
+
+
+def _selector_for(label: str) -> tuple[str, str | None] | None:
+    if label in _LABEL_SELECTOR:
+        return _LABEL_SELECTOR[label]
+    if label.lower().startswith("bloomberg"):
+        return None  # external benchmark; not derivable from constituents
+    return ("P", label)  # an AI-capex sub-category, matched on Data!P
+
+
+def read_agg_records(ws) -> dict:
+    """Read the Data sheet into per-stock roll-up records + the P/E history dates."""
+    ni_cols = _series_cols(ws, "CT")   # NTM net income history ($m)
+    mkt_cols = _series_cols(ws, "DR")  # market cap history ($b)
+    n = min(len(ni_cols), len(mkt_cols))
+    hist_dates = [_iso_date(ws.cell(row=10, column=c).value) for c in ni_cols[:n]]
+
+    records: list[dict] = []
+    for r in range(11, ws.max_row + 1):
+        name = _text(_cell(ws, r, "C"))
+        if not name:
+            continue
+        flag = lambda col: _text(_cell(ws, r, col)).lower() == "yes"  # noqa: E731
+        records.append(
+            {
+                "name": name,
+                "comp": flag("D"),
+                "P": _text(_cell(ws, r, "P")),
+                "F": flag("F"),
+                "G": flag("G"),
+                "H": flag("H"),
+                "I": flag("I"),
+                "J": flag("J"),
+                "perf": [_num(_cell(ws, r, c)) for c in ("AA", "AB", "AC")],
+                "earn": [_num(_cell(ws, r, c)) for c in ("BO", "BP", "BT", "BX")],
+                "e26": [_num(_cell(ws, r, c)) for c in ("BR", "BS", "BT")],
+                "e27": [_num(_cell(ws, r, c)) for c in ("BV", "BW", "BX")],
+                "ni_hist": [_num(ws.cell(row=r, column=c).value) for c in ni_cols[:n]],
+                "mkt_hist": [_num(ws.cell(row=r, column=c).value) for c in mkt_cols[:n]],
+            }
+        )
+    return {"records": records, "hist_dates": hist_dates}
+
+
+def _members(records: list[dict], label: str, compounders: bool) -> list[dict] | None:
+    sel = _selector_for(label)
+    if sel is None:
+        return None
+    kind, arg = sel
+    out = []
+    for rec in records:
+        if compounders and not rec["comp"]:
+            continue
+        if kind == "P":
+            ok = rec["P"] == label
+        elif kind == "FLAG":
+            ok = rec[arg]
+        else:  # ALL
+            ok = True
+        if ok:
+            out.append(rec)
+    return out
+
+
+def _sum(vals) -> float | None:
+    xs = [v for v in vals if v is not None]
+    return sum(xs) if xs else None
+
+
+def _div(a: float | None, b: float | None) -> float | None:
+    return None if (a is None or b in (None, 0)) else a / b
+
+
+def _pe_val(mkt: float | None, ni_m: float | None) -> float | None:
+    """P/E from market cap ($b) and net income ($m); meaningless when earnings
+    aren't positive, so those periods are dropped rather than shown as garbage."""
+    if mkt is None or ni_m is None or ni_m <= 0:
+        return None
+    return mkt * 1000 / ni_m
+
+
+def _residual(total: float | None, parts: list) -> float | None:
+    """Total minus the named buckets — how the Output sheet defines 'Other'.
+    A bucket with no members contributes 0 (not None) to the subtraction."""
+    if total is None:
+        return None
+    return total - sum(p for p in parts if p is not None)
+
+
+# Named buckets whose sum, subtracted from Total SPX, yields "Other".
+_OTHER_PARTS = [
+    "Total AI Capex Beneficiaries",
+    "AI Buildout Funders",
+    "Infrastructure software",
+    "Application software",
+]
+
+
+def _three_date_subset(base: dict, records, compounders: bool, key: str, div: float) -> dict:
+    raw: dict[str, list] = {}
+    for br in base["rows"]:
+        mem = _members(records, br["label"], compounders)
+        if mem is None:
+            continue
+        raw[br["label"]] = [
+            (lambda s: None if s is None else s / div)(_sum([rec[key][i] for rec in mem]))
+            for i in range(3)
+        ]
+    if "Other" in raw and "Total SPX" in raw:
+        raw["Other"] = [
+            _residual(raw["Total SPX"][i], [raw[n][i] for n in _OTHER_PARTS if n in raw])
+            for i in range(3)
+        ]
+
+    rows = []
+    for br in base["rows"]:
+        if br["label"] not in raw:
+            continue
+        vals = raw[br["label"]]
+        d0 = None if (vals[2] is None or vals[0] is None) else vals[2] - vals[0]
+        d1 = None if (vals[2] is None or vals[1] is None) else vals[2] - vals[1]
+        p0 = _div(vals[2], vals[0])
+        p1 = _div(vals[2], vals[1])
+        rows.append(
+            {
+                "label": br["label"],
+                "values": vals,
+                "delta_abs": [d0, d1],
+                "delta_pct": [None if p0 is None else p0 - 1, None if p1 is None else p1 - 1],
+                "is_total": br["is_total"],
+            }
+        )
+    meta = {k: base[k] for k in ("title", "value_label", "dates", "dates_iso")}
+    return {**meta, "rows": rows, "pct_of_spx": []}
+
+
+def _growth_subset(base: dict, records, compounders: bool) -> dict:
+    raw: dict[str, list] = {}
+    for br in base["rows"]:
+        mem = _members(records, br["label"], compounders)
+        if mem is None:
+            continue
+        raw[br["label"]] = [
+            (lambda s: None if s is None else s / 1000)(_sum([rec["earn"][i] for rec in mem]))
+            for i in range(4)
+        ]
+    if "Other" in raw and "Total SPX" in raw:
+        raw["Other"] = [
+            _residual(raw["Total SPX"][i], [raw[n][i] for n in _OTHER_PARTS if n in raw])
+            for i in range(4)
+        ]
+
+    rows = []
+    for br in base["rows"]:
+        if br["label"] not in raw:
+            continue
+        vals = raw[br["label"]]
+        dabs = [
+            None if (vals[i + 1] is None or vals[i] is None) else vals[i + 1] - vals[i]
+            for i in range(3)
+        ]
+        dpct = []
+        for i in range(3):
+            q = _div(vals[i + 1], vals[i])
+            dpct.append(None if q is None else q - 1)
+        rows.append(
+            {
+                "label": br["label"],
+                "values": vals,
+                "delta_abs": dabs,
+                "delta_pct": dpct,
+                "is_total": br["is_total"],
+            }
+        )
+    meta = {k: base[k] for k in ("title", "value_label", "years", "delta_years")}
+    return {**meta, "rows": rows, "pct_of_spx": []}
+
+
+def _pe_subset(base: dict, agg: dict, compounders: bool) -> dict:
+    records = agg["records"]
+    hist_dates = agg["hist_dates"]
+    series_dates = base["series_dates"]
+    avg_iso = base.get("avg_dates_iso") or []
+    # AVERAGEIFS uses ">=" & (avg_date - 1 day) on the history date headers.
+    thresholds = [
+        (dt.date.fromisoformat(x) - dt.timedelta(days=1)) if x else None for x in avg_iso
+    ]
+    n = len(hist_dates)
+
+    # Raw market-cap and net-income aggregates per row (so "Other" can be taken
+    # as a residual at the numerator/denominator level, like the workbook does).
+    raw: dict[str, dict] = {}
+    for br in base["rows"]:
+        mem = _members(records, br["label"], compounders)
+        if mem is None:
+            continue  # external benchmark rows (Bloomberg SPX) are dropped
+        raw[br["label"]] = {
+            "mkt_cap": _sum([rec["perf"][2] for rec in mem]),     # current mkt cap (AC)
+            "ni_cur": _sum([rec["ni_hist"][0] for rec in mem]),   # current NTM NI ($m)
+            "mkt_h": [_sum([rec["mkt_hist"][k] for rec in mem]) for k in range(n)],
+            "ni_h": [_sum([rec["ni_hist"][k] for rec in mem]) for k in range(n)],
+        }
+    if "Other" in raw and "Total SPX" in raw:
+        T = raw["Total SPX"]
+        parts = [raw[p] for p in _OTHER_PARTS if p in raw]
+        o = raw["Other"]
+        o["mkt_cap"] = _residual(T["mkt_cap"], [p["mkt_cap"] for p in parts])
+        o["ni_cur"] = _residual(T["ni_cur"], [p["ni_cur"] for p in parts])
+        o["mkt_h"] = [_residual(T["mkt_h"][k], [p["mkt_h"][k] for p in parts]) for k in range(n)]
+        o["ni_h"] = [_residual(T["ni_h"][k], [p["ni_h"][k] for p in parts]) for k in range(n)]
+
+    rows = []
+    for br in base["rows"]:
+        if br["label"] not in raw:
+            continue
+        R = raw[br["label"]]
+        ntm_ni = None if R["ni_cur"] is None else R["ni_cur"] / 1000
+        ntm_pe = _pe_val(R["mkt_cap"], R["ni_cur"])
+
+        pe_by_date = {hist_dates[k]: _pe_val(R["mkt_h"][k], R["ni_h"][k]) for k in range(n)}
+        series = [pe_by_date.get(d) for d in series_dates]
+        avg_since = []
+        for thr in thresholds:
+            if thr is None:
+                avg_since.append(None)
+                continue
+            vals = [
+                v
+                for d, v in pe_by_date.items()
+                if v is not None and d and dt.date.fromisoformat(d) >= thr
+            ]
+            avg_since.append(sum(vals) / len(vals) if vals else None)
+        delta = []
+        for a in avg_since:
+            q = _div(ntm_pe, a)
+            delta.append(None if q is None else q - 1)
+
+        rows.append(
+            {
+                "label": br["label"],
+                "mkt_cap": R["mkt_cap"],
+                "ntm_ni": ntm_ni,
+                "ntm_pe": ntm_pe,
+                "avg_since": avg_since,
+                "delta_vs_avg": delta,
+                "series": series,
+                "is_total": br["is_total"],
+            }
+        )
+    meta = {
+        k: base[k]
+        for k in ("title", "current_label", "avg_dates", "avg_dates_iso", "series_dates")
+    }
+    return {**meta, "rows": rows}
+
+
+def build_subset_tables(agg: dict, base_tables: dict, compounders: bool) -> dict:
+    recs = agg["records"]
+    return {
+        "stock_performance": _three_date_subset(
+            base_tables["stock_performance"], recs, compounders, "perf", 1
+        ),
+        "est_rev_2026": _three_date_subset(
+            base_tables["est_rev_2026"], recs, compounders, "e26", 1000
+        ),
+        "est_rev_2027": _three_date_subset(
+            base_tables["est_rev_2027"], recs, compounders, "e27", 1000
+        ),
+        "earnings_growth": _growth_subset(base_tables["earnings_growth"], recs, compounders),
+        "ntm_pe": _pe_subset(base_tables["ntm_pe"], agg, compounders),
+    }
+
+
+# --------------------------------------------------------------------------- #
 # Main
 # --------------------------------------------------------------------------- #
 def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
@@ -509,22 +801,34 @@ def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
         ws, "YTD Stock Performance", "Market cap ($b)"
     ))
 
+    tables = {
+        "stock_performance": stock_perf,
+        "est_rev_2026": _relabel(parse_three_date_table(
+            ws, "2026 Estimates", "Consensus Adj. Net Income ($b)"
+        )),
+        "est_rev_2027": _relabel(parse_three_date_table(
+            ws, "2027 Estimates", "Consensus Adj. Net Income ($b)"
+        )),
+        "earnings_growth": parse_growth_table(ws),
+        "ntm_pe": parse_ntm_pe(ws),
+        "categories": parse_categories(ws, universe),
+    }
+
+    # Compounders-only roll-ups of every aggregate table, computed with the
+    # same SUMIFS logic the Output sheet uses (Data!D="yes" added to each sum).
+    # The base tables are already relabeled above, so the date headers the
+    # subset builder copies are correct.
+    tables_compounders: dict = {}
+    if "Data" in wb.sheetnames:
+        agg = read_agg_records(wb["Data"])
+        tables_compounders = build_subset_tables(agg, tables, compounders=True)
+
     return {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "refreshed_date": refreshed_date,
         "latest_date": stock_perf["dates"][-1],
-        "tables": {
-            "stock_performance": stock_perf,
-            "est_rev_2026": _relabel(parse_three_date_table(
-                ws, "2026 Estimates", "Consensus Adj. Net Income ($b)"
-            )),
-            "est_rev_2027": _relabel(parse_three_date_table(
-                ws, "2027 Estimates", "Consensus Adj. Net Income ($b)"
-            )),
-            "earnings_growth": parse_growth_table(ws),
-            "ntm_pe": parse_ntm_pe(ws),
-            "categories": parse_categories(ws, universe),
-        },
+        "tables": tables,
+        "tables_compounders": tables_compounders,
     }
 
 

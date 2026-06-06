@@ -4,11 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavGroup } from "@/lib/data";
 import { cx } from "@/lib/format";
+import { useCompounders } from "./CompoundersContext";
 
 // Left rail: toggle between the aggregate SPX view and each category's
 // per-stock breakdown. Highlights whichever route is active.
 export function Sidebar({ nav }: { nav: NavGroup[] }) {
   const pathname = usePathname();
+  const { on: compoundersOnly, toggle } = useCompounders();
   const activeSlug = pathname?.startsWith("/category/")
     ? decodeURIComponent(pathname.slice("/category/".length))
     : null;
@@ -17,6 +19,17 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">Mendo Monitor</div>
+
+      <button
+        type="button"
+        onClick={toggle}
+        aria-pressed={compoundersOnly}
+        className={cx("compounder-btn", compoundersOnly && "compounder-btn-on")}
+        title="Show only stocks flagged as compounders"
+      >
+        {compoundersOnly ? "✓ Compounders only" : "Compounders only"}
+      </button>
+
       <nav className="sidebar-nav">
         <Link
           href="/"

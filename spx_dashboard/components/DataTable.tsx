@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { cellStyle, computeScale, HeatMode } from "@/lib/heatmap";
 import { cx, fmtMoney, fmtNum, fmtPct, fmtSignedMoney } from "@/lib/format";
 import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
+import { useCompounders } from "./CompoundersContext";
 
 export type CellFormat = "money" | "signedMoney" | "pct" | "num";
 
@@ -53,20 +54,27 @@ const LABEL_KEY = "__label__";
 export function DataTable({
   columns,
   rows,
+  altRows,
 }: {
   columns: Column[];
   rows: TableRow[];
+  // Rows to show when the "Compounders only" filter is active. For aggregate
+  // tables this is the compounder roll-up; for per-stock tables it's the
+  // compounder-only subset of stocks.
+  altRows?: TableRow[];
 }) {
   const [sort, setSort] = useState(NO_SORT);
+  const { on: compoundersOnly } = useCompounders();
+  const effectiveRows = compoundersOnly && altRows ? altRows : rows;
 
   // Per-column heat scale from category rows only (totals excluded so they
   // don't dominate the gradient). Independent of sort order.
   const scales = useMemo(() => {
-    const scaleRows = rows.filter((r) => !r.isTotal);
+    const scaleRows = effectiveRows.filter((r) => !r.isTotal);
     return columns.map((_, ci) =>
       computeScale(scaleRows.map((r) => r.cells[ci] ?? null)),
     );
-  }, [columns, rows]);
+  }, [columns, effectiveRows]);
 
   const hasGroups = columns.some((c) => c.groupLabel);
 
@@ -76,14 +84,14 @@ export function DataTable({
   // original position. Tables without any totals (the per-stock category
   // pages) sort in full.
   const displayRows = useMemo(() => {
-    if (!sort.key) return rows;
-    const firstTotalIdx = rows.findIndex((r) => r.isTotal);
-    const splitAt = firstTotalIdx === -1 ? rows.length : firstTotalIdx;
-    const head = sortRows(rows.slice(0, splitAt), sort, (row, key) =>
+    if (!sort.key) return effectiveRows;
+    const firstTotalIdx = effectiveRows.findIndex((r) => r.isTotal);
+    const splitAt = firstTotalIdx === -1 ? effectiveRows.length : firstTotalIdx;
+    const head = sortRows(effectiveRows.slice(0, splitAt), sort, (row, key) =>
       key === LABEL_KEY ? row.label : row.cells[Number(key)] ?? null,
     );
-    return [...head, ...rows.slice(splitAt)];
-  }, [rows, sort]);
+    return [...head, ...effectiveRows.slice(splitAt)];
+  }, [effectiveRows, sort]);
 
   return (
     <div className="table-wrap">
@@ -121,6 +129,13 @@ export function DataTable({
           </tr>
         </thead>
         <tbody>
+          {displayRows.length === 0 && (
+            <tr>
+              <td className="empty-row" colSpan={columns.length + 1}>
+                No compounders in this view.
+              </td>
+            </tr>
+          )}
           {displayRows.map((r, ri) => (
             <tr key={ri} className={cx(r.isTotal && "total-row")}>
               <th scope="row" className="row-head">
