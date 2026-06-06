@@ -36,6 +36,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable}`}>
+      {/* iOS Safari ignores user-scalable=no since iOS 10. Blocking multi-touch
+          on touchmove is the only reliable way to prevent pinch-zoom there. */}
+      <script dangerouslySetInnerHTML={{ __html:
+        "document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});"
+      }} />
       <body>
         <CompoundersProvider>
           <SidebarStateProvider>{children}</SidebarStateProvider>

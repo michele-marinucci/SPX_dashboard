@@ -37,6 +37,10 @@ body {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Disallow pinch-zoom in browsers that honour touch-action (Chrome/Edge).
+     iOS Safari ignores user-scalable=no since iOS 10; a JS listener below
+     is the only reliable way to block it there. */
+  touch-action: pan-x pan-y;
 }
 
 /* ---------- Login ---------- */
@@ -630,6 +634,12 @@ body {
     content: "▾";
     font-size: 11px;
     line-height: 1;
+  }
+
+  /* When the sidebar is open it IS the screen — hide page content completely
+     so nothing bleeds through at any zoom level. */
+  .sidebar:not(.sidebar-collapsed) ~ .content {
+    display: none;
   }
 
   /* Push content below the fixed collapsed bar (~60px tall). */
