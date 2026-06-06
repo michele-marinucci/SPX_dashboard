@@ -526,6 +526,8 @@ body {
   .shell {
     flex-direction: column;
   }
+  /* Collapsed state = a slim full-width top bar holding just the toggle and
+     brand. The nav + filter are hidden (inherited from .sidebar-collapsed). */
   .sidebar {
     position: sticky;
     top: 0;
@@ -539,16 +541,37 @@ body {
   .sidebar-head {
     padding-bottom: 0;
   }
+  /* Expanded state on mobile = a full-screen overlay so the categories get
+     the whole viewport and read as a clean vertical list. */
+  .sidebar:not(.sidebar-collapsed) {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    z-index: 60;
+    overflow-y: auto;
+    padding: 14px 18px 32px;
+    border-bottom: none;
+  }
+  .sidebar:not(.sidebar-collapsed) .sidebar-head {
+    padding-bottom: 12px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .sidebar-nav {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    margin-top: 10px;
+  }
   .sidebar .compounder-btn {
     margin-top: 12px;
   }
-  .sidebar-nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin-top: 8px;
-  }
   .nav-group {
-    margin-top: 6px;
+    margin-top: 14px;
+  }
+  .nav-link {
+    padding: 11px 12px;
+    font-size: 14px;
   }
   /* On mobile the collapsed state is a full-width top bar (toggle + brand),
      not a slim rail — keep the brand visible, just hide the nav + filter. */
@@ -561,6 +584,36 @@ body {
   }
   .sidebar-collapsed .sidebar-brand {
     display: flex;
+  }
+
+  /* Tighten the content area so wide tables have more room and fit better. */
+  .content {
+    padding: 16px 12px 56px;
+  }
+  .content-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .content-header h1 {
+    font-size: 21px;
+  }
+  .section {
+    padding: 14px 12px 12px;
+  }
+  .data-table {
+    font-size: 12px;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 6px 8px;
+  }
+  .num-td,
+  .num-th {
+    font-size: 11.5px;
+  }
+  .row-head {
+    min-width: 130px;
   }
 }
 .subtitle {
