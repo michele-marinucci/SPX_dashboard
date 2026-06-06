@@ -29,7 +29,17 @@ export function DashboardFrame({
               Data refreshed <strong>{refreshed}</strong>
             </p>
           </div>
-          <LogoutButton />
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <a
+              href="/api/download-xlsx"
+              download="SPX_inputs.xlsx"
+              className="logout-btn"
+              style={{ textDecoration: "none" }}
+            >
+              Export Excel
+            </a>
+            <LogoutButton />
+          </div>
         </header>
         {children}
       </div>

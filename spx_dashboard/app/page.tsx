@@ -55,39 +55,6 @@ function threeDateRows(t: ThreeDateTable): TableRow[] {
   }));
 }
 
-function shareColumns(t: ThreeDateTable): Column[] {
-  return [
-    ...t.dates.map((d, i) => ({
-      key: `s${i}`,
-      label: d,
-      groupLabel: "Share of S&P 500",
-      format: "pct" as const,
-      heat: "blue" as const,
-    })),
-    {
-      key: "sd0",
-      label: "YTD",
-      groupLabel: "Δ share",
-      format: "pct" as const,
-      heat: "rg" as const,
-    },
-    {
-      key: "sd1",
-      label: "QTD",
-      groupLabel: "Δ share",
-      format: "pct" as const,
-      heat: "rg" as const,
-    },
-  ];
-}
-function shareRows(t: ThreeDateTable): TableRow[] {
-  return t.pct_of_spx.map((r) => ({
-    label: r.label,
-    isTotal: r.is_total,
-    cells: [...r.values, ...r.delta_abs],
-  }));
-}
-
 function growthColumns(t: GrowthTable): Column[] {
   return [
     ...t.years.map((y) => ({
@@ -154,41 +121,12 @@ export default function DashboardPage() {
           columns={threeDateColumns(t.stock_performance, 0)}
           rows={threeDateRows(t.stock_performance)}
         />
-        <h4 className="sub-title">Share of S&amp;P 500</h4>
-        <DataTable
-          columns={shareColumns(t.stock_performance)}
-          rows={shareRows(t.stock_performance)}
-        />
       </Section>
 
       <Section id="growth" title="Earnings Growth">
         <DataTable
           columns={growthColumns(t.earnings_growth)}
           rows={growthRows(t.earnings_growth)}
-        />
-        <h4 className="sub-title">Share of S&amp;P 500</h4>
-        <DataTable
-          columns={[
-            ...t.earnings_growth.years.map((y) => ({
-              key: `sy${y}`,
-              label: y,
-              groupLabel: "Share of S&P 500",
-              format: "pct" as const,
-              heat: "blue" as const,
-            })),
-            ...t.earnings_growth.delta_years.map((y) => ({
-              key: `sd${y}`,
-              label: y,
-              groupLabel: "Δ share YoY",
-              format: "pct" as const,
-              heat: "rg" as const,
-            })),
-          ]}
-          rows={t.earnings_growth.pct_of_spx.map((r) => ({
-            label: r.label,
-            isTotal: r.is_total,
-            cells: [...r.values, ...r.delta_abs],
-          }))}
         />
       </Section>
 
@@ -197,22 +135,12 @@ export default function DashboardPage() {
           columns={threeDateColumns(t.est_rev_2026, 1)}
           rows={threeDateRows(t.est_rev_2026)}
         />
-        <h4 className="sub-title">Share of S&amp;P 500</h4>
-        <DataTable
-          columns={shareColumns(t.est_rev_2026)}
-          rows={shareRows(t.est_rev_2026)}
-        />
       </Section>
 
       <Section id="rev2027" title="Estimate Revisions 2027">
         <DataTable
           columns={threeDateColumns(t.est_rev_2027, 1)}
           rows={threeDateRows(t.est_rev_2027)}
-        />
-        <h4 className="sub-title">Share of S&amp;P 500</h4>
-        <DataTable
-          columns={shareColumns(t.est_rev_2027)}
-          rows={shareRows(t.est_rev_2027)}
         />
       </Section>
 

@@ -16,7 +16,7 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">SPX Dashboard</div>
+      <div className="sidebar-brand">Mendo Monitor</div>
       <nav className="sidebar-nav">
         <Link
           href="/"
