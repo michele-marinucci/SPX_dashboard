@@ -70,14 +70,19 @@ export function DataTable({
 
   const hasGroups = columns.some((c) => c.groupLabel);
 
-  // Totals stay pinned to the bottom; only the category rows reorder.
+  // Only the leading block of rows (those above the first subtotal, e.g.
+  // "Total AI Capex Beneficiaries") reorders. Everything from that subtotal
+  // down — the funders, software, Other and the grand total — keeps its
+  // original position. Tables without any totals (the per-stock category
+  // pages) sort in full.
   const displayRows = useMemo(() => {
-    const normal = rows.filter((r) => !r.isTotal);
-    const totals = rows.filter((r) => r.isTotal);
-    const sorted = sortRows(normal, sort, (row, key) =>
+    if (!sort.key) return rows;
+    const firstTotalIdx = rows.findIndex((r) => r.isTotal);
+    const splitAt = firstTotalIdx === -1 ? rows.length : firstTotalIdx;
+    const head = sortRows(rows.slice(0, splitAt), sort, (row, key) =>
       key === LABEL_KEY ? row.label : row.cells[Number(key)] ?? null,
     );
-    return sort.key ? [...sorted, ...totals] : rows;
+    return [...head, ...rows.slice(splitAt)];
   }, [rows, sort]);
 
   return (

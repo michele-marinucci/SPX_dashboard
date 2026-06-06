@@ -34,12 +34,15 @@ export function NtmPeTable({ data }: { data: NtmPeTableData }) {
     [catRows, data.avg_dates],
   );
 
-  // Totals pinned to the bottom; category rows reorder on sort.
+  // Only the rows above the first subtotal ("Total AI Capex Beneficiaries")
+  // reorder; everything from that subtotal down keeps its original position.
   const displayRows = useMemo(() => {
-    const totals = data.rows.filter((r) => r.is_total);
-    const sorted = sortRows(catRows, sort, accessor);
-    return sort.key ? [...sorted, ...totals] : data.rows;
-  }, [data.rows, catRows, sort]);
+    if (!sort.key) return data.rows;
+    const firstTotalIdx = data.rows.findIndex((r) => r.is_total);
+    const splitAt = firstTotalIdx === -1 ? data.rows.length : firstTotalIdx;
+    const head = sortRows(data.rows.slice(0, splitAt), sort, accessor);
+    return [...head, ...data.rows.slice(splitAt)];
+  }, [data.rows, sort]);
 
   const sortableTh = (key: string, label: React.ReactNode) => (
     <th
