@@ -5,6 +5,7 @@ import { cellStyle, computeScale, HeatMode } from "@/lib/heatmap";
 import { cx, fmtMoney, fmtNum, fmtPct, fmtSignedMoney } from "@/lib/format";
 import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
 import { useCompounders } from "./CompoundersContext";
+import { FitTable } from "./FitTable";
 
 export type CellFormat = "money" | "signedMoney" | "pct" | "num";
 
@@ -96,7 +97,7 @@ export function DataTable({
   }, [effectiveRows, sort]);
 
   return (
-    <div className="table-wrap">
+    <FitTable>
       <table className="data-table">
         <thead>
           {hasGroups && (
@@ -163,6 +164,6 @@ export function DataTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </FitTable>
   );
 }

@@ -655,19 +655,32 @@ body {
   .section {
     padding: 14px 12px 12px;
   }
+  /* On mobile we scale the table to fit (FitTable) instead of scrolling, so
+     the wrapper clips rather than scrolls. Let the table size to its content
+     so we can measure its natural width, and tighten spacing so less
+     down-scaling is needed (= larger, more legible text after the fit). */
+  .table-wrap {
+    overflow: hidden;
+  }
+  .fit-inner {
+    display: inline-block;
+  }
+  .fit-inner .data-table {
+    width: auto;
+  }
   .data-table {
-    font-size: 12px;
+    font-size: 11px;
   }
   .data-table th,
   .data-table td {
-    padding: 6px 8px;
+    padding: 4px 6px;
   }
   .num-td,
   .num-th {
-    font-size: 11.5px;
+    font-size: 10.5px;
   }
   .row-head {
-    min-width: 130px;
+    min-width: 86px;
   }
 }
 .subtitle {
@@ -780,6 +793,10 @@ body {
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
+}
+/* Auto-fit scaling wrapper (see FitTable). Neutral on desktop. */
+.fit-inner {
+  transform-origin: top left;
 }
 .data-table {
   border-collapse: separate;
