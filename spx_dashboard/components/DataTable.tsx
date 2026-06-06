@@ -57,7 +57,6 @@ export function DataTable({
   columns,
   rows,
   altRows,
-  unitLabel,
 }: {
   columns: Column[];
   rows: TableRow[];
