@@ -229,15 +229,6 @@ body {
   overflow: hidden;
   white-space: nowrap;
 }
-.sidebar-brand::before {
-  content: "";
-  flex-shrink: 0;
-  width: 9px;
-  height: 9px;
-  border-radius: 3px;
-  background: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
 
 /* Collapsed (desktop): a slim rail showing just the toggle. */
 .sidebar-collapsed {
