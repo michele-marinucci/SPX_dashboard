@@ -27,7 +27,7 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
         className={cx("compounder-btn", compoundersOnly && "compounder-btn-on")}
         title="Show only stocks flagged as compounders"
       >
-        {compoundersOnly ? "✓ Compounders only" : "Compounders only"}
+        Compounders only
       </button>
 
       <nav className="sidebar-nav">

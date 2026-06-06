@@ -1,5 +1,6 @@
 import { LogoutButton } from "@/components/LogoutButton";
 import { Sidebar } from "@/components/Sidebar";
+import { HowToBanner } from "@/components/HowToBanner";
 import { getNavModel, getRefreshedLabel } from "@/lib/data";
 
 // The shared shell for every dashboard view: a left sidebar to switch views
@@ -25,22 +26,20 @@ export function DashboardFrame({
           <div>
             <h1>{title}</h1>
             {subtitle && <p className="subtitle">{subtitle}</p>}
-            <p className="subtitle">
-              Data refreshed <strong>{refreshed}</strong>
-            </p>
           </div>
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <div className="header-actions">
             <a
               href="/SPX_inputs.xlsx"
               download="SPX_inputs.xlsx"
-              className="logout-btn"
-              style={{ textDecoration: "none" }}
+              className="btn-export"
+              title="Download the Excel file powering this site"
             >
-              Export Excel
+              <span aria-hidden="true">↓</span> Export Excel
             </a>
             <LogoutButton />
           </div>
         </header>
+        <HowToBanner refreshed={refreshed} />
         {children}
       </div>
     </div>

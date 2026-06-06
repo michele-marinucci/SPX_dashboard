@@ -20,6 +20,8 @@ export interface Column {
 export interface TableRow {
   label: string;
   isTotal?: boolean;
+  // Marks a per-stock row as a compounder (renders a small badge by the name).
+  isCompounder?: boolean;
   cells: (number | null)[];
 }
 
@@ -140,6 +142,11 @@ export function DataTable({
             <tr key={ri} className={cx(r.isTotal && "total-row")}>
               <th scope="row" className="row-head">
                 {r.label}
+                {r.isCompounder && (
+                  <span className="badge-c" title="Compounder">
+                    C
+                  </span>
+                )}
               </th>
               {r.cells.map((v, ci) => {
                 const col = columns[ci];

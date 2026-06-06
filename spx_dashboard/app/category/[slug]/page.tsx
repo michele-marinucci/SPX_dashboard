@@ -67,7 +67,11 @@ function estColumns(dates: string[], valueLabel: string): Column[] {
 function metricRows(stocks: CategoryStock[], pick: (s: CategoryStock) => StockMetric) {
   return stocks.map((s) => {
     const m = pick(s);
-    return { label: s.name, cells: [...m.values, ...m.delta_abs, ...m.delta_pct] };
+    return {
+      label: s.name,
+      isCompounder: s.is_compounder ?? false,
+      cells: [...m.values, ...m.delta_abs, ...m.delta_pct],
+    };
   });
 }
 

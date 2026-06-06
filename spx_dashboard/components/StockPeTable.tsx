@@ -63,6 +63,11 @@ export function StockPeTable({ stocks }: { stocks: CategoryStock[] }) {
             <tr key={s.name}>
               <th scope="row" className="row-head">
                 {s.name}
+                {s.is_compounder && (
+                  <span className="badge-c" title="Compounder">
+                    C
+                  </span>
+                )}
               </th>
               <td className="num-td">{fmtMoney(s.pe.mkt_cap, 0)}</td>
               <td className="num-td">{fmtNum(s.pe.ntm_ni, 1)}</td>

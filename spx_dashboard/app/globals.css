@@ -1,14 +1,26 @@
 :root {
-  --bg: #f1f5f9;
+  --bg: #f7f8fa;
   --panel: #ffffff;
-  --ink: #0f172a;
-  --muted: #64748b;
-  --line: #e2e8f0;
+  --panel-2: #fbfcfe;
+  --ink: #0b1220;
+  --ink-soft: #334155;
+  --muted: #6b7280;
+  --line: #e7eaf0;
+  --line-soft: #eef1f6;
   --accent: #1d4ed8;
-  --total-bg: #0f172a;
+  --accent-soft: #eef3ff;
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+  --total-bg: #0b1220;
   --total-ink: #f8fafc;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
   font-synthesis: none;
 }
+
+/* next/font sets --font-sans / --font-mono on <html>; var() fallbacks below
+   keep things working if the web fonts ever fail to load. */
 
 * {
   box-sizing: border-box;
@@ -20,9 +32,11 @@ body {
   padding: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans, ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* ---------- Login ---------- */
@@ -89,7 +103,7 @@ body {
   position: sticky;
   top: 0;
   align-self: flex-start;
-  width: 240px;
+  width: 248px;
   flex-shrink: 0;
   height: 100vh;
   overflow-y: auto;
@@ -98,33 +112,61 @@ body {
   padding: 18px 14px 28px;
 }
 .sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.02em;
-  padding: 4px 8px 14px;
+  letter-spacing: -0.01em;
+  padding: 2px 8px 14px;
   color: var(--ink);
 }
+.sidebar-brand::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
 .compounder-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 9px;
   width: 100%;
-  margin: 0 0 10px;
-  padding: 9px 10px;
-  border: 1px solid #dc2626;
-  border-radius: 8px;
-  background: #fff;
-  color: #dc2626;
-  font-size: 13px;
+  margin: 2px 0 12px;
+  padding: 9px 12px;
+  border: 1px solid var(--danger);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--danger);
+  font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.12s, color 0.12s, box-shadow 0.12s;
+  transition: background 0.14s, color 0.14s, box-shadow 0.14s;
+}
+/* Status dot: hollow when off, solid white when on. */
+.compounder-btn::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--danger);
+  background: transparent;
+  transition: background 0.14s, border-color 0.14s;
 }
 .compounder-btn:hover {
-  background: #fef2f2;
+  background: var(--danger-soft);
 }
 .compounder-btn-on {
-  background: #dc2626;
+  background: var(--danger);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+}
+.compounder-btn-on::before {
+  background: #fff;
+  border-color: #fff;
 }
 .sidebar-nav {
   display: flex;
@@ -147,21 +189,23 @@ body {
   justify-content: space-between;
   gap: 8px;
   text-decoration: none;
-  color: var(--ink);
+  color: var(--ink-soft);
   font-size: 13px;
-  padding: 7px 9px;
-  border-radius: 8px;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
   border: 1px solid transparent;
+  transition: background 0.12s, color 0.12s;
 }
 .nav-link:hover {
-  background: #f1f5ff;
+  background: var(--line-soft);
+  color: var(--ink);
 }
 .nav-link-top {
   font-weight: 600;
+  color: var(--ink);
 }
 .nav-link-active {
-  background: #e8efff;
-  border-color: var(--accent);
+  background: var(--accent-soft);
   color: var(--accent);
   font-weight: 600;
 }
@@ -185,9 +229,9 @@ body {
 .content {
   flex: 1;
   min-width: 0;
-  max-width: 1280px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 28px 24px 64px;
+  padding: 26px 28px 72px;
 }
 .content-header {
   display: flex;
@@ -197,8 +241,128 @@ body {
   margin-bottom: 18px;
 }
 .content-header h1 {
-  font-size: 26px;
+  font-size: 25px;
+  letter-spacing: -0.02em;
   margin: 0;
+}
+
+/* ---------- "How it works" banner ---------- */
+.howto {
+  position: relative;
+  background: linear-gradient(180deg, #ffffff 0%, var(--panel-2) 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px 16px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-sm);
+}
+.howto-lead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding-right: 28px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.howto-lead strong {
+  color: var(--ink);
+}
+.howto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+.howto-card {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+}
+.howto-ic {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 14px;
+}
+.howto-card.is-danger .howto-ic {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.howto-ct {
+  min-width: 0;
+}
+.howto-ct b {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--ink);
+  margin-bottom: 1px;
+}
+.howto-ct span {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.howto-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.howto-close:hover {
+  background: var(--line-soft);
+  color: var(--ink);
+}
+.howto-reopen {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.howto-reopen:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ---------- Compounder badge (per-stock rows) ---------- */
+.badge-c {
+  display: inline-block;
+  margin-left: 7px;
+  padding: 1px 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  font-family: var(--font-sans, system-ui, sans-serif);
 }
 
 /* Legacy single-column page wrapper (login etc.) */
@@ -240,17 +404,43 @@ body {
 }
 .subtitle {
   color: var(--muted);
-  margin: 4px 0 0;
-  font-size: 14px;
+  margin: 5px 0 0;
+  font-size: 13px;
+}
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.12s, box-shadow 0.12s;
+}
+.btn-export:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
 }
 .logout-btn {
   border: 1px solid var(--line);
   background: var(--panel);
-  color: var(--ink);
-  border-radius: 8px;
+  color: var(--ink-soft);
+  border-radius: var(--radius-sm);
   padding: 8px 14px;
   font-size: 13px;
   cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
 }
 .logout-btn:hover {
   border-color: var(--accent);
@@ -287,14 +477,17 @@ body {
 .section {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 22px;
-  margin-bottom: 26px;
+  border-radius: var(--radius);
+  padding: 20px 20px 18px;
+  margin-bottom: 22px;
   scroll-margin-top: 64px;
+  box-shadow: var(--shadow-sm);
 }
 .section-title {
-  font-size: 19px;
-  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0 0 12px;
 }
 .sub-title {
   font-size: 13px;
@@ -318,7 +511,7 @@ body {
 .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
 }
 .data-table {
   border-collapse: separate;
@@ -330,17 +523,28 @@ body {
 .data-table th,
 .data-table td {
   white-space: nowrap;
-  padding: 7px 10px;
-  border-bottom: 1px solid var(--line);
+  padding: 7px 11px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.data-table tbody tr:last-child td,
+.data-table tbody tr:last-child th {
+  border-bottom: none;
 }
 .data-table thead th {
-  background: #f8fafc;
+  background: var(--panel-2);
   font-weight: 600;
+  font-size: 12px;
   color: var(--muted);
   text-align: right;
   position: sticky;
   top: 0;
   z-index: 2;
+}
+/* All figures use the tabular monospace face so columns line up exactly. */
+.num-td,
+.num-th {
+  font-family: var(--font-mono, ui-monospace, "SFMono-Regular", Menlo, monospace);
+  font-size: 12.5px;
 }
 .group-row .group-th {
   text-align: center;
@@ -356,10 +560,11 @@ body {
 .data-table thead th.sortable {
   cursor: pointer;
   user-select: none;
+  transition: background 0.1s, color 0.1s;
 }
 .data-table thead th.sortable:hover {
   color: var(--accent);
-  background: #eef2ff;
+  background: var(--accent-soft);
 }
 .row-head {
   text-align: left;
@@ -368,25 +573,34 @@ body {
   background: var(--panel);
   z-index: 3;
   font-weight: 500;
+  font-family: var(--font-sans, system-ui, sans-serif);
   color: var(--ink);
   min-width: 190px;
   border-right: 1px solid var(--line);
 }
 thead .row-head {
   z-index: 4;
-  background: #f8fafc;
+  background: var(--panel-2);
 }
 .num-td {
   text-align: right;
+  color: var(--ink-soft);
 }
-.data-table tbody tr:hover .num-td {
-  outline: 1px solid rgba(29, 78, 216, 0.15);
+/* Inset tint layers over the inline heatmap colours so hover is visible
+   even on coloured cells. */
+.data-table tbody tr:hover td,
+.data-table tbody tr:hover .row-head {
+  box-shadow: inset 0 0 0 9999px rgba(29, 78, 216, 0.06);
 }
 .total-row .row-head,
 .total-row .num-td {
   background: var(--total-bg);
   color: var(--total-ink);
   font-weight: 600;
+}
+.data-table tbody tr.total-row:hover td,
+.data-table tbody tr.total-row:hover .row-head {
+  box-shadow: none;
 }
 .empty-row {
   text-align: center;
