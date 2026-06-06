@@ -12,9 +12,20 @@ import { useCompounders } from "./CompoundersContext";
 // collapsed by default on mobile, expanded by default on the desktop site.
 export function Sidebar({ nav }: { nav: NavGroup[] }) {
   const pathname = usePathname();
-  const { on: compoundersOnly, toggle } = useCompounders();
+  const { on: compoundersOnly, set: setCompounders } = useCompounders();
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Totals for the two top buttons, summed from the same per-category counts
+  // shown below so the figures always reconcile.
+  const totalStocks = nav.reduce(
+    (a, g) => a + g.items.reduce((b, i) => b + i.count, 0),
+    0,
+  );
+  const totalCompounders = nav.reduce(
+    (a, g) => a + g.items.reduce((b, i) => b + i.compounderCount, 0),
+    0,
+  );
 
   // Track the viewport so mobile-only behaviours (full-screen overlay, tap the
   // blue bar to open, collapse after picking a category) can branch off it.
@@ -28,8 +39,8 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
   }, []);
 
   const toggleSidebar = () => setCollapsed((c) => !c);
-  // On mobile, picking a category collapses the overlay back to the top bar.
-  const handleNavClick = () => {
+  // On mobile, any selection in the sidebar collapses it back to the top bar.
+  const handleSelect = () => {
     if (isMobile) setCollapsed(true);
   };
 
@@ -50,7 +61,6 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
   const activeSlug = pathname?.startsWith("/category/")
     ? decodeURIComponent(pathname.slice("/category/".length))
     : null;
-  const aggregateActive = pathname === "/";
 
   return (
     <aside className={cx("sidebar", collapsed && "sidebar-collapsed")}>
@@ -79,27 +89,33 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
         </span>
       </div>
 
-      <p className="sidebar-explain">
-        Use the left sidebar to switch between Aggregate SPX, each category, and
-        Other.
-      </p>
-
+      {/* Two mutually-exclusive blue toggles: show every SPX stock, or only the
+          compounders. Both reflect the same global filter, so exactly one is on. */}
       <Link
         href="/"
-        onClick={handleNavClick}
-        className={cx("aggregate-link", aggregateActive && "aggregate-link-on")}
+        onClick={() => {
+          setCompounders(false);
+          handleSelect();
+        }}
+        className={cx("seg-btn", !compoundersOnly && "seg-btn-on")}
+        title="Show every stock in the tracked S&P 500 universe"
       >
-        Aggregate SPX
+        <span className="seg-label">Aggregate SPX</span>
+        <span className="seg-count">{totalStocks}</span>
       </Link>
 
       <button
         type="button"
-        onClick={toggle}
+        onClick={() => {
+          setCompounders(true);
+          handleSelect();
+        }}
         aria-pressed={compoundersOnly}
-        className={cx("compounder-btn", compoundersOnly && "compounder-btn-on")}
+        className={cx("seg-btn", compoundersOnly && "seg-btn-on")}
         title="Show only stocks flagged as compounders"
       >
-        SPX Compounders only
+        <span className="seg-label">SPX Compounders only</span>
+        <span className="seg-count">{totalCompounders}</span>
       </button>
 
       <nav className="sidebar-nav">
@@ -111,7 +127,7 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
                 key={it.slug}
                 href={`/category/${it.slug}`}
                 prefetch={false}
-                onClick={handleNavClick}
+                onClick={handleSelect}
                 className={cx("nav-link", activeSlug === it.slug && "nav-link-active")}
               >
                 <span className="nav-link-label">{it.label}</span>

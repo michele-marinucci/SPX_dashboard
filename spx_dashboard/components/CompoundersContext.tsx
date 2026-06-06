@@ -15,9 +15,14 @@ const KEY = "mendo:compounders-only";
 interface Ctx {
   on: boolean;
   toggle: () => void;
+  set: (v: boolean) => void;
 }
 
-const CompoundersCtx = createContext<Ctx>({ on: false, toggle: () => {} });
+const CompoundersCtx = createContext<Ctx>({
+  on: false,
+  toggle: () => {},
+  set: () => {},
+});
 
 export function CompoundersProvider({ children }: { children: React.ReactNode }) {
   const [on, setOn] = useState(false);
@@ -31,20 +36,29 @@ export function CompoundersProvider({ children }: { children: React.ReactNode })
     }
   }, []);
 
+  const persist = (v: boolean) => {
+    try {
+      window.localStorage.setItem(KEY, v ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const set = (v: boolean) => {
+    setOn(v);
+    persist(v);
+  };
+
   const toggle = () => {
     setOn((prev) => {
       const next = !prev;
-      try {
-        window.localStorage.setItem(KEY, next ? "1" : "0");
-      } catch {
-        /* ignore */
-      }
+      persist(next);
       return next;
     });
   };
 
   return (
-    <CompoundersCtx.Provider value={{ on, toggle }}>
+    <CompoundersCtx.Provider value={{ on, toggle, set }}>
       {children}
     </CompoundersCtx.Provider>
   );

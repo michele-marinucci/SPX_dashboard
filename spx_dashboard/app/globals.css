@@ -246,24 +246,19 @@ body {
   justify-content: center;
 }
 .sidebar-collapsed .sidebar-brand,
-.sidebar-collapsed .sidebar-explain,
-.sidebar-collapsed .aggregate-link,
-.sidebar-collapsed .compounder-btn,
+.sidebar-collapsed .seg-btn,
 .sidebar-collapsed .sidebar-nav {
   display: none;
 }
-/* Explanatory line shown at the top of the open mobile overlay only. */
-.sidebar-explain {
-  display: none;
-}
-/* "Aggregate SPX" rendered as a blue pill with a status dot, mirroring the
-   Compounders-only button. Filled when the aggregate view is active. */
-.aggregate-link {
+/* The two mutually-exclusive blue toggles ("Aggregate SPX" / "SPX Compounders
+   only"). Identical blue pills with a status dot and a stock-count badge; the
+   active one is filled. */
+.seg-btn {
   display: flex;
   align-items: center;
   gap: 9px;
   width: 100%;
-  margin: 2px 0 10px;
+  margin: 2px 0 8px;
   padding: 9px 12px;
   border: 1px solid var(--accent);
   border-radius: 999px;
@@ -275,66 +270,50 @@ body {
   cursor: pointer;
   transition: background 0.14s, color 0.14s, box-shadow 0.14s;
 }
-.aggregate-link::before {
+.seg-btn:last-of-type {
+  margin-bottom: 12px;
+}
+/* Status dot: hollow when off, solid white when on. */
+.seg-btn::before {
   content: "";
   width: 9px;
   height: 9px;
   flex-shrink: 0;
   border-radius: 50%;
-  border: 2px solid var(--accent);
+  border: 2px solid currentColor;
   background: transparent;
   transition: background 0.14s, border-color 0.14s;
 }
-.aggregate-link:hover {
+.seg-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.seg-count {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.seg-btn:hover {
   background: var(--accent-soft);
 }
-.aggregate-link-on {
+.seg-btn-on {
   background: var(--accent);
   color: #fff;
   box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);
 }
-.aggregate-link-on::before {
+.seg-btn-on::before {
   background: #fff;
   border-color: #fff;
 }
-.compounder-btn {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 100%;
-  margin: 2px 0 12px;
-  padding: 9px 12px;
-  border: 1px solid var(--danger);
-  border-radius: 999px;
-  background: var(--panel);
-  color: var(--danger);
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.14s, color 0.14s, box-shadow 0.14s;
-}
-/* Status dot: hollow when off, solid white when on. */
-.compounder-btn::before {
-  content: "";
-  width: 9px;
-  height: 9px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  border: 2px solid var(--danger);
-  background: transparent;
-  transition: background 0.14s, border-color 0.14s;
-}
-.compounder-btn:hover {
-  background: var(--danger-soft);
-}
-.compounder-btn-on {
-  background: var(--danger);
+.seg-btn-on .seg-count {
+  background: rgba(255, 255, 255, 0.22);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
-}
-.compounder-btn-on::before {
-  background: #fff;
-  border-color: #fff;
 }
 .sidebar-nav {
   display: flex;
@@ -366,10 +345,6 @@ body {
 }
 .nav-link:hover {
   background: var(--line-soft);
-  color: var(--ink);
-}
-.nav-link-top {
-  font-weight: 600;
   color: var(--ink);
 }
 .nav-link-active {
@@ -602,17 +577,6 @@ body {
     flex-direction: column;
     flex-wrap: nowrap;
     margin-top: 10px;
-  }
-  /* Show the explanatory line at the top of the open overlay. */
-  .sidebar:not(.sidebar-collapsed) .sidebar-explain {
-    display: block;
-    margin: 2px 0 14px;
-    font-size: 13px;
-    line-height: 1.45;
-    color: var(--muted);
-  }
-  .sidebar .compounder-btn {
-    margin-top: 4px;
   }
   .nav-group {
     margin-top: 14px;
