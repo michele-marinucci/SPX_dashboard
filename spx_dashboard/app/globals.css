@@ -110,6 +110,54 @@ body {
   background: var(--panel);
   border-right: 1px solid var(--line);
   padding: 18px 14px 28px;
+  transition: width 0.16s ease;
+}
+.sidebar-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 4px 14px;
+}
+.sidebar-toggle {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s;
+}
+.sidebar-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.hamburger,
+.hamburger::before,
+.hamburger::after {
+  display: block;
+  width: 15px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+}
+.hamburger {
+  position: relative;
+}
+.hamburger::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -5px;
+}
+.hamburger::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 5px;
 }
 .sidebar-brand {
   display: flex;
@@ -118,16 +166,35 @@ body {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  padding: 2px 8px 14px;
   color: var(--ink);
+  overflow: hidden;
+  white-space: nowrap;
 }
 .sidebar-brand::before {
   content: "";
+  flex-shrink: 0;
   width: 9px;
   height: 9px;
   border-radius: 3px;
   background: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* Collapsed (desktop): a slim rail showing just the toggle. */
+.sidebar-collapsed {
+  width: 58px;
+  padding-left: 11px;
+  padding-right: 11px;
+}
+.sidebar-collapsed .sidebar-head {
+  padding-left: 0;
+  padding-right: 0;
+  justify-content: center;
+}
+.sidebar-collapsed .sidebar-brand,
+.sidebar-collapsed .compounder-btn,
+.sidebar-collapsed .sidebar-nav {
+  display: none;
 }
 .compounder-btn {
   display: flex;
@@ -388,18 +455,40 @@ body {
     flex-direction: column;
   }
   .sidebar {
-    position: static;
+    position: sticky;
+    top: 0;
+    z-index: 30;
     width: 100%;
     height: auto;
+    padding: 12px 16px;
     border-right: none;
     border-bottom: 1px solid var(--line);
+  }
+  .sidebar-head {
+    padding-bottom: 0;
+  }
+  .sidebar .compounder-btn {
+    margin-top: 12px;
   }
   .sidebar-nav {
     flex-direction: row;
     flex-wrap: wrap;
+    margin-top: 8px;
   }
   .nav-group {
     margin-top: 6px;
+  }
+  /* On mobile the collapsed state is a full-width top bar (toggle + brand),
+     not a slim rail — keep the brand visible, just hide the nav + filter. */
+  .sidebar-collapsed {
+    width: 100%;
+    padding: 12px 16px;
+  }
+  .sidebar-collapsed .sidebar-head {
+    justify-content: flex-start;
+  }
+  .sidebar-collapsed .sidebar-brand {
+    display: flex;
   }
 }
 .subtitle {
