@@ -296,8 +296,29 @@ def _series_cols(ws, start_letter: str) -> list[int]:
     return cols
 
 
-def parse_stock_universe(ws) -> dict[str, dict]:
+def _norm_ticker(v: Any) -> str:
+    return str(v).strip().upper() if v is not None else ""
+
+
+def read_compounder_tickers(wb) -> set[str]:
+    """The authoritative compounder list lives on the `Compounders` sheet
+    (column A, Bloomberg tickers). The Data sheet's "Is compounder?" column is
+    just a cached =MATCH() against this list and can go stale, so we match
+    against the source directly."""
+    if "Compounders" not in wb.sheetnames:
+        return set()
+    ws = wb["Compounders"]
+    out: set[str] = set()
+    for r in range(1, ws.max_row + 1):
+        t = _norm_ticker(ws.cell(row=r, column=1).value)
+        if t and t != "TICKER":
+            out.add(t)
+    return out
+
+
+def parse_stock_universe(ws, compounders: set[str] | None = None) -> dict[str, dict]:
     """Read the Data sheet into {company name -> per-stock metrics}."""
+    compounders = compounders or set()
     ni_cols = _series_cols(ws, "CT")    # NTM net income estimate history ($m)
     mkt_cols = _series_cols(ws, "DR")   # market cap history ($b), same dates
     n = min(len(ni_cols), len(mkt_cols))
@@ -342,10 +363,11 @@ def parse_stock_universe(ws) -> dict[str, dict]:
         ]
         ntm_ni = ni_hist[0] if ni_hist else None
 
+        ticker = _text(_cell(ws, r, "B"))
         universe[name] = {
             "name": name,
-            "ticker": _text(_cell(ws, r, "B")),
-            "is_compounder": _text(_cell(ws, r, "D")).lower() == "yes",
+            "ticker": ticker,
+            "is_compounder": _norm_ticker(ticker) in compounders,
             "performance": perf,
             "earnings": earnings,
             "est_2026": _est(r, "BR", "BS", "BT"),
@@ -508,8 +530,9 @@ def _selector_for(label: str) -> tuple[str, str | None] | None:
     return ("P", label)  # an AI-capex sub-category, matched on Data!P
 
 
-def read_agg_records(ws) -> dict:
+def read_agg_records(ws, compounders: set[str] | None = None) -> dict:
     """Read the Data sheet into per-stock roll-up records + the P/E history dates."""
+    compounders = compounders or set()
     ni_cols = _series_cols(ws, "CT")   # NTM net income history ($m)
     mkt_cols = _series_cols(ws, "DR")  # market cap history ($b)
     n = min(len(ni_cols), len(mkt_cols))
@@ -524,7 +547,7 @@ def read_agg_records(ws) -> dict:
         records.append(
             {
                 "name": name,
-                "comp": flag("D"),
+                "comp": _norm_ticker(_cell(ws, r, "B")) in compounders,
                 "P": _text(_cell(ws, r, "P")),
                 "F": flag("F"),
                 "G": flag("G"),
@@ -779,7 +802,12 @@ def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
     if "Output" not in wb.sheetnames:
         raise ValueError("Workbook has no 'Output' sheet")
     ws = wb["Output"]
-    universe = parse_stock_universe(wb["Data"]) if "Data" in wb.sheetnames else {}
+    compounders = read_compounder_tickers(wb)
+    universe = (
+        parse_stock_universe(wb["Data"], compounders)
+        if "Data" in wb.sheetnames
+        else {}
+    )
 
     # When refreshed_date is provided, relabel the last "current" date column
     # in each table to reflect when the file was actually refreshed, since the
@@ -820,7 +848,7 @@ def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
     # subset builder copies are correct.
     tables_compounders: dict = {}
     if "Data" in wb.sheetnames:
-        agg = read_agg_records(wb["Data"])
+        agg = read_agg_records(wb["Data"], compounders)
         tables_compounders = build_subset_tables(agg, tables, compounders=True)
 
     return {

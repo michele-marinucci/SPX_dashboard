@@ -293,6 +293,14 @@ body {
   background: #dbe5ff;
   color: var(--accent);
 }
+.nav-count-c {
+  background: #ecfdf5;
+  color: #047857;
+}
+.nav-link-active .nav-count-c {
+  background: #d1fae5;
+  color: #047857;
+}
 .content {
   flex: 1;
   min-width: 0;

@@ -77,7 +77,16 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
                 className={cx("nav-link", activeSlug === it.slug && "nav-link-active")}
               >
                 <span className="nav-link-label">{it.label}</span>
-                <span className="nav-count">{it.count}</span>
+                <span
+                  className={cx("nav-count", compoundersOnly && "nav-count-c")}
+                  title={
+                    compoundersOnly
+                      ? `${it.compounderCount} compounders`
+                      : `${it.count} stocks`
+                  }
+                >
+                  {compoundersOnly ? it.compounderCount : it.count}
+                </span>
               </Link>
             ))}
           </div>

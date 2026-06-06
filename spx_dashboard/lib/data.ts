@@ -160,6 +160,9 @@ export interface NavItem {
   slug: string;
   label: string;
   count: number;
+  // How many of the category's stocks are compounders (shown when the
+  // "Compounders only" filter is active).
+  compounderCount: number;
 }
 export interface NavGroup {
   group: string;
@@ -176,6 +179,7 @@ export function getNavModel(): NavGroup[] {
         slug: c.slug,
         label: c.category,
         count: c.members.length,
+        compounderCount: c.stocks.filter((s) => s.is_compounder).length,
       })),
   }));
 }
