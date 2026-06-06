@@ -1,64 +1,70 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-// Wraps a data table so it always fills the screen width on mobile — no more,
-// no less. Each table is measured and scaled independently to exactly fit its
-// container: wide tables shrink so every column is visible, narrow tables grow
-// so there's no empty space on the right. Re-fits on resize, rotation and
-// after web fonts load (which change the natural width). On desktop (>820px)
-// it's a no-op: tables keep their natural size and horizontal scroll.
+// Wraps a data table so it always fits the screen width on mobile — each table
+// independently. We measure the table's natural width and apply CSS `zoom` so
+// it fills the container exactly: wide tables shrink so every column is visible
+// without scrolling, narrow tables grow so there's no empty space.
+//
+// `zoom` (not `transform: scale`) is used deliberately: zoom reflows layout, so
+// the shrunk table's footprint shrinks too — no overflow to clip, no manual
+// height bookkeeping. It's natively supported on iOS Safari. Applied
+// imperatively via a ref so measuring (at zoom 1) and applying never fight the
+// React render cycle or loop the ResizeObserver. No-op on desktop (>820px).
 export function FitTable({ children }: { children: React.ReactNode }) {
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-  const [height, setHeight] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     const outer = outerRef.current;
     const inner = innerRef.current;
     if (!outer || !inner) return;
 
-    const fit = () => {
+    let lastAvail = -1;
+
+    const fit = (force = false) => {
       const mobile = window.matchMedia("(max-width: 820px)").matches;
       if (!mobile) {
-        setScale(1);
-        setHeight(undefined);
+        inner.style.zoom = "1";
+        lastAvail = -1;
         return;
       }
-      // scrollWidth/Height are unscaled layout dimensions (CSS transforms are
-      // paint-only and don't feed back into them, so this can't loop).
-      const natural = inner.scrollWidth;
       const avail = outer.clientWidth;
-      if (natural <= 0 || avail <= 0) return;
-      const s = avail / natural; // fill exactly: shrink if wide, grow if narrow
-      setScale(s);
-      setHeight(inner.scrollHeight * s);
+      // Skip when the available width hasn't changed (avoids ResizeObserver
+      // feedback when zoom changes the inner's height). `force` overrides this
+      // for font-load / orientation re-fits.
+      if (!force && avail === lastAvail) return;
+      // Measure the natural (unscaled) width first.
+      inner.style.zoom = "1";
+      const natural = inner.scrollWidth;
+      if (!natural || !avail) {
+        lastAvail = -1;
+        return;
+      }
+      lastAvail = avail;
+      inner.style.zoom = String(avail / natural);
     };
 
-    fit();
-    const ro = new ResizeObserver(fit);
+    fit(true);
+    const ro = new ResizeObserver(() => fit());
     ro.observe(outer);
-    ro.observe(inner);
-    window.addEventListener("orientationchange", fit);
-    window.addEventListener("resize", fit);
-    // Web fonts load after first paint and change the table's natural width;
-    // re-fit once they're ready so we don't leave a gap or overflow.
-    if (document.fonts?.ready) document.fonts.ready.then(fit);
+    const onReflow = () => fit(true);
+    window.addEventListener("orientationchange", onReflow);
+    window.addEventListener("resize", onReflow);
+    // Web fonts change the natural width after first paint; re-fit when ready.
+    if (document.fonts?.ready) document.fonts.ready.then(() => fit(true));
+
     return () => {
       ro.disconnect();
-      window.removeEventListener("orientationchange", fit);
-      window.removeEventListener("resize", fit);
+      window.removeEventListener("orientationchange", onReflow);
+      window.removeEventListener("resize", onReflow);
     };
   }, []);
 
   return (
-    <div ref={outerRef} className="table-wrap" style={{ height }}>
-      <div
-        ref={innerRef}
-        className="fit-inner"
-        style={{ transform: scale !== 1 ? `scale(${scale})` : undefined }}
-      >
+    <div ref={outerRef} className="table-wrap">
+      <div ref={innerRef} className="fit-inner">
         {children}
       </div>
     </div>
