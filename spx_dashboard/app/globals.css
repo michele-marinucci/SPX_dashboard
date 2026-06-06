@@ -289,8 +289,6 @@ body {
   transition: background 0.14s, border-color 0.14s;
 }
 .seg-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 .seg-count {
