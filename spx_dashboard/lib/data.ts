@@ -144,13 +144,29 @@ export function getCategorySlugs(): string[] {
   return slugs;
 }
 
-// The date shown in the header: the file's refresh date, formatted M/D/YYYY.
-// Falls back to the last data-column date for older data without the field.
+// The date+time shown in the header, derived from generated_at in ET.
+// Falls back to latest_date for older data without the field.
 export function getRefreshedLabel(): string {
-  const { refreshed_date, latest_date } = getDashboard();
-  if (refreshed_date) {
-    const [y, m, d] = refreshed_date.split("-").map(Number);
-    if (y && m && d) return `${m}/${d}/${y}`;
+  const { generated_at, latest_date } = getDashboard();
+  if (generated_at) {
+    try {
+      const dt = new Date(generated_at);
+      const datePart = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        month: "numeric",
+        day: "numeric",
+        year: "numeric",
+      }).format(dt);
+      const timePart = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }).format(dt);
+      return `${datePart} at ${timePart} ET`;
+    } catch {
+      /* fall through */
+    }
   }
   return latest_date;
 }
