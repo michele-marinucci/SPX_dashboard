@@ -85,6 +85,9 @@ export interface CategoriesTableData {
 
 export interface DashboardData {
   generated_at: string;
+  // ISO yyyy-mm-dd date the workbook was refreshed/emailed (may be absent on
+  // data produced before this field existed).
+  refreshed_date?: string | null;
   latest_date: string;
   tables: {
     stock_performance: ThreeDateTable;
@@ -115,8 +118,8 @@ export function getCategoryBySlug(slug: string): ResolvedCategory | null {
   return null;
 }
 
-// Slugs of categories that actually have per-stock detail (skip placeholders
-// like "Miscellaneous → All remaining 428 stocks").
+// Slugs of categories that have per-stock detail (every category does now,
+// including Miscellaneous = the rest of the S&P 500).
 export function getCategorySlugs(): string[] {
   const { groups } = getDashboard().tables.categories;
   const slugs: string[] = [];
@@ -126,4 +129,40 @@ export function getCategorySlugs(): string[] {
     }
   }
   return slugs;
+}
+
+// The date shown in the header: the file's refresh date, formatted M/D/YYYY.
+// Falls back to the last data-column date for older data without the field.
+export function getRefreshedLabel(): string {
+  const { refreshed_date, latest_date } = getDashboard();
+  if (refreshed_date) {
+    const [y, m, d] = refreshed_date.split("-").map(Number);
+    if (y && m && d) return `${m}/${d}/${y}`;
+  }
+  return latest_date;
+}
+
+// ---- Sidebar navigation model -------------------------------------------- //
+export interface NavItem {
+  slug: string;
+  label: string;
+  count: number;
+}
+export interface NavGroup {
+  group: string;
+  items: NavItem[];
+}
+
+export function getNavModel(): NavGroup[] {
+  const { groups } = getDashboard().tables.categories;
+  return groups.map((g) => ({
+    group: g.group,
+    items: g.categories
+      .filter((c) => (c.stocks?.length ?? 0) > 0)
+      .map((c) => ({
+        slug: c.slug,
+        label: c.category,
+        count: c.members.length,
+      })),
+  }));
 }

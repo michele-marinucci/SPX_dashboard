@@ -1,5 +1,9 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import { cellStyle, computeScale, HeatMode } from "@/lib/heatmap";
 import { cx, fmtMoney, fmtNum, fmtPct, fmtSignedMoney } from "@/lib/format";
+import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
 
 export type CellFormat = "money" | "signedMoney" | "pct" | "num";
 
@@ -43,6 +47,9 @@ function groupSpans(columns: Column[]) {
   return spans;
 }
 
+// Sort key for the row-label column.
+const LABEL_KEY = "__label__";
+
 export function DataTable({
   columns,
   rows,
@@ -50,14 +57,28 @@ export function DataTable({
   columns: Column[];
   rows: TableRow[];
 }) {
+  const [sort, setSort] = useState(NO_SORT);
+
   // Per-column heat scale from category rows only (totals excluded so they
-  // don't dominate the gradient).
-  const scaleRows = rows.filter((r) => !r.isTotal);
-  const scales = columns.map((_, ci) =>
-    computeScale(scaleRows.map((r) => r.cells[ci] ?? null)),
-  );
+  // don't dominate the gradient). Independent of sort order.
+  const scales = useMemo(() => {
+    const scaleRows = rows.filter((r) => !r.isTotal);
+    return columns.map((_, ci) =>
+      computeScale(scaleRows.map((r) => r.cells[ci] ?? null)),
+    );
+  }, [columns, rows]);
 
   const hasGroups = columns.some((c) => c.groupLabel);
+
+  // Totals stay pinned to the bottom; only the category rows reorder.
+  const displayRows = useMemo(() => {
+    const normal = rows.filter((r) => !r.isTotal);
+    const totals = rows.filter((r) => r.isTotal);
+    const sorted = sortRows(normal, sort, (row, key) =>
+      key === LABEL_KEY ? row.label : row.cells[Number(key)] ?? null,
+    );
+    return sort.key ? [...sorted, ...totals] : rows;
+  }, [rows, sort]);
 
   return (
     <div className="table-wrap">
@@ -74,16 +95,28 @@ export function DataTable({
             </tr>
           )}
           <tr>
-            <th className="row-head" />
-            {columns.map((c) => (
-              <th key={c.key} className="num-th">
+            <th
+              className="row-head sortable"
+              onClick={() => setSort((s) => nextSort(s, LABEL_KEY))}
+              title="Sort by name"
+            >
+              {sortGlyph(sort, LABEL_KEY)}
+            </th>
+            {columns.map((c, ci) => (
+              <th
+                key={c.key}
+                className="num-th sortable"
+                onClick={() => setSort((s) => nextSort(s, String(ci)))}
+                title="Sort by this column"
+              >
                 {c.label}
+                {sortGlyph(sort, String(ci))}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((r, ri) => (
+          {displayRows.map((r, ri) => (
             <tr key={ri} className={cx(r.isTotal && "total-row")}>
               <th scope="row" className="row-head">
                 {r.label}

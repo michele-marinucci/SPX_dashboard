@@ -17,6 +17,7 @@ Env: see fetch_gmail.py for Gmail variables.
 
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import json
 import os
@@ -30,6 +31,7 @@ DASHBOARD_JSON = os.path.join(DATA_DIR, "dashboard.json")
 SOURCE_HASH = os.path.join(DATA_DIR, ".source_hash")
 
 sys.path.insert(0, HERE)
+import fetch_gmail  # noqa: E402
 from fetch_gmail import fetch_latest_xlsx  # noqa: E402
 from parse_excel import parse_workbook  # noqa: E402
 
@@ -68,7 +70,20 @@ def main() -> int:
             print("UNCHANGED: source file identical to last processed; skipping.")
             return 0
 
-        data = parse_workbook(xlsx_path)
+        # The refresh date is the email's internal date (when you sent the
+        # workbook); fall back to today if the server didn't report one.
+        if fetch_gmail.LAST_EMAIL_EPOCH_MS:
+            refreshed_date = (
+                dt.datetime.fromtimestamp(
+                    fetch_gmail.LAST_EMAIL_EPOCH_MS / 1000, dt.timezone.utc
+                )
+                .date()
+                .isoformat()
+            )
+        else:
+            refreshed_date = dt.date.today().isoformat()
+
+        data = parse_workbook(xlsx_path, refreshed_date)
         with open(DASHBOARD_JSON, "w") as f:
             json.dump(data, f, indent=2, default=str)
         with open(SOURCE_HASH, "w") as f:

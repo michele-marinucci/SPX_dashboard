@@ -35,6 +35,10 @@ from email.message import Message
 
 IMAP_HOST = "imap.gmail.com"
 
+# Set to the internal date (epoch ms) of the message we downloaded, so callers
+# that import this module (e.g. run_pipeline) can record the refresh date.
+LAST_EMAIL_EPOCH_MS = 0
+
 
 def _env(name: str, default: str | None = None) -> str | None:
     v = os.environ.get(name, default)
@@ -105,6 +109,8 @@ def fetch_latest_xlsx(out_path: str) -> int:
                 epoch_ms = (
                     int(__import__("time").mktime(internal) * 1000) if internal else 0
                 )
+                global LAST_EMAIL_EPOCH_MS
+                LAST_EMAIL_EPOCH_MS = epoch_ms
                 print(epoch_ms)  # stdout: timestamp for change detection
                 print(
                     f"Downloaded {filename!r} ({len(payload)} bytes) -> {out_path}",

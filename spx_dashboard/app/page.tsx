@@ -1,7 +1,6 @@
 import { Column, DataTable, TableRow } from "@/components/DataTable";
-import { CategoriesTable } from "@/components/CategoriesTable";
 import { NtmPeTable } from "@/components/NtmPeTable";
-import { LogoutButton } from "@/components/LogoutButton";
+import { DashboardFrame } from "@/components/DashboardFrame";
 import { getDashboard, GrowthTable, ThreeDateTable } from "@/lib/data";
 
 // --- column builders ------------------------------------------------------- //
@@ -146,31 +145,10 @@ export default function DashboardPage() {
   const t = d.tables;
 
   return (
-    <main className="page">
-      <header className="page-header">
-        <div>
-          <h1>SPX Categories Dashboard</h1>
-          <p className="subtitle">
-            AI beneficiary &amp; software tracker · data as of{" "}
-            <strong>{d.latest_date}</strong>
-          </p>
-        </div>
-        <LogoutButton />
-      </header>
-
-      <nav className="toc">
-        <a href="#categories">Categories</a>
-        <a href="#performance">Performance</a>
-        <a href="#growth">Earnings Growth</a>
-        <a href="#rev2026">Revisions 2026</a>
-        <a href="#rev2027">Revisions 2027</a>
-        <a href="#pe">NTM P/E</a>
-      </nav>
-
-      <Section id="categories" title={t.categories.title}>
-        <CategoriesTable data={t.categories} />
-      </Section>
-
+    <DashboardFrame
+      title="Aggregate SPX"
+      subtitle={`AI beneficiary & software tracker · data through ${d.latest_date}`}
+    >
       <Section id="performance" title="Stock Performance">
         <DataTable
           columns={threeDateColumns(t.stock_performance, 0)}
@@ -246,6 +224,6 @@ export default function DashboardPage() {
         Generated {new Date(d.generated_at).toLocaleString("en-US")} · refreshed
         automatically when a new file arrives in the inbox.
       </footer>
-    </main>
+    </DashboardFrame>
   );
 }

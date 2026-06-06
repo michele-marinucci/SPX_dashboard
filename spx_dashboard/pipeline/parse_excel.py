@@ -442,10 +442,24 @@ def parse_categories(ws, universe: dict | None = None) -> dict:
         "Miscellaneous": "Other",
     }
 
+    # Names explicitly placed in a named category. Everything else in the Data
+    # sheet universe falls into "Miscellaneous" (the rest of the S&P 500).
+    assigned = {
+        m
+        for cat in order
+        if cat.lower() != "miscellaneous"
+        for m in categories[cat]
+        if universe and m in universe
+    }
+
     groups: dict[str, list[dict]] = {}
     for cat in order:
         g = parent.get(cat, "Other")
-        members = categories[cat]
+        if cat.lower() == "miscellaneous" and universe:
+            # All remaining constituents, kept in Data-sheet order (largest first).
+            members = [name for name in universe if name not in assigned]
+        else:
+            members = categories[cat]
         stocks = [universe[m] for m in members if universe and m in universe]
         groups.setdefault(g, []).append(
             {
@@ -468,7 +482,7 @@ def parse_categories(ws, universe: dict | None = None) -> dict:
 # --------------------------------------------------------------------------- #
 # Main
 # --------------------------------------------------------------------------- #
-def parse_workbook(path: str) -> dict:
+def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
     wb = openpyxl.load_workbook(path, data_only=True)
     if "Output" not in wb.sheetnames:
         raise ValueError("Workbook has no 'Output' sheet")
@@ -481,6 +495,10 @@ def parse_workbook(path: str) -> dict:
 
     return {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        # The date the workbook was refreshed/emailed (ISO yyyy-mm-dd). The
+        # caller supplies this (e.g. from the email's date); the Output sheet
+        # itself only carries the data-column dates.
+        "refreshed_date": refreshed_date,
         "latest_date": stock_perf["dates"][-1],
         "tables": {
             "stock_performance": stock_perf,
@@ -498,10 +516,14 @@ def parse_workbook(path: str) -> dict:
 
 
 def main() -> int:
-    if len(sys.argv) != 3:
-        print("usage: parse_excel.py <input.xlsx> <output.json>", file=sys.stderr)
+    if len(sys.argv) not in (3, 4):
+        print(
+            "usage: parse_excel.py <input.xlsx> <output.json> [refreshed_date]",
+            file=sys.stderr,
+        )
         return 2
-    data = parse_workbook(sys.argv[1])
+    refreshed_date = sys.argv[3] if len(sys.argv) == 4 else None
+    data = parse_workbook(sys.argv[1], refreshed_date)
     with open(sys.argv[2], "w") as f:
         json.dump(data, f, indent=2, default=str)
     print(f"Wrote {sys.argv[2]}")

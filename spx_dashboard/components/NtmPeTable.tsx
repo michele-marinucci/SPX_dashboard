@@ -1,17 +1,55 @@
-import { NtmPeTableData } from "@/lib/data";
+"use client";
+
+import { useMemo, useState } from "react";
+import { NtmPeRow, NtmPeTableData } from "@/lib/data";
 import { cellStyle, computeScale } from "@/lib/heatmap";
 import { cx, fmtMoney, fmtNum, fmtPct } from "@/lib/format";
+import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
 import { Sparkline } from "./Sparkline";
 
-export function NtmPeTable({ data }: { data: NtmPeTableData }) {
-  const catRows = data.rows.filter((r) => !r.is_total);
+const LABEL_KEY = "__label__";
 
-  const peScale = computeScale(catRows.map((r) => r.ntm_pe));
-  const avgScales = data.avg_dates.map((_, i) =>
-    computeScale(catRows.map((r) => r.avg_since[i] ?? null)),
+function accessor(r: NtmPeRow, key: string): number | string | null {
+  if (key === LABEL_KEY) return r.label;
+  if (key === "mkt_cap") return r.mkt_cap;
+  if (key === "ntm_ni") return r.ntm_ni;
+  if (key === "ntm_pe") return r.ntm_pe;
+  if (key.startsWith("avg")) return r.avg_since[Number(key.slice(3))] ?? null;
+  if (key.startsWith("delta")) return r.delta_vs_avg[Number(key.slice(5))] ?? null;
+  return null;
+}
+
+export function NtmPeTable({ data }: { data: NtmPeTableData }) {
+  const [sort, setSort] = useState(NO_SORT);
+
+  const catRows = useMemo(() => data.rows.filter((r) => !r.is_total), [data.rows]);
+
+  const peScale = useMemo(() => computeScale(catRows.map((r) => r.ntm_pe)), [catRows]);
+  const avgScales = useMemo(
+    () => data.avg_dates.map((_, i) => computeScale(catRows.map((r) => r.avg_since[i] ?? null))),
+    [catRows, data.avg_dates],
   );
-  const deltaScales = data.avg_dates.map((_, i) =>
-    computeScale(catRows.map((r) => r.delta_vs_avg[i] ?? null)),
+  const deltaScales = useMemo(
+    () => data.avg_dates.map((_, i) => computeScale(catRows.map((r) => r.delta_vs_avg[i] ?? null))),
+    [catRows, data.avg_dates],
+  );
+
+  // Totals pinned to the bottom; category rows reorder on sort.
+  const displayRows = useMemo(() => {
+    const totals = data.rows.filter((r) => r.is_total);
+    const sorted = sortRows(catRows, sort, accessor);
+    return sort.key ? [...sorted, ...totals] : data.rows;
+  }, [data.rows, catRows, sort]);
+
+  const sortableTh = (key: string, label: React.ReactNode) => (
+    <th
+      className="num-th sortable"
+      onClick={() => setSort((s) => nextSort(s, key))}
+      title="Sort by this column"
+    >
+      {label}
+      {sortGlyph(sort, key)}
+    </th>
   );
 
   return (
@@ -32,25 +70,23 @@ export function NtmPeTable({ data }: { data: NtmPeTableData }) {
             <th className="group-th">History</th>
           </tr>
           <tr>
-            <th className="row-head" />
-            <th className="num-th">$b</th>
-            <th className="num-th">$b</th>
-            <th className="num-th">{data.current_label.replace(/[()]/g, "")}</th>
-            {data.avg_dates.map((d) => (
-              <th key={`a-${d}`} className="num-th">
-                {d}
-              </th>
-            ))}
-            {data.avg_dates.map((d) => (
-              <th key={`d-${d}`} className="num-th">
-                {d}
-              </th>
-            ))}
+            <th
+              className="row-head sortable"
+              onClick={() => setSort((s) => nextSort(s, LABEL_KEY))}
+              title="Sort by name"
+            >
+              {sortGlyph(sort, LABEL_KEY)}
+            </th>
+            {sortableTh("mkt_cap", "$b")}
+            {sortableTh("ntm_ni", "$b")}
+            {sortableTh("ntm_pe", data.current_label.replace(/[()]/g, ""))}
+            {data.avg_dates.map((d, i) => sortableTh(`avg${i}`, d))}
+            {data.avg_dates.map((d, i) => sortableTh(`delta${i}`, d))}
             <th className="num-th">since &apos;20</th>
           </tr>
         </thead>
         <tbody>
-          {data.rows.map((r, ri) => (
+          {displayRows.map((r, ri) => (
             <tr key={ri} className={cx(r.is_total && "total-row")}>
               <th scope="row" className="row-head">
                 {r.label}
