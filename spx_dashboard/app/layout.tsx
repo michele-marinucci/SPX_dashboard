@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { CompoundersProvider } from "@/components/CompoundersContext";
 import { SidebarStateProvider } from "@/components/SidebarStateContext";
+import { ZoomLock } from "@/components/ZoomLock";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,14 +37,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable}`}>
-      {/* iOS Safari ignores user-scalable=no since iOS 10.
-          gesturestart/change are iOS-specific pinch events; touchmove covers
-          other browsers. Both are required to reliably block pinch-zoom. */}
-      <script dangerouslySetInnerHTML={{ __html:
-        "['gesturestart','gesturechange'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});" +
-        "document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});"
-      }} />
       <body>
+        <ZoomLock />
         <CompoundersProvider>
           <SidebarStateProvider>{children}</SidebarStateProvider>
         </CompoundersProvider>

@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
-// Wraps a wide data table so it always fits the screen width on mobile.
-// On phones we can't pinch-zoom (disabled) and these tables have many columns,
-// so we measure the table's natural width and scale it down by exactly the
-// ratio needed to fit the viewport — the largest size that still shows every
-// column. Re-fits on resize and orientation change. On desktop (>820px) it is
-// a no-op: the table keeps its natural size and horizontal scroll.
+// Wraps a data table so it always fills the screen width on mobile — no more,
+// no less. Each table is measured and scaled independently to exactly fit its
+// container: wide tables shrink so every column is visible, narrow tables grow
+// so there's no empty space on the right. Re-fits on resize, rotation and
+// after web fonts load (which change the natural width). On desktop (>820px)
+// it's a no-op: tables keep their natural size and horizontal scroll.
 export function FitTable({ children }: { children: React.ReactNode }) {
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -26,13 +26,14 @@ export function FitTable({ children }: { children: React.ReactNode }) {
         setHeight(undefined);
         return;
       }
-      // scrollWidth/Height are the unscaled layout dimensions (CSS transforms
-      // are paint-only, so they don't feed back into these measurements).
+      // scrollWidth/Height are unscaled layout dimensions (CSS transforms are
+      // paint-only and don't feed back into them, so this can't loop).
       const natural = inner.scrollWidth;
       const avail = outer.clientWidth;
-      const s = natural > avail ? avail / natural : 1;
+      if (natural <= 0 || avail <= 0) return;
+      const s = avail / natural; // fill exactly: shrink if wide, grow if narrow
       setScale(s);
-      setHeight(s < 1 ? inner.scrollHeight * s : undefined);
+      setHeight(inner.scrollHeight * s);
     };
 
     fit();
@@ -40,9 +41,14 @@ export function FitTable({ children }: { children: React.ReactNode }) {
     ro.observe(outer);
     ro.observe(inner);
     window.addEventListener("orientationchange", fit);
+    window.addEventListener("resize", fit);
+    // Web fonts load after first paint and change the table's natural width;
+    // re-fit once they're ready so we don't leave a gap or overflow.
+    if (document.fonts?.ready) document.fonts.ready.then(fit);
     return () => {
       ro.disconnect();
       window.removeEventListener("orientationchange", fit);
+      window.removeEventListener("resize", fit);
     };
   }, []);
 
@@ -51,7 +57,7 @@ export function FitTable({ children }: { children: React.ReactNode }) {
       <div
         ref={innerRef}
         className="fit-inner"
-        style={{ transform: scale < 1 ? `scale(${scale})` : undefined }}
+        style={{ transform: scale !== 1 ? `scale(${scale})` : undefined }}
       >
         {children}
       </div>
