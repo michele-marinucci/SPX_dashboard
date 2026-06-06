@@ -31,7 +31,7 @@ export function DashboardFrame({
           </div>
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <a
-              href="/api/download-xlsx"
+              href="/SPX_inputs.xlsx"
               download="SPX_inputs.xlsx"
               className="logout-btn"
               style={{ textDecoration: "none" }}

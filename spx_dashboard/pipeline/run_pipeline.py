@@ -21,13 +21,18 @@ import datetime as dt
 import hashlib
 import json
 import os
+import shutil
 import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 DATA_DIR = os.path.join(REPO, "data")
+PUBLIC_DIR = os.path.join(REPO, "public")
 DASHBOARD_JSON = os.path.join(DATA_DIR, "dashboard.json")
+# The exact workbook that powers the dashboard, served as a static asset so the
+# "Export Excel" button hands back the same file the tables were built from.
+PUBLIC_XLSX = os.path.join(PUBLIC_DIR, "SPX_inputs.xlsx")
 SOURCE_HASH = os.path.join(DATA_DIR, ".source_hash")
 
 sys.path.insert(0, HERE)
@@ -88,6 +93,9 @@ def main() -> int:
             json.dump(data, f, indent=2, default=str)
         with open(SOURCE_HASH, "w") as f:
             f.write(new_hash)
+        # Publish the workbook itself for the Export Excel button.
+        os.makedirs(PUBLIC_DIR, exist_ok=True)
+        shutil.copyfile(xlsx_path, PUBLIC_XLSX)
 
         print(f"UPDATED: parsed new file -> {DASHBOARD_JSON} (latest={data['latest_date']})")
         return 0
