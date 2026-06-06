@@ -37,10 +37,13 @@ jobs:
 
       - name: Commit refreshed data (triggers Vercel redeploy)
         run: |
-          if [ -n "$(git status --porcelain spx_dashboard/data/)" ]; then
+          if [ -n "$(git status --porcelain spx_dashboard/data/ spx_dashboard/public/SPX_inputs.xlsx)" ]; then
             git config user.name "spx-dashboard-bot"
             git config user.email "actions@github.com"
-            git add spx_dashboard/data/dashboard.json spx_dashboard/data/.source_hash
+            # Commit the parsed data AND the workbook itself, so the
+            # "Export Excel" button always serves the same file the tables
+            # were built from.
+            git add spx_dashboard/data/dashboard.json spx_dashboard/data/.source_hash spx_dashboard/public/SPX_inputs.xlsx
             git commit -m "data: refresh dashboard from new SPX_inputs.xlsx"
             git push
           else
