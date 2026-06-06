@@ -61,7 +61,7 @@ const CARDS = [
   },
 ];
 
-export function HowToBanner({ refreshed }: { refreshed: string }) {
+export function HowToBanner() {
   // Default to shown; reconcile with localStorage after mount to avoid an
   // SSR/client hydration mismatch.
   const [dismissed, setDismissed] = useState(false);
@@ -106,7 +106,7 @@ export function HowToBanner({ refreshed }: { refreshed: string }) {
     <section className="howto" aria-label="How this dashboard works">
       <p className="howto-lead">
         <strong>Mendo Monitor</strong> tracks AI-beneficiary &amp; software
-        groups within the S&amp;P 500. Data refreshed <strong>{refreshed}</strong>.
+        groups within the S&amp;P 500.
       </p>
       <div className="howto-grid">
         {CARDS.map((c) => (

@@ -5,6 +5,7 @@ import { ViewHeading } from "@/components/ViewHeading";
 import { StockPeTable } from "@/components/StockPeTable";
 import {
   CategoryStock,
+  getBloombergDateLabel,
   getCategoryBySlug,
   getCategorySlugs,
   getDashboard,
@@ -98,13 +99,14 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
           meta={group}
           stockCount={stocks.length}
           compounderCount={comp.length}
-          trailing={`data through ${d.latest_date}`}
+          trailing={`Bloomberg data as of ${getBloombergDateLabel()}`}
         />
       }
     >
       <section className="section">
         <h2 className="section-title">Stock Performance</h2>
         <DataTable
+          unitLabel="$ in billions"
           columns={perfColumns(t.stock_performance.dates)}
           rows={metricRows(stocks, (s) => s.performance)}
           altRows={metricRows(comp, (s) => s.performance)}
@@ -114,6 +116,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       <section className="section">
         <h2 className="section-title">Earnings Growth</h2>
         <DataTable
+          unitLabel="$ in billions"
           columns={earnColumns(t.earnings_growth.years, t.earnings_growth.delta_years)}
           rows={metricRows(stocks, (s) => s.earnings)}
           altRows={metricRows(comp, (s) => s.earnings)}
@@ -123,6 +126,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       <section className="section">
         <h2 className="section-title">Estimate Revisions 2026</h2>
         <DataTable
+          unitLabel="$ in billions"
           columns={estColumns(t.est_rev_2026.dates, "Consensus Adj. NI ($b)")}
           rows={metricRows(stocks, (s) => s.est_2026)}
           altRows={metricRows(comp, (s) => s.est_2026)}
@@ -132,6 +136,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       <section className="section">
         <h2 className="section-title">Estimate Revisions 2027</h2>
         <DataTable
+          unitLabel="$ in billions"
           columns={estColumns(t.est_rev_2027.dates, "Consensus Adj. NI ($b)")}
           rows={metricRows(stocks, (s) => s.est_2027)}
           altRows={metricRows(comp, (s) => s.est_2027)}
@@ -144,11 +149,6 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
           <StockPeTable stocks={stocks} />
         </section>
       )}
-
-      <footer className="page-footer">
-        Generated {new Date(d.generated_at).toLocaleString("en-US")} · refreshed
-        automatically when a new file arrives in the inbox.
-      </footer>
     </DashboardFrame>
   );
 }

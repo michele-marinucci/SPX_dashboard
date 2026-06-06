@@ -3,6 +3,7 @@ import { NtmPeTable } from "@/components/NtmPeTable";
 import { DashboardFrame } from "@/components/DashboardFrame";
 import { ViewHeading } from "@/components/ViewHeading";
 import {
+  getBloombergDateLabel,
   getCompounderTables,
   getDashboard,
   GrowthTable,
@@ -124,12 +125,13 @@ export default function DashboardPage() {
         <ViewHeading
           title="Aggregate SPX"
           meta="AI beneficiary & software tracker"
-          trailing={`data through ${d.latest_date}`}
+          trailing={`Bloomberg data as of ${getBloombergDateLabel()}`}
         />
       }
     >
       <Section id="performance" title="Stock Performance">
         <DataTable
+          unitLabel="$ in billions"
           columns={threeDateColumns(t.stock_performance, 0)}
           rows={threeDateRows(t.stock_performance)}
           altRows={tc ? threeDateRows(tc.stock_performance) : undefined}
@@ -138,6 +140,7 @@ export default function DashboardPage() {
 
       <Section id="growth" title="Earnings Growth">
         <DataTable
+          unitLabel="$ in billions"
           columns={growthColumns(t.earnings_growth)}
           rows={growthRows(t.earnings_growth)}
           altRows={tc ? growthRows(tc.earnings_growth) : undefined}
@@ -146,6 +149,7 @@ export default function DashboardPage() {
 
       <Section id="rev2026" title="Estimate Revisions 2026">
         <DataTable
+          unitLabel="$ in billions"
           columns={threeDateColumns(t.est_rev_2026, 1)}
           rows={threeDateRows(t.est_rev_2026)}
           altRows={tc ? threeDateRows(tc.est_rev_2026) : undefined}
@@ -154,6 +158,7 @@ export default function DashboardPage() {
 
       <Section id="rev2027" title="Estimate Revisions 2027">
         <DataTable
+          unitLabel="$ in billions"
           columns={threeDateColumns(t.est_rev_2027, 1)}
           rows={threeDateRows(t.est_rev_2027)}
           altRows={tc ? threeDateRows(tc.est_rev_2027) : undefined}
@@ -163,11 +168,6 @@ export default function DashboardPage() {
       <Section id="pe" title="NTM P/E">
         <NtmPeTable data={t.ntm_pe} altData={tc?.ntm_pe} />
       </Section>
-
-      <footer className="page-footer">
-        Generated {new Date(d.generated_at).toLocaleString("en-US")} · refreshed
-        automatically when a new file arrives in the inbox.
-      </footer>
     </DashboardFrame>
   );
 }

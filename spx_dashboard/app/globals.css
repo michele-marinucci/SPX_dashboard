@@ -795,6 +795,16 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
+/* "$ in billions" unit note in the top-left corner of dollar-valued tables. */
+.unit-label {
+  display: inline-block;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
 .num-th {
   text-align: right;
 }
@@ -942,10 +952,4 @@ thead .row-head {
   border-radius: 8px;
   padding: 12px 14px;
   line-height: 1.5;
-}
-.page-footer {
-  color: var(--muted);
-  font-size: 12px;
-  text-align: center;
-  margin-top: 20px;
 }

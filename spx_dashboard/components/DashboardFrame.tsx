@@ -1,11 +1,11 @@
 import { LogoutButton } from "@/components/LogoutButton";
 import { Sidebar } from "@/components/Sidebar";
 import { HowToBanner } from "@/components/HowToBanner";
-import { getNavModel, getRefreshedLabel } from "@/lib/data";
+import { getNavModel } from "@/lib/data";
 
 // The shared shell for every dashboard view: a left sidebar to switch views
-// and a content area with a per-view heading. The "refreshed" date is the
-// file's actual refresh date (not the last data column).
+// and a content area with a per-view heading. The "data as of" date is shown
+// once, in the per-view heading subtitle.
 export function DashboardFrame({
   heading,
   children,
@@ -14,7 +14,6 @@ export function DashboardFrame({
   children: React.ReactNode;
 }) {
   const nav = getNavModel();
-  const refreshed = getRefreshedLabel();
 
   return (
     <div className="shell">
@@ -34,7 +33,7 @@ export function DashboardFrame({
             <LogoutButton />
           </div>
         </header>
-        <HowToBanner refreshed={refreshed} />
+        <HowToBanner />
         {children}
       </div>
     </div>

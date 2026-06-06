@@ -99,6 +99,9 @@ export interface DashboardData {
   // ISO yyyy-mm-dd date the workbook was refreshed/emailed (may be absent on
   // data produced before this field existed).
   refreshed_date?: string | null;
+  // ISO yyyy-mm-dd date of the latest Bloomberg data (Data!AC10) — the value
+  // quoted as "data as of" everywhere in the UI.
+  bloomberg_date?: string | null;
   latest_date: string;
   tables: AggregateTables & {
     categories: CategoriesTableData;
@@ -144,29 +147,14 @@ export function getCategorySlugs(): string[] {
   return slugs;
 }
 
-// The date+time shown in the header, derived from generated_at in ET.
+// The "data as of" date shown once at the top of every view: the latest
+// Bloomberg data date (Data!AC10), formatted M/D/YYYY with no time.
 // Falls back to latest_date for older data without the field.
-export function getRefreshedLabel(): string {
-  const { generated_at, latest_date } = getDashboard();
-  if (generated_at) {
-    try {
-      const dt = new Date(generated_at);
-      const datePart = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/New_York",
-        month: "numeric",
-        day: "numeric",
-        year: "numeric",
-      }).format(dt);
-      const timePart = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/New_York",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      }).format(dt);
-      return `${datePart} at ${timePart} ET`;
-    } catch {
-      /* fall through */
-    }
+export function getBloombergDateLabel(): string {
+  const { bloomberg_date, latest_date } = getDashboard();
+  if (bloomberg_date) {
+    const [y, m, d] = bloomberg_date.split("-").map(Number);
+    if (y && m && d) return `${m}/${d}/${y}`;
   }
   return latest_date;
 }

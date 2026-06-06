@@ -797,6 +797,22 @@ def build_subset_tables(agg: dict, base_tables: dict, compounders: bool) -> dict
 # --------------------------------------------------------------------------- #
 # Main
 # --------------------------------------------------------------------------- #
+def read_bloomberg_date(wb) -> str | None:
+    """Date of the latest Bloomberg data, read from cell Data!AC10.
+
+    This is the single source of truth for the "data as of" date shown across
+    the dashboard. Returns an ISO yyyy-mm-dd string, or None if unavailable.
+    """
+    if "Data" not in wb.sheetnames:
+        return None
+    val = wb["Data"]["AC10"].value
+    if isinstance(val, dt.datetime):
+        return val.date().isoformat()
+    if isinstance(val, dt.date):
+        return val.isoformat()
+    return None
+
+
 def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
     wb = openpyxl.load_workbook(path, data_only=True)
     if "Output" not in wb.sheetnames:
@@ -854,6 +870,9 @@ def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
     return {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "refreshed_date": refreshed_date,
+        # Date of the latest Bloomberg data (Data!AC10) — the value quoted as
+        # "data as of" across the dashboard.
+        "bloomberg_date": read_bloomberg_date(wb),
         "latest_date": stock_perf["dates"][-1],
         "tables": tables,
         "tables_compounders": tables_compounders,
