@@ -489,25 +489,38 @@ def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
     ws = wb["Output"]
     universe = parse_stock_universe(wb["Data"]) if "Data" in wb.sheetnames else {}
 
-    stock_perf = parse_three_date_table(
+    # When refreshed_date is provided, relabel the last "current" date column
+    # in each table to reflect when the file was actually refreshed, since the
+    # Excel cell often lags by a few days.
+    refreshed_label: str | None = None
+    if refreshed_date:
+        try:
+            d = dt.date.fromisoformat(refreshed_date)
+            refreshed_label = f"{d.month}/{d.day}/{str(d.year)[-2:]}"
+        except ValueError:
+            pass
+
+    def _relabel(table: dict) -> dict:
+        if refreshed_label and table.get("dates"):
+            table["dates"][-1] = refreshed_label
+        return table
+
+    stock_perf = _relabel(parse_three_date_table(
         ws, "YTD Stock Performance", "Market cap ($b)"
-    )
+    ))
 
     return {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-        # The date the workbook was refreshed/emailed (ISO yyyy-mm-dd). The
-        # caller supplies this (e.g. from the email's date); the Output sheet
-        # itself only carries the data-column dates.
         "refreshed_date": refreshed_date,
         "latest_date": stock_perf["dates"][-1],
         "tables": {
             "stock_performance": stock_perf,
-            "est_rev_2026": parse_three_date_table(
+            "est_rev_2026": _relabel(parse_three_date_table(
                 ws, "2026 Estimates", "Consensus Adj. Net Income ($b)"
-            ),
-            "est_rev_2027": parse_three_date_table(
+            )),
+            "est_rev_2027": _relabel(parse_three_date_table(
                 ws, "2027 Estimates", "Consensus Adj. Net Income ($b)"
-            ),
+            )),
             "earnings_growth": parse_growth_table(ws),
             "ntm_pe": parse_ntm_pe(ws),
             "categories": parse_categories(ws, universe),
