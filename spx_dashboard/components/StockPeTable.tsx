@@ -7,7 +7,6 @@ import { fmtMoney, fmtNum } from "@/lib/format";
 import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
 import { useCompounders } from "./CompoundersContext";
 import { Sparkline } from "./Sparkline";
-import { FitTable } from "./FitTable";
 
 const LABEL_KEY = "__label__";
 
@@ -42,7 +41,7 @@ export function StockPeTable({ stocks }: { stocks: CategoryStock[] }) {
   );
 
   return (
-    <FitTable>
+    <div className="table-wrap">
       <table className="data-table">
         <thead>
           <tr>
@@ -82,6 +81,6 @@ export function StockPeTable({ stocks }: { stocks: CategoryStock[] }) {
           ))}
         </tbody>
       </table>
-    </FitTable>
+    </div>
   );
 }

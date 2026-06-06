@@ -7,7 +7,6 @@ import { cx, fmtMoney, fmtNum, fmtPct } from "@/lib/format";
 import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
 import { useCompounders } from "./CompoundersContext";
 import { Sparkline } from "./Sparkline";
-import { FitTable } from "./FitTable";
 
 const LABEL_KEY = "__label__";
 
@@ -66,7 +65,7 @@ export function NtmPeTable({
   );
 
   return (
-    <FitTable>
+    <div className="table-wrap">
       <table className="data-table">
         <thead>
           <tr className="group-row">
@@ -137,6 +136,6 @@ export function NtmPeTable({
           ))}
         </tbody>
       </table>
-    </FitTable>
+    </div>
   );
 }

@@ -655,12 +655,6 @@ body {
   .section {
     padding: 14px 12px 12px;
   }
-  /* On mobile FitTable applies CSS `zoom` to shrink each table to fit. Let the
-     table size to its content so we can measure its natural width, and tighten
-     spacing so less shrinking is needed (= larger, more legible text). */
-  .fit-inner .data-table {
-    width: auto;
-  }
   .data-table {
     font-size: 11px;
   }

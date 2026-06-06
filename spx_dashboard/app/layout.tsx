@@ -22,11 +22,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+// Render the desktop layout on every device. Pinning the viewport to a fixed
+// desktop width (wide enough to fit the widest table without horizontal scroll)
+// makes mobile browsers zoom the whole page out to fit the screen — same
+// proportions as desktop, just smaller. Zoom stays disabled (see ZoomLock).
 export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  minimumScale: 1,
-  maximumScale: 1,
+  width: 1600,
   userScalable: false,
 };
 
