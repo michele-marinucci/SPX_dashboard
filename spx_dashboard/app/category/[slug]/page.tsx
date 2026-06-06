@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Column, DataTable } from "@/components/DataTable";
 import { DashboardFrame } from "@/components/DashboardFrame";
+import { ViewHeading } from "@/components/ViewHeading";
 import { StockPeTable } from "@/components/StockPeTable";
 import {
   CategoryStock,
@@ -91,8 +92,15 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
 
   return (
     <DashboardFrame
-      title={category.category}
-      subtitle={`${group} · ${stocks.length} stocks · data through ${d.latest_date}`}
+      heading={
+        <ViewHeading
+          title={category.category}
+          meta={group}
+          stockCount={stocks.length}
+          compounderCount={comp.length}
+          trailing={`data through ${d.latest_date}`}
+        />
+      }
     >
       <section className="section">
         <h2 className="section-title">Stock Performance</h2>

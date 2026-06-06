@@ -1,6 +1,7 @@
 import { Column, DataTable, TableRow } from "@/components/DataTable";
 import { NtmPeTable } from "@/components/NtmPeTable";
 import { DashboardFrame } from "@/components/DashboardFrame";
+import { ViewHeading } from "@/components/ViewHeading";
 import {
   getCompounderTables,
   getDashboard,
@@ -119,8 +120,13 @@ export default function DashboardPage() {
 
   return (
     <DashboardFrame
-      title="Aggregate SPX"
-      subtitle={`AI beneficiary & software tracker · data through ${d.latest_date}`}
+      heading={
+        <ViewHeading
+          title="Aggregate SPX"
+          meta="AI beneficiary & software tracker"
+          trailing={`data through ${d.latest_date}`}
+        />
+      }
     >
       <Section id="performance" title="Stock Performance">
         <DataTable

@@ -4,15 +4,13 @@ import { HowToBanner } from "@/components/HowToBanner";
 import { getNavModel, getRefreshedLabel } from "@/lib/data";
 
 // The shared shell for every dashboard view: a left sidebar to switch views
-// and a content area with a per-view title. The "refreshed" date is the file's
-// actual refresh date (not the last data column).
+// and a content area with a per-view heading. The "refreshed" date is the
+// file's actual refresh date (not the last data column).
 export function DashboardFrame({
-  title,
-  subtitle,
+  heading,
   children,
 }: {
-  title: string;
-  subtitle?: React.ReactNode;
+  heading: React.ReactNode;
   children: React.ReactNode;
 }) {
   const nav = getNavModel();
@@ -23,10 +21,7 @@ export function DashboardFrame({
       <Sidebar nav={nav} />
       <div className="content">
         <header className="content-header">
-          <div>
-            <h1>{title}</h1>
-            {subtitle && <p className="subtitle">{subtitle}</p>}
-          </div>
+          {heading}
           <div className="header-actions">
             <a
               href="/SPX_inputs.xlsx"

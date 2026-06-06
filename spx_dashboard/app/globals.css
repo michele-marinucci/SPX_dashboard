@@ -320,6 +320,13 @@ body {
   letter-spacing: -0.02em;
   margin: 0;
 }
+.title-tag {
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
 
 /* ---------- "How it works" banner ---------- */
 .howto {
