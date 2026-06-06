@@ -36,9 +36,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable}`}>
-      {/* iOS Safari ignores user-scalable=no since iOS 10. Blocking multi-touch
-          on touchmove is the only reliable way to prevent pinch-zoom there. */}
+      {/* iOS Safari ignores user-scalable=no since iOS 10.
+          gesturestart/change are iOS-specific pinch events; touchmove covers
+          other browsers. Both are required to reliably block pinch-zoom. */}
       <script dangerouslySetInnerHTML={{ __html:
+        "['gesturestart','gesturechange'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});" +
         "document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});"
       }} />
       <body>

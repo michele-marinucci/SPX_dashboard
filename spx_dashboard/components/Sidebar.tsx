@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavGroup } from "@/lib/data";
@@ -39,7 +39,19 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  // Read the media query directly at click time so we never act on stale state.
+  // Auto-collapse whenever the route changes on mobile. Using a ref to track
+  // the previous pathname means the initial mount never triggers a collapse.
+  const prevPathname = useRef<string | null>(null);
+  useEffect(() => {
+    const mobile = window.matchMedia("(max-width: 820px)").matches;
+    if (mobile && prevPathname.current !== null && prevPathname.current !== pathname) {
+      setCollapsed(true);
+    }
+    prevPathname.current = pathname;
+  }, [pathname, setCollapsed]);
+
+  // Also collapse immediately on click so there's no lag waiting for the
+  // navigation to complete and the pathname effect to fire.
   const handleSelect = () => {
     if (window.matchMedia("(max-width: 820px)").matches) setCollapsed(true);
   };

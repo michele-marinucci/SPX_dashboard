@@ -166,7 +166,7 @@ body {
   position: sticky;
   top: 0;
   align-self: flex-start;
-  width: 248px;
+  width: 272px;
   flex-shrink: 0;
   height: 100vh;
   overflow-y: auto;
