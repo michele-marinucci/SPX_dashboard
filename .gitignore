@@ -1,0 +1,16 @@
+# Next.js build output
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Next.js type declarations (auto-generated)
+next-env.d.ts
+
+# Local source files (scratch area)
+_source/
+
+# Misc
+.DS_Store
+*.local
