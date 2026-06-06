@@ -37,22 +37,43 @@ function LoginForm() {
 
   return (
     <div className="login-wrap">
-      <form className="login-card" onSubmit={onSubmit}>
-        <h1>SPX Categories Dashboard</h1>
-        <p className="login-sub">Enter the access password to continue.</p>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          autoFocus
-          autoComplete="current-password"
-        />
-        {error && <p className="login-error">{error}</p>}
-        <button type="submit" disabled={loading || !password}>
-          {loading ? "Checking…" : "Sign in"}
-        </button>
-      </form>
+      <div className="login-card">
+        <div className="login-brand">
+          <span className="login-dot" aria-hidden="true" />
+          Mendo Monitor
+        </div>
+        <p className="login-tagline">
+          An AI-beneficiary &amp; software tracker within the S&amp;P 500.
+        </p>
+        <ul className="login-points">
+          <li>
+            <b>Browse</b> categories in the sidebar — Aggregate SPX, each group,
+            and Other.
+          </li>
+          <li>
+            <b>Sort</b> any column with a click, and toggle{" "}
+            <b>Compounders only</b> to focus the whole view.
+          </li>
+          <li>
+            <b>Export</b> the underlying Excel file at any time.
+          </li>
+        </ul>
+
+        <form className="login-form" onSubmit={onSubmit}>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Access password"
+            autoFocus
+            autoComplete="current-password"
+          />
+          {error && <p className="login-error">{error}</p>}
+          <button type="submit" disabled={loading || !password}>
+            {loading ? "Checking…" : "Sign in"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -6,27 +6,58 @@ import { useEffect, useState } from "react";
 // dismissed it collapses to a small "How it works" pill that reopens it.
 const KEY = "mendo:howto-dismissed";
 
+// 16px line icons, sized/contained by .howto-ic so nothing spills out.
+const I = {
+  browse: (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="18" rx="1.5" />
+      <rect x="14" y="3" width="7" height="18" rx="1.5" />
+    </svg>
+  ),
+  sort: (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 4v16M8 20l-3-3M8 4l3 3" />
+      <path d="M16 20V4M16 4l3 3M16 20l-3-3" />
+    </svg>
+  ),
+  filter: (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 5h18l-7 8v6l-4-2v-4z" />
+    </svg>
+  ),
+  download: (
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 4v11M12 15l4-4M12 15l-4-4" />
+      <path d="M4 19h16" />
+    </svg>
+  ),
+};
+
 const CARDS = [
   {
-    icon: "▦",
+    icon: I.browse,
     title: "Browse",
     body: "Use the left sidebar to switch between Aggregate SPX, each category, and Other.",
   },
   {
-    icon: "↕",
+    icon: I.sort,
     title: "Sort",
-    body: "Click any column header to rank largest→smallest→ascending→off. Totals stay pinned.",
+    body: "Click any column header to rank largest to smallest, ascending, then off. Totals stay pinned.",
   },
   {
-    icon: "◉",
+    icon: I.filter,
     title: "Compounders only",
     body: "The red toggle filters every table to stocks flagged as compounders.",
     danger: true,
   },
   {
-    icon: "↓",
+    icon: I.download,
     title: "Export",
-    body: "Top-right button downloads the exact Excel file powering these tables.",
+    body: "The top-right button downloads the exact Excel file powering these tables.",
   },
 ];
 

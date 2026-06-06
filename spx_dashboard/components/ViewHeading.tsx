@@ -32,7 +32,7 @@ export function ViewHeading({
     <div>
       <h1>
         {title}
-        {on && <span className="title-tag"> — Compounders only</span>}
+        {on && <span className="title-tag">Compounders only</span>}
       </h1>
       {parts.length > 0 && <p className="subtitle">{parts.join(" · ")}</p>}
     </div>
