@@ -825,20 +825,24 @@ def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
         else {}
     )
 
-    # When refreshed_date is provided, relabel the last "current" date column
-    # in each table to reflect when the file was actually refreshed, since the
-    # Excel cell often lags by a few days.
-    refreshed_label: str | None = None
-    if refreshed_date:
+    # The single date quoted everywhere — the top-of-page "data as of" label
+    # AND the last ("current") column of each table — is the Bloomberg data
+    # date in Data!AC10. We relabel the last date column to it so the headers
+    # stay consistent with the top-of-page label. Fall back to the email's
+    # refresh date only if AC10 is unavailable.
+    bloomberg_date = read_bloomberg_date(wb)
+    label_source = bloomberg_date or refreshed_date
+    current_label: str | None = None
+    if label_source:
         try:
-            d = dt.date.fromisoformat(refreshed_date)
-            refreshed_label = f"{d.month}/{d.day}/{str(d.year)[-2:]}"
+            d = dt.date.fromisoformat(label_source)
+            current_label = f"{d.month}/{d.day}/{str(d.year)[-2:]}"
         except ValueError:
             pass
 
     def _relabel(table: dict) -> dict:
-        if refreshed_label and table.get("dates"):
-            table["dates"][-1] = refreshed_label
+        if current_label and table.get("dates"):
+            table["dates"][-1] = current_label
         return table
 
     stock_perf = _relabel(parse_three_date_table(
@@ -871,8 +875,8 @@ def parse_workbook(path: str, refreshed_date: str | None = None) -> dict:
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "refreshed_date": refreshed_date,
         # Date of the latest Bloomberg data (Data!AC10) — the value quoted as
-        # "data as of" across the dashboard.
-        "bloomberg_date": read_bloomberg_date(wb),
+        # "data as of" across the dashboard and on every table's last column.
+        "bloomberg_date": bloomberg_date,
         "latest_date": stock_perf["dates"][-1],
         "tables": tables,
         "tables_compounders": tables_compounders,
