@@ -229,6 +229,10 @@ body {
   overflow: hidden;
   white-space: nowrap;
 }
+/* "Click to filter" hint — only ever shown on the mobile collapsed bar. */
+.sidebar-hint {
+  display: none;
+}
 
 /* Collapsed (desktop): a slim rail showing just the toggle. */
 .sidebar-collapsed {
@@ -573,17 +577,50 @@ body {
     padding: 11px 12px;
     font-size: 14px;
   }
-  /* On mobile the collapsed state is a full-width top bar (toggle + brand),
-     not a slim rail — keep the brand visible, just hide the nav + filter. */
+  /* On mobile the collapsed state is a prominent, full-width BLUE bar that is
+     tappable anywhere to reveal the categories. The nav + filter stay hidden
+     (inherited from .sidebar-collapsed). */
   .sidebar-collapsed {
     width: 100%;
-    padding: 12px 16px;
+    padding: 0;
+    background: var(--accent);
+    border-bottom: none;
   }
   .sidebar-collapsed .sidebar-head {
+    margin: 0;
+    padding: 13px 16px;
+    border-bottom: none;
     justify-content: flex-start;
+    gap: 11px;
+    cursor: pointer;
   }
   .sidebar-collapsed .sidebar-brand {
     display: flex;
+    color: #fff;
+    font-size: 16px;
+  }
+  .sidebar-collapsed .sidebar-toggle {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.45);
+    color: #fff;
+  }
+  .sidebar-collapsed .sidebar-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    padding: 4px 11px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .sidebar-collapsed .sidebar-hint::before {
+    content: "▾";
+    font-size: 11px;
+    line-height: 1;
   }
 
   /* Tighten the content area so wide tables have more room and fit better. */
