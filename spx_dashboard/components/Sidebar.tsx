@@ -39,24 +39,10 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
   }, []);
 
   const toggleSidebar = () => setCollapsed((c) => !c);
-  // On mobile, any selection in the sidebar collapses it back to the top bar.
+  // Read the media query directly at click time so we never act on stale state.
   const handleSelect = () => {
-    if (isMobile) setCollapsed(true);
+    if (window.matchMedia("(max-width: 820px)").matches) setCollapsed(true);
   };
-
-  // While the full-screen sidebar overlay is open on mobile, lock zooming so
-  // the nav stays at a comfortable, legible size. Restore pinch-zoom (used to
-  // read wide tables) whenever it's closed or we're on desktop.
-  useEffect(() => {
-    const meta = document.querySelector('meta[name="viewport"]');
-    if (!meta) return;
-    const zoomable =
-      "width=device-width, initial-scale=1, minimum-scale=0.25, maximum-scale=5, user-scalable=yes";
-    const locked =
-      "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no";
-    meta.setAttribute("content", isMobile && !collapsed ? locked : zoomable);
-    return () => meta.setAttribute("content", zoomable);
-  }, [isMobile, collapsed]);
 
   const activeSlug = pathname?.startsWith("/category/")
     ? decodeURIComponent(pathname.slice("/category/".length))

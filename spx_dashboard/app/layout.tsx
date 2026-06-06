@@ -20,14 +20,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Fit the viewport to the device but let users pinch-zoom out to take in the
-// full width of the data tables on small screens.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  minimumScale: 0.25,
-  maximumScale: 5,
-  userScalable: true,
+  minimumScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
