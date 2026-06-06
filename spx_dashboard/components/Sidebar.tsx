@@ -33,6 +33,20 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
     if (isMobile) setCollapsed(true);
   };
 
+  // While the full-screen sidebar overlay is open on mobile, lock zooming so
+  // the nav stays at a comfortable, legible size. Restore pinch-zoom (used to
+  // read wide tables) whenever it's closed or we're on desktop.
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) return;
+    const zoomable =
+      "width=device-width, initial-scale=1, minimum-scale=0.25, maximum-scale=5, user-scalable=yes";
+    const locked =
+      "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no";
+    meta.setAttribute("content", isMobile && !collapsed ? locked : zoomable);
+    return () => meta.setAttribute("content", zoomable);
+  }, [isMobile, collapsed]);
+
   const activeSlug = pathname?.startsWith("/category/")
     ? decodeURIComponent(pathname.slice("/category/".length))
     : null;
@@ -65,6 +79,19 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
         </span>
       </div>
 
+      <p className="sidebar-explain">
+        Use the left sidebar to switch between Aggregate SPX, each category, and
+        Other.
+      </p>
+
+      <Link
+        href="/"
+        onClick={handleNavClick}
+        className={cx("aggregate-link", aggregateActive && "aggregate-link-on")}
+      >
+        Aggregate SPX
+      </Link>
+
       <button
         type="button"
         onClick={toggle}
@@ -72,18 +99,10 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
         className={cx("compounder-btn", compoundersOnly && "compounder-btn-on")}
         title="Show only stocks flagged as compounders"
       >
-        Compounders only
+        SPX Compounders only
       </button>
 
       <nav className="sidebar-nav">
-        <Link
-          href="/"
-          onClick={handleNavClick}
-          className={cx("nav-link", "nav-link-top", aggregateActive && "nav-link-active")}
-        >
-          Aggregate SPX
-        </Link>
-
         {nav.map((g) => (
           <div key={g.group} className="nav-group">
             <div className="nav-group-title">{g.group}</div>
