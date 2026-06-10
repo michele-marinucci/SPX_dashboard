@@ -44,6 +44,42 @@ export default function HomePage() {
             {ideas > 0 ? `Open X Themes · ${ideas} ideas →` : "Open X Themes →"}
           </span>
         </Link>
+
+        <Link href="/dashboard" className="landing-card">
+          <div className="landing-card-head">
+            <div className="landing-card-title">Equities Dashboard</div>
+            <span className="landing-card-wip">Work in progress</span>
+          </div>
+          <p className="landing-card-desc">
+            A consolidated view of the equities book — positions, exposures, and
+            performance in one place. Coming soon.
+          </p>
+          <span className="landing-card-cta">Preview →</span>
+        </Link>
+
+        <Link href="/diligence" className="landing-card">
+          <div className="landing-card-head">
+            <div className="landing-card-title">Diligence Tracker</div>
+            <span className="landing-card-wip">Work in progress</span>
+          </div>
+          <p className="landing-card-desc">
+            Track diligence across names — open questions, notes, and status as
+            each idea moves through the process. Coming soon.
+          </p>
+          <span className="landing-card-cta">Preview →</span>
+        </Link>
+
+        <Link href="/podcast" className="landing-card">
+          <div className="landing-card-head">
+            <div className="landing-card-title">Podcast Creator</div>
+            <span className="landing-card-wip">Work in progress</span>
+          </div>
+          <p className="landing-card-desc">
+            Turn research and ideas into a narrated audio briefing you can listen
+            to on the go. Coming soon.
+          </p>
+          <span className="landing-card-cta">Preview →</span>
+        </Link>
       </div>
 
       {asOf && <p className="landing-foot">X Themes as of {asOf}</p>}
