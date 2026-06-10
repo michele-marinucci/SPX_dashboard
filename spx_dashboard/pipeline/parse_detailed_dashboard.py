@@ -87,6 +87,24 @@ def formula_text(ws_raw, ref):
     return v if isinstance(v, str) else ""
 
 
+def patchable_cells(ws_raw, r):
+    """Map column letter → dotted model path for every input cell on row `r`
+    that is a literal number (or empty) in the workbook. The Excel-export
+    route overwrites exactly these cells with current DB values, so formula
+    cells — including every Bloomberg call — survive the round trip."""
+    cells = {}
+    for key, (cols, years) in SERIES.items():
+        for col, yr in zip(cols, years):
+            v = ws_raw[f"{col}{r}"].value
+            if v is None or (isinstance(v, (int, float)) and not isinstance(v, bool)):
+                cells[col] = f"{key}.{yr}"
+    for col, key in [("I", "shares"), ("J", "cash"), ("K", "debt"), ("L", "min_int")]:
+        v = ws_raw[f"{col}{r}"].value
+        if v is None or (isinstance(v, (int, float)) and not isinstance(v, bool)):
+            cells[col] = key
+    return cells
+
+
 def main(src: str, dest: str) -> None:
     raw = openpyxl.load_workbook(src, data_only=False)["Summary"]
     ws = openpyxl.load_workbook(src, data_only=True)["Summary"]
@@ -119,6 +137,7 @@ def main(src: str, dest: str) -> None:
             indexes.append(
                 {
                     "ticker": ticker,
+                    "xl_row": r,
                     "bbg": bbg,
                     "yahoo": INDEX_YAHOO.get(ticker),
                     "best_pe": best_pe,
@@ -184,6 +203,8 @@ def main(src: str, dest: str) -> None:
         upd = ws[f"F{r}"].value
         company = {
             "ticker": ticker,
+            "xl_row": r,
+            "xl_patch": patchable_cells(raw, r),
             "bbg": bbg,
             "yahoo": symbol,
             "currency": ccy,

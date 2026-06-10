@@ -2,8 +2,12 @@
 // modal. Edit this list to add/remove analysts — names are stored verbatim
 // on every logged model change.
 export const ANALYSTS = [
+  "Nik",
+  "Andrew",
+  "Steve",
+  "Shub",
+  "Grant",
   "Michele",
-  "Analyst 2",
-  "Analyst 3",
-  "Analyst 4",
+  "Praneeth",
+  "Gabby",
 ];

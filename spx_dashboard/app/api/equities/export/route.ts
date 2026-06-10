@@ -1,243 +1,125 @@
-// "Download Excel" for the Equities Dashboard: builds a fresh workbook from
-// the current shared state — the two Summary views recomputed with live
-// prices, plus a Model Inputs sheet that is a complete, re-importable backup
-// of every editable assumption.
+// "Download Excel" for the Equities Dashboard.
+//
+// Returns the team's ORIGINAL workbook (committed as
+// data/detailed_dashboard_template.xlsx) with only the analyst model-input
+// cells overwritten by the current shared values — every Bloomberg formula,
+// derived formula, format, and the other tabs survive untouched, so the file
+// recalculates normally the next time it's opened on a terminal.
+//
+// Two kinds of patches, driven by the xl_row/xl_patch metadata the parser
+// recorded for each row:
+//   1. literal input cells (revs, GM%, EPS, DPS, multiples, …) → new <v>,
+//      plus the Port flag (E), update date (F) and analyst (G);
+//   2. Bloomberg price/performance cells (H, EB–ED) keep their <f> formula
+//      but get the current Yahoo value written into the cached <v>, so the
+//      file shows live-ish numbers even when opened off-terminal.
+// Companies added on the site (no template row) can't be patched in;
+// removed companies keep their last template values.
+import { promises as fs } from "fs";
+import path from "path";
 import { NextResponse } from "next/server";
-import ExcelJS from "exceljs";
+import JSZip from "jszip";
+import seedJson from "@/data/equities_seed.json";
 import { latestAsOf, loadCompanies, loadQuotes } from "@/lib/equities/load";
-import { compute, displayYears } from "@/lib/equities/calc";
 import { Company } from "@/lib/equities/types";
+import { dateSerial, numCell, setCachedValue, setCell, strCell } from "@/lib/equities/xlsxPatch";
 
 export const dynamic = "force-dynamic";
 
-const X = '0.0"x"';
-const PCT = "0.0%";
-const MONEY = "#,##0.00";
-const NUM = "#,##0.0";
+const SHEET_PATH = "xl/worksheets/sheet1.xml"; // "Summary" in the template
 
-const GREEN_FILL: ExcelJS.Fill = {
-  type: "pattern",
-  pattern: "solid",
-  fgColor: { argb: "FFC9EED2" },
-};
-const HEAD_FONT = { bold: true, size: 9 } as const;
-const BASE_FONT = { size: 9 } as const;
+interface XlMeta {
+  row: number;
+  patch: Record<string, string>; // column letter → dotted model path
+  isIndex: boolean;
+}
 
-function groupRows(companies: Company[]): [string, Company[]][] {
-  const order: string[] = [];
-  const by: Record<string, Company[]> = {};
-  for (const c of companies) {
-    if (!by[c.grp]) {
-      by[c.grp] = [];
-      order.push(c.grp);
+function xlMeta(): Map<string, XlMeta> {
+  const map = new Map<string, XlMeta>();
+  for (const g of seedJson.groups as {
+    companies: { ticker: string; xl_row: number; xl_patch: Record<string, string> }[];
+  }[]) {
+    for (const c of g.companies) {
+      map.set(c.ticker, { row: c.xl_row, patch: c.xl_patch, isIndex: false });
     }
-    by[c.grp].push(c);
   }
-  return order.map((g) => [g, by[g]]);
+  for (const ix of seedJson.indexes as { ticker: string; xl_row: number }[]) {
+    map.set(ix.ticker, { row: ix.xl_row, patch: {}, isIndex: true });
+  }
+  return map;
+}
+
+// Resolve a dotted path ("revs.2027", "gp.2028", "shares") against the model.
+function resolve(c: Company, pathStr: string): number | null {
+  const [head, year] = pathStr.split(".");
+  if (!year) {
+    const v = c.model[head as "shares" | "cash" | "debt" | "min_int"];
+    return typeof v === "number" ? v : null;
+  }
+  if (head === "gp") {
+    const gm = c.model.gm[year];
+    const revs = c.model.revs[year];
+    return gm != null && revs != null ? gm * revs : null;
+  }
+  const series = c.model[head as "revs"] as Record<string, number> | undefined;
+  const v = series?.[year];
+  return typeof v === "number" ? v : null;
 }
 
 export async function GET() {
   const { enabled, companies } = await loadCompanies();
   const quotes = await loadQuotes(companies, enabled, false);
   const today = new Date();
-  const years = displayYears(today);
-  const [y0, y1, y2, y3, y4] = years;
 
-  const wb = new ExcelJS.Workbook();
-  wb.created = today;
+  const template = await fs.readFile(
+    path.join(process.cwd(), "data", "detailed_dashboard_template.xlsx"),
+  );
+  const zip = await JSZip.loadAsync(template);
+  let xml = await zip.file(SHEET_PATH)!.async("string");
 
-  // ---- Sheet 1: the valuation grid ---------------------------------------- //
-  const s1 = wb.addWorksheet("Dashboard", { views: [{ state: "frozen", xSplit: 1, ySplit: 2 }] });
-  const cols1: { h1: string; h2: string; fmt?: string; w?: number }[] = [
-    { h1: "", h2: "Company", w: 14 },
-    { h1: "", h2: "Px", fmt: MONEY, w: 10 },
-    { h1: "EV / GP", h2: String(y0), fmt: X },
-    { h1: "EV / GP", h2: String(y1), fmt: X },
-    ...years.map((y) => ({ h1: "Mendo P/E", h2: String(y), fmt: X })),
-    ...[y1, y2, y3].map((y) => ({ h1: "Target Mult", h2: String(y), fmt: X })),
-    ...[y1, y2, y3].map((y) => ({ h1: "IRR", h2: String(y), fmt: PCT })),
-    ...[y0, y1, y2, y3].map((y) => ({ h1: "MoM", h2: String(y), fmt: X })),
-    { h1: "Recent Perf", h2: "1M", fmt: PCT },
-    { h1: "Recent Perf", h2: "3M", fmt: PCT },
-    { h1: "Recent Perf", h2: "6M", fmt: PCT },
-  ];
-  s1.columns = cols1.map((c) => ({ width: c.w ?? 8 }));
-  s1.addRow(cols1.map((c) => c.h1));
-  s1.addRow(cols1.map((c) => c.h2));
+  const meta = xlMeta();
+  for (const c of companies) {
+    const m = meta.get(c.ticker);
+    if (!m) continue; // added on the site — no template row to patch
 
-  // ---- Sheet 2: IRR decomposition ----------------------------------------- //
-  const s2 = wb.addWorksheet("IRR Decomp", { views: [{ state: "frozen", xSplit: 1, ySplit: 2 }] });
-  const decompCols = [
-    "Company",
-    "Px",
-    "Revs",
-    "Margin",
-    "Mendo NI",
-    "Yield",
-    "EPS + Divs",
-    "Multiple",
-    "Return",
-    "GP CAGR",
-    "mEPS CAGR",
-  ];
-  s2.columns = decompCols.map((_, i) => ({ width: i === 0 ? 14 : 10 }));
-  s2.addRow([`NTM – YE${String(y2).slice(2)} IRR Decomp`]);
-  s2.addRow(decompCols);
-
-  // ---- Sheet 3: every editable input -------------------------------------- //
-  const s3 = wb.addWorksheet("Model Inputs");
-  const seriesKeys = [
-    ["revs", "Revs"],
-    ["gm", "GM %"],
-    ["adj_eps", "Adj EPS"],
-    ["mendo_eps", "Mendo EPS"],
-    ["dps", "DPS"],
-    ["target_mult", "Target Mult"],
-    ["ncps", "Net Cash/Sh"],
-    ["wadso", "WADSO"],
-    ["net_debt", "Net Debt"],
-  ] as const;
-  const allYears = Array.from({ length: 9 }, (_, i) => y0 - 4 + i);
-  s3.columns = [
-    { width: 12 },
-    { width: 18 },
-    { width: 14 },
-    ...allYears.map(() => ({ width: 11 })),
-    { width: 10 },
-    { width: 12 },
-    { width: 12 },
-    { width: 10 },
-    { width: 6 },
-    { width: 12 },
-    { width: 12 },
-  ];
-  s3.addRow([
-    "Ticker",
-    "Bloomberg",
-    "Field",
-    ...allYears.map(String),
-    "Shares",
-    "Cash",
-    "Debt",
-    "Min Int",
-    "Port",
-    "Updated",
-    "By",
-  ]);
-
-  for (const [grp, rows] of groupRows(companies)) {
-    const g1 = s1.addRow([grp]);
-    g1.font = HEAD_FONT;
-    const g2 = s2.addRow([grp]);
-    g2.font = HEAD_FONT;
-
-    for (const c of rows) {
-      const q = c.yahoo ? quotes[c.yahoo] : undefined;
-      const d = compute(c, q?.price ?? null, today);
-      const perf = {
-        m1: q?.m1 ?? c.perf.m1,
-        m3: q?.m3 ?? c.perf.m3,
-        m6: q?.m6 ?? c.perf.m6,
-      };
-
-      if (c.is_index) {
-        const pe = (y: number) => c.best_pe?.[String(y)] ?? null;
-        const r = s1.addRow([
-          c.ticker,
-          d.price,
-          null,
-          null,
-          pe(y0),
-          pe(y1),
-          pe(y2),
-          pe(y3),
-          pe(y4),
-          ...Array(10).fill(null),
-          perf.m1,
-          perf.m3,
-          perf.m6,
-        ]);
-        r.font = BASE_FONT;
-        continue;
+    if (!m.isIndex) {
+      for (const [col, pathStr] of Object.entries(m.patch)) {
+        xml = setCell(xml, `${col}${m.row}`, numCell(`${col}${m.row}`, resolve(c, pathStr)));
       }
-
-      const r1 = s1.addRow([
-        c.ticker,
-        d.price,
-        d.evGp[y0],
-        d.evGp[y1],
-        ...years.map((y) => d.mendoPe[y]),
-        ...[y1, y2, y3].map((y) => c.model.target_mult[String(y)] ?? null),
-        ...[y1, y2, y3].map((y) => d.irr[y]),
-        ...[y0, y1, y2, y3].map((y) => d.mom[y]),
-        perf.m1,
-        perf.m3,
-        perf.m6,
-      ]);
-      r1.font = BASE_FONT;
-      if (c.port === 1) r1.getCell(1).fill = GREEN_FILL;
-
-      const r2 = s2.addRow([
-        c.ticker,
-        d.price,
-        d.decomp.revs,
-        d.decomp.margin,
-        d.decomp.ni,
-        d.decomp.yld,
-        d.decomp.epsDivs,
-        d.decomp.multiple,
-        d.decomp.ret,
-        d.gpCagr,
-        d.mepsCagr,
-      ]);
-      r2.font = BASE_FONT;
-      if (c.port === 1) r2.getCell(1).fill = GREEN_FILL;
-
-      seriesKeys.forEach(([key, label], i) => {
-        const series = c.model[key];
-        const row = s3.addRow([
-          i === 0 ? c.ticker : null,
-          i === 0 ? c.bbg : null,
-          label,
-          ...allYears.map((y) => series[String(y)] ?? null),
-          ...(i === 0
-            ? [c.model.shares, c.model.cash, c.model.debt, c.model.min_int, c.port, c.update_date, c.update_by]
-            : []),
-        ]);
-        row.font = BASE_FONT;
-        const fmt = key === "gm" ? "0.0%" : key === "target_mult" ? X : NUM;
-        for (let j = 0; j < allYears.length; j++) row.getCell(4 + j).numFmt = fmt;
-      });
+      xml = setCell(xml, `E${m.row}`, numCell(`E${m.row}`, c.port));
+      xml = setCell(
+        xml,
+        `F${m.row}`,
+        numCell(`F${m.row}`, c.update_date ? dateSerial(c.update_date) : null),
+      );
+      xml = setCell(xml, `G${m.row}`, strCell(`G${m.row}`, c.update_by));
     }
-    s1.addRow([]);
-    s2.addRow([]);
+
+    // Refresh the cached values of the Bloomberg price/perf cells so the
+    // file is current even before a terminal recalculates it.
+    const q = c.yahoo ? quotes[c.yahoo] : undefined;
+    if (q) {
+      xml = setCachedValue(xml, `H${m.row}`, q.price != null ? q.price * c.px_scale : null);
+      xml = setCachedValue(xml, `EB${m.row}`, q.m1);
+      xml = setCachedValue(xml, `EC${m.row}`, q.m3);
+      xml = setCachedValue(xml, `ED${m.row}`, q.m6);
+    }
   }
 
-  // Column formats + header styling for sheets 1 and 2.
-  cols1.forEach((c, i) => {
-    if (c.fmt) s1.getColumn(i + 1).numFmt = c.fmt;
-  });
-  for (let i = 2; i <= decompCols.length; i++) {
-    s2.getColumn(i).numFmt = i === 2 ? MONEY : PCT;
-  }
-  s2.getColumn(2).numFmt = MONEY;
-  [s1, s2, s3].forEach((s) => {
-    s.getRow(1).font = HEAD_FONT;
-    s.getRow(2).font = HEAD_FONT;
+  zip.file(SHEET_PATH, xml);
+  const buf = await zip.generateAsync({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+    compressionOptions: { level: 6 },
   });
 
-  const asOf = latestAsOf(quotes);
-  s1.addRow([]);
-  s1.addRow([
-    `Generated ${today.toISOString().slice(0, 10)} · prices as of ${asOf ?? "n/a"} (Yahoo Finance)`,
-  ]).font = { size: 8, italic: true };
-
-  const buf = await wb.xlsx.writeBuffer();
   const stamp = today.toISOString().slice(0, 10).replace(/-/g, "");
-  return new NextResponse(Buffer.from(buf), {
+  const asOf = latestAsOf(quotes);
+  return new NextResponse(new Uint8Array(buf), {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       "Content-Disposition": `attachment; filename="${stamp}_Detailed_Dashboard.xlsx"`,
+      "X-Prices-As-Of": asOf ?? "none",
     },
   });
 }

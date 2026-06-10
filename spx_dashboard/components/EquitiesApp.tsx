@@ -252,6 +252,12 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           {asOf
             ? `Prices as of ${new Date(asOf).toLocaleString()} · Yahoo Finance`
             : "Loading prices…"}
+          {asOf && Date.now() - Date.parse(asOf) > 20 * 3_600_000 && (
+            <strong className="eq-stale">
+              {" "}
+              · price feed unavailable — showing last cached prices
+            </strong>
+          )}
           {enabled === false && " · edits disabled (no shared database configured)"}
         </span>
       </div>
