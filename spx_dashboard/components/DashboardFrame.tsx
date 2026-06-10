@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
 import { Sidebar } from "@/components/Sidebar";
 import { HowToBanner } from "@/components/HowToBanner";
@@ -24,6 +25,9 @@ export function DashboardFrame({
         <header className="content-header">
           {heading}
           <div className="header-actions">
+            <Link href="/" className="btn-back" title="Back to all views">
+              ← All views
+            </Link>
             <a
               href="/SPX_inputs.xlsx"
               download="SPX_inputs.xlsx"

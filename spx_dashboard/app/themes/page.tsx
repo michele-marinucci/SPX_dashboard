@@ -1,5 +1,5 @@
-import { DashboardFrame } from "@/components/DashboardFrame";
-import { ViewHeading } from "@/components/ViewHeading";
+import Link from "next/link";
+import { LogoutButton } from "@/components/LogoutButton";
 import { Sparkline } from "@/components/Sparkline";
 import { cx } from "@/lib/format";
 import {
@@ -19,7 +19,7 @@ import {
 const TIER_META: Record<Tier, { title: string; blurb: string }> = {
   priority: {
     title: "Priority",
-    blurb: "From the accounts you trust most.",
+    blurb: "From the accounts you trust most (your curated handles).",
   },
   credible: {
     title: "Credible",
@@ -28,7 +28,7 @@ const TIER_META: Record<Tier, { title: string; blurb: string }> = {
   },
   discovery: {
     title: "Discovery",
-    blurb: "Unvetted — surfaced from the wider firehose.",
+    blurb: "Unvetted — surfaced from the wider firehose. Treat with caution.",
   },
 };
 
@@ -37,6 +37,65 @@ const DIR_LABEL: Record<Direction, string> = {
   short: "Short",
   watch: "Watch",
 };
+
+// Static "how it works" explainer, styled like the SPX How-To banner.
+function HowItWorks() {
+  return (
+    <section className="howto" aria-label="How X Themes works">
+      <p className="howto-lead">
+        <strong>X Themes</strong> scouts X (Twitter) every morning for
+        actionable investment ideas about your themes. Every idea is{" "}
+        <strong>grounded</strong> in at least one real post, sorted into three
+        tiers by how much the source can be trusted, and{" "}
+        <strong>ranked by a derived score</strong> (source trust × distinct
+        trusted accounts × how many days it keeps recurring). It is a bounded,
+        ranked feed — not a timeline.
+      </p>
+      <div className="howto-grid">
+        <div className="howto-card">
+          <div className="howto-ic tier-priority">
+            <span className="tier-dot" />
+          </div>
+          <div className="howto-ct">
+            <b>Priority</b>
+            <span>From the accounts you trust most (your curated handles).</span>
+          </div>
+        </div>
+        <div className="howto-card">
+          <div className="howto-ic tier-credible">
+            <span className="tier-dot" />
+          </div>
+          <div className="howto-ct">
+            <b>Credible</b>
+            <span>
+              Company execs & well-known managers, inferred from profile — check
+              the role shown on each card.
+            </span>
+          </div>
+        </div>
+        <div className="howto-card">
+          <div className="howto-ic tier-discovery">
+            <span className="tier-dot" />
+          </div>
+          <div className="howto-ct">
+            <b>Discovery</b>
+            <span>Unvetted accounts from the wider firehose; treat with caution.</span>
+          </div>
+        </div>
+        <div className="howto-card">
+          <div className="howto-ic">↗</div>
+          <div className="howto-ct">
+            <b>On each card</b>
+            <span>
+              Direction, one-line thesis, conviction & score, source handles
+              linking to the cited post(s), and a YTD price spark.
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function SourceLink({ s }: { s: IdeaSource }) {
   return (
@@ -56,6 +115,7 @@ function SourceLink({ s }: { s: IdeaSource }) {
 }
 
 function IdeaCard({ idea }: { idea: ThemeIdea }) {
+  const hasChart = !!idea.prices?.series?.length;
   return (
     <article className="idea-card">
       <div className="idea-head">
@@ -87,12 +147,14 @@ function IdeaCard({ idea }: { idea: ThemeIdea }) {
         </p>
       )}
 
-      <div className="idea-chart">
-        <Sparkline values={idea.prices?.series ?? []} width={160} height={34} />
-        <span className="idea-chart-cap">
-          YTD{idea.prices?.as_of ? ` · as of ${idea.prices.as_of}` : ""}
-        </span>
-      </div>
+      {hasChart && (
+        <div className="idea-chart">
+          <Sparkline values={idea.prices!.series} width={160} height={34} />
+          <span className="idea-chart-cap">
+            YTD{idea.prices?.as_of ? ` · as of ${idea.prices.as_of}` : ""}
+          </span>
+        </div>
+      )}
 
       <div className="idea-sources">
         {idea.sources.map((s) => (
@@ -107,9 +169,7 @@ function IdeaCard({ idea }: { idea: ThemeIdea }) {
           </span>
         ))}
         <span className="idea-recur">
-          {idea.seen_count > 1
-            ? `recurring ${idea.seen_count}d`
-            : "new today"}
+          {idea.seen_count > 1 ? `recurring ${idea.seen_count}d` : "new today"}
         </span>
       </div>
     </article>
@@ -140,21 +200,30 @@ function TierSection({ tier, ideas }: { tier: Tier; ideas: ThemeIdea[] }) {
   );
 }
 
+// Standalone view — no sidebar, no Export. Just a back link + sign out.
 export default function ThemesPage() {
   const byTier = getActiveIdeasByTier();
   const total = getActiveIdeasCount();
   const asOf = getGeneratedAtLabel();
 
   return (
-    <DashboardFrame
-      heading={
-        <ViewHeading
-          title="X Themes"
-          meta="Daily idea briefing from X"
-          trailing={asOf ? `As of ${asOf}` : "Awaiting first run"}
-        />
-      }
-    >
+    <div className="solo">
+      <header className="solo-header">
+        <Link href="/" className="back-link">
+          ← All views
+        </Link>
+        <LogoutButton />
+      </header>
+
+      <div className="solo-title">
+        <h1>X Themes</h1>
+        <p className="subtitle">
+          Daily idea briefing from X · {asOf ? `as of ${asOf}` : "awaiting first run"}
+        </p>
+      </div>
+
+      <HowItWorks />
+
       {total === 0 ? (
         <section className="section">
           <p className="muted">
@@ -167,6 +236,6 @@ export default function ThemesPage() {
           <TierSection key={tier} tier={tier} ideas={byTier[tier]} />
         ))
       )}
-    </DashboardFrame>
+    </div>
   );
 }
