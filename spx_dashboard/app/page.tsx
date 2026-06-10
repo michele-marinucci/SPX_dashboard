@@ -45,7 +45,7 @@ export default function HomePage() {
           </span>
         </Link>
 
-        <Link href="/equities" className="landing-card">
+        <Link href="/dashboard" className="landing-card">
           <div className="landing-card-head">
             <div className="landing-card-title">Equities Dashboard</div>
             <span className="landing-card-wip">Work in progress</span>
@@ -65,6 +65,18 @@ export default function HomePage() {
           <p className="landing-card-desc">
             Track diligence across names — open questions, notes, and status as
             each idea moves through the process. Coming soon.
+          </p>
+          <span className="landing-card-cta">Preview →</span>
+        </Link>
+
+        <Link href="/podcast" className="landing-card">
+          <div className="landing-card-head">
+            <div className="landing-card-title">Podcast Creator</div>
+            <span className="landing-card-wip">Work in progress</span>
+          </div>
+          <p className="landing-card-desc">
+            Turn research and ideas into a narrated audio briefing you can listen
+            to on the go. Coming soon.
           </p>
           <span className="landing-card-cta">Preview →</span>
         </Link>
