@@ -2,6 +2,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { Sidebar } from "@/components/Sidebar";
 import { HowToBanner } from "@/components/HowToBanner";
 import { getNavModel } from "@/lib/data";
+import { getActiveIdeasCount } from "@/lib/themes";
 
 // The shared shell for every dashboard view: a left sidebar to switch views
 // and a content area with a per-view heading. The "data as of" date is shown
@@ -14,10 +15,11 @@ export function DashboardFrame({
   children: React.ReactNode;
 }) {
   const nav = getNavModel();
+  const themesCount = getActiveIdeasCount();
 
   return (
     <div className="shell">
-      <Sidebar nav={nav} />
+      <Sidebar nav={nav} themesCount={themesCount} />
       <div className="content">
         <header className="content-header">
           {heading}
