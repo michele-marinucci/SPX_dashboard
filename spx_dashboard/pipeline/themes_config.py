@@ -16,11 +16,14 @@ Edit freely — the pipeline imports these names directly.
 
 from __future__ import annotations
 
-# xAI models. Retrieval needs a tool-capable Grok (x_search); the cheaper
-# "fast" model handles summarization/sentiment/clustering; vision describes
-# chart images. Bump these as xAI ships newer models.
-MODEL = "grok-4.3"            # retrieval (x_search) + vision
-FAST_MODEL = "grok-4.1-fast"  # summaries, sentiment, theme clustering
+# xAI models. Retrieval needs a tool-capable Grok (x_search); FAST_MODEL is
+# the knob for routing summaries/sentiment/clustering to a cheaper model.
+# NOTE: the grok-4-1-fast-* family was deprecated 2026-05-15 (requests now
+# redirect to grok-4.3 at 4.3 pricing), so both point at grok-4.3 until xAI
+# ships a new discounted tier. The pipeline falls back to MODEL automatically
+# if FAST_MODEL is ever invalid.
+MODEL = "grok-4.3"       # retrieval (x_search) + vision
+FAST_MODEL = "grok-4.3"  # summaries, sentiment, theme clustering
 
 # How many days back each scheduled run looks. The cron fires Mon/Wed/Fri, so
 # a 3-day window always covers the gap since the previous run (Fri→Mon).

@@ -302,6 +302,26 @@ def fetch_window(
     return deduped
 
 
+def _sample_json(client: Any, model: str, system_text: str, user_text: str) -> Any:
+    from xai_sdk.chat import system, user
+
+    chat = client.chat.create(model=model, messages=[system(system_text)])
+    chat.append(user(user_text))
+    return _extract_json(getattr(chat.sample(), "content", "") or "")
+
+
+def _fast_json(client: Any, system_text: str, user_text: str) -> Any:
+    """Run a JSON task on FAST_MODEL, falling back to MODEL if it's invalid
+    (e.g. xAI retired the id — the grok-4-1-fast family died 2026-05-15)."""
+    try:
+        return _sample_json(client, cfg.FAST_MODEL, system_text, user_text)
+    except Exception as e:
+        if cfg.FAST_MODEL == cfg.MODEL:
+            raise
+        _log(f"  FAST_MODEL '{cfg.FAST_MODEL}' failed ({e}); retrying on {cfg.MODEL}")
+        return _sample_json(client, cfg.MODEL, system_text, user_text)
+
+
 # --------------------------------------------------------------------------- #
 # Stage 2 — enrichment (FAST_MODEL: summary, sentiment, themes, tickers)
 # --------------------------------------------------------------------------- #
@@ -326,26 +346,19 @@ def enrich_tweets(client: Any, tweets: list[dict]) -> None:
     """Annotate tweets in place with summary/sentiment/themes/tickers."""
     if not tweets:
         return
-    from xai_sdk.chat import system, user
 
     taxonomy = [{"key": t["key"], "label": t["label"]} for t in cfg.THEMES]
     payload = [
         {"id": t["id"], "handle": t["handle"], "text": t["text"][:2000]}
         for t in tweets
     ]
-    chat = client.chat.create(
-        model=cfg.FAST_MODEL,
-        messages=[system(ENRICH_SYSTEM)],
+    obj = _fast_json(
+        client,
+        ENRICH_SYSTEM,
+        f"Theme taxonomy: {json.dumps(taxonomy)}\n"
+        f"Watchlist hint (not a filter): {', '.join(sorted(WATCHLIST))}\n\n"
+        f"Tweets: {json.dumps(payload)}",
     )
-    chat.append(
-        user(
-            f"Theme taxonomy: {json.dumps(taxonomy)}\n"
-            f"Watchlist hint (not a filter): {', '.join(sorted(WATCHLIST))}\n\n"
-            f"Tweets: {json.dumps(payload)}"
-        )
-    )
-    response = chat.sample()
-    obj = _extract_json(getattr(response, "content", "") or "")
     items = obj.get("items") if isinstance(obj, dict) else obj
     by_id = {
         i["id"]: i for i in items if isinstance(i, dict) and i.get("id")
@@ -377,6 +390,13 @@ VISION_PROMPT = (
 )
 
 
+# A URL is worth a vision attempt only when it plausibly serves a raw image —
+# the API rejects pages/videos with an unsupported-content-type error.
+_IMAGE_URL_RE = re.compile(
+    r"(pbs\.twimg\.com|\.(?:png|jpe?g|webp)(?:\?|$))", re.IGNORECASE
+)
+
+
 def describe_media(client: Any, tweets: list[dict]) -> None:
     """Attach `media_summary` to tweets with images (best-effort, capped)."""
     from xai_sdk.chat import image, user
@@ -385,18 +405,19 @@ def describe_media(client: Any, tweets: list[dict]) -> None:
     for t in tweets:
         if budget <= 0:
             break
-        if not t.get("media_urls"):
-            continue
-        try:
-            chat = client.chat.create(model=cfg.MODEL)
-            chat.append(user(VISION_PROMPT, image(t["media_urls"][0])))
-            response = chat.sample()
-            desc = (getattr(response, "content", "") or "").strip()
-            if desc:
-                t["media_summary"] = desc[:300]
-                budget -= 1
-        except Exception as e:
-            _log(f"  vision failed for {t['id']}: {type(e).__name__}: {e}")
+        urls = [u for u in t.get("media_urls") or [] if _IMAGE_URL_RE.search(u)]
+        for url in urls[:2]:  # at most two attempts per tweet
+            try:
+                chat = client.chat.create(model=cfg.MODEL)
+                chat.append(user(VISION_PROMPT, image(url)))
+                response = chat.sample()
+                desc = (getattr(response, "content", "") or "").strip()
+                if desc:
+                    t["media_summary"] = desc[:300]
+                    budget -= 1
+                    break
+            except Exception as e:
+                _log(f"  vision failed for {t['id']} ({url}): {type(e).__name__}: {e}")
 
 
 # --------------------------------------------------------------------------- #
@@ -499,7 +520,6 @@ def build_daily_summary(
 ) -> dict:
     if not todays:
         return {"date": today.isoformat(), "headline": "", "items": []}
-    from xai_sdk.chat import system, user
 
     taxonomy = [{"key": t["key"], "label": t["label"]} for t in cfg.THEMES]
     payload = [
@@ -511,11 +531,11 @@ def build_daily_summary(
         }
         for t in todays
     ]
-    chat = client.chat.create(model=cfg.FAST_MODEL, messages=[system(DAILY_SYSTEM)])
-    chat.append(
-        user(f"Theme taxonomy: {json.dumps(taxonomy)}\n\nTweets: {json.dumps(payload)}")
+    obj = _fast_json(
+        client,
+        DAILY_SYSTEM,
+        f"Theme taxonomy: {json.dumps(taxonomy)}\n\nTweets: {json.dumps(payload)}",
     )
-    obj = _extract_json(getattr(chat.sample(), "content", "") or "")
     if not isinstance(obj, dict):
         obj = {}
     label_of = {t["key"]: t["label"] for t in cfg.THEMES}
@@ -546,7 +566,6 @@ def build_daily_summary(
 def build_recurring(client: Any, store: list[dict]) -> list[dict]:
     if not store:
         return []
-    from xai_sdk.chat import system, user
 
     payload = [
         {
@@ -558,12 +577,11 @@ def build_recurring(client: Any, store: list[dict]) -> list[dict]:
         }
         for t in store
     ]
-    chat = client.chat.create(
-        model=cfg.FAST_MODEL,
-        messages=[system(RECUR_SYSTEM.format(min_days=cfg.RECUR_MIN_DAYS))],
+    obj = _fast_json(
+        client,
+        RECUR_SYSTEM.format(min_days=cfg.RECUR_MIN_DAYS),
+        json.dumps(payload),
     )
-    chat.append(user(json.dumps(payload)))
-    obj = _extract_json(getattr(chat.sample(), "content", "") or "")
     topics = obj.get("topics") if isinstance(obj, dict) else None
     if not isinstance(topics, list):
         return []
