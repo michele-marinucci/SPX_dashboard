@@ -162,9 +162,24 @@ export default function HomePage() {
         <div className="prev">Preview →</div>
       </Link>
 
+      <Link href="/morning-news" className="hub-row wip">
+        <div className="hub-idx">07</div>
+        <div>
+          <div className="rname">Morning News Summary</div>
+          <p className="rdesc">
+            A pre-market digest of overnight headlines and the news that moves
+            your names, summarized each morning.
+          </p>
+        </div>
+        <div>
+          <span className="wiptag">Work in progress</span>
+        </div>
+        <div className="prev">Preview →</div>
+      </Link>
+
       <div className="hub-foot">
         <span>{asOf ? `X THEMES AS OF ${asOf}` : "X THEMES"}</span>
-        <span>6 MODULES · 2 LIVE</span>
+        <span>7 MODULES · 2 LIVE</span>
       </div>
     </div>
   );
