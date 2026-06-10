@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T05:30:52.094063+00:00",
+  "generated_at": "2026-06-10T12:57:01.548420+00:00",
   "themes": [
     {
       "key": "digital-semis",
@@ -46,59 +46,36 @@
       "label": "AI Buildout Funders"
     }
   ],
+  "followed_handles": [
+    "altcap",
+    "beth_kindig",
+    "bgurley",
+    "billackman",
+    "darioamodei",
+    "datacenterhawk",
+    "demishassabis",
+    "dnystedt",
+    "dwarkesh_sp",
+    "dylan522p",
+    "gavinsbaker",
+    "hhhypergrowth",
+    "modestproposal1",
+    "p_ferragu",
+    "patrick_oshag",
+    "rihardjarc",
+    "sama",
+    "stockmarketnerd"
+  ],
   "ideas": [
-    {
-      "ticker": "MU",
-      "direction": "long",
-      "thesis": "AI demand creating multi-year HBM/DRAM shortage with sold-out capacity through 2026+ and structural pricing power for Micron.",
-      "catalyst": "HBM3E ramp and record Cloud Memory margins",
-      "sources": [
-        {
-          "handle": "beth_kindig",
-          "role": "Investor and analyst",
-          "tier": "priority",
-          "url": "https://x.com/Beth_Kindig/status/2064009359965749508"
-        },
-        {
-          "handle": "sergeycyw",
-          "role": "Growth stock investor",
-          "tier": "discovery",
-          "url": "https://x.com/SergeyCYW/status/2064317344802050229"
-        },
-        {
-          "handle": "asksecondorder",
-          "role": "Investor",
-          "tier": "discovery",
-          "url": "https://x.com/asksecondorder/status/2063984384341160023"
-        }
-      ],
-      "theme_keys": [
-        "memory"
-      ],
-      "prices": null,
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1,
-      "tier": "priority",
-      "score": 64.0,
-      "conviction": "medium",
-      "active": true,
-      "on_watchlist": true,
-      "citations": [
-        "https://x.com/Beth_Kindig/status/2064009359965749508",
-        "https://x.com/SergeyCYW/status/2064317344802050229",
-        "https://x.com/asksecondorder/status/2063984384341160023"
-      ]
-    },
     {
       "ticker": "CIEN",
       "direction": "long",
-      "thesis": "CIEN owns the coherent fiber layer linking AI clusters across sites (metro/long-haul/DCI) as training leaves single campuses, with WaveLogic 6 the only shipping 1.6T coherent solution.",
+      "thesis": "CIEN dominates the inter-site coherent optics layer (WaveLogic 6) needed as AI clusters span multiple buildings and cities.",
       "catalyst": "NVIDIA/Google/Microsoft roadmaps driving exponential bandwidth requirements from 2028",
       "sources": [
         {
           "handle": "sapphirebooks",
-          "role": "Managing Director and Head of Macro & Investment Strategy at Rockefeller Global Investment Management",
+          "role": "Managing Director, Head of Macro & Investment Strategy at Rockefeller Global Investment Management",
           "tier": "credible",
           "url": "https://x.com/SapphireBooks/status/2062627455710658681"
         }
@@ -117,6 +94,201 @@
       "on_watchlist": true,
       "citations": [
         "https://x.com/SapphireBooks/status/2062627455710658681"
+      ]
+    },
+    {
+      "ticker": "CDNS",
+      "direction": "long",
+      "thesis": "CDNS and SNPS form an essential EDA duopoly collecting tolls on every AI chip design amid rising complexity, with SNPS at 37% growth and $2B Nvidia investment validating the moat.",
+      "catalyst": "",
+      "sources": [
+        {
+          "handle": "keithtradesmith",
+          "role": "CEO of TradeSmith investment research firm",
+          "tier": "credible",
+          "url": "https://x.com/KeithTradeSmith/status/2063591300541349988"
+        }
+      ],
+      "theme_keys": [
+        "design-semicap"
+      ],
+      "prices": null,
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1,
+      "tier": "credible",
+      "score": 44.0,
+      "conviction": "low",
+      "active": true,
+      "on_watchlist": true,
+      "citations": [
+        "https://x.com/KeithTradeSmith/status/2063591300541349988"
+      ]
+    },
+    {
+      "ticker": "SNPS",
+      "direction": "long",
+      "thesis": "CDNS and SNPS form an essential EDA duopoly collecting tolls on every AI chip design amid rising complexity, with SNPS at 37% growth and $2B Nvidia investment validating the moat.",
+      "catalyst": "",
+      "sources": [
+        {
+          "handle": "keithtradesmith",
+          "role": "CEO of TradeSmith investment research firm",
+          "tier": "credible",
+          "url": "https://x.com/KeithTradeSmith/status/2063591300541349988"
+        }
+      ],
+      "theme_keys": [
+        "design-semicap"
+      ],
+      "prices": null,
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1,
+      "tier": "credible",
+      "score": 44.0,
+      "conviction": "low",
+      "active": true,
+      "on_watchlist": true,
+      "citations": [
+        "https://x.com/KeithTradeSmith/status/2063591300541349988"
+      ]
+    },
+    {
+      "ticker": "AMAT",
+      "direction": "long",
+      "thesis": "AMAT, KLAC and LRCX are the picks-and-shovels leaders hitting new highs on $1T+ AI infra spend flowing to fabs, with strong revenue growth and 100%+ YTD gains.",
+      "catalyst": "Physical scaling challenges in chip production",
+      "sources": [
+        {
+          "handle": "keithtradesmith",
+          "role": "CEO of TradeSmith investment research firm",
+          "tier": "credible",
+          "url": "https://x.com/KeithTradeSmith/status/2064000497208700946"
+        }
+      ],
+      "theme_keys": [
+        "design-semicap"
+      ],
+      "prices": null,
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1,
+      "tier": "credible",
+      "score": 44.0,
+      "conviction": "low",
+      "active": true,
+      "on_watchlist": true,
+      "citations": [
+        "https://x.com/KeithTradeSmith/status/2064000497208700946"
+      ]
+    },
+    {
+      "ticker": "KLAC",
+      "direction": "long",
+      "thesis": "AMAT, KLAC and LRCX are the picks-and-shovels leaders hitting new highs on $1T+ AI infra spend flowing to fabs, with strong revenue growth and 100%+ YTD gains.",
+      "catalyst": "",
+      "sources": [
+        {
+          "handle": "keithtradesmith",
+          "role": "CEO of TradeSmith investment research firm",
+          "tier": "credible",
+          "url": "https://x.com/KeithTradeSmith/status/2064000497208700946"
+        }
+      ],
+      "theme_keys": [
+        "design-semicap"
+      ],
+      "prices": null,
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1,
+      "tier": "credible",
+      "score": 44.0,
+      "conviction": "low",
+      "active": true,
+      "on_watchlist": true,
+      "citations": [
+        "https://x.com/KeithTradeSmith/status/2064000497208700946"
+      ]
+    },
+    {
+      "ticker": "META",
+      "direction": "long",
+      "thesis": "META has the fastest 3-yr revenue CAGR at 20.7% among hyperscalers yet trades at the lowest forward multiple of 18x, with AI capex already driving ROI via higher ad conversions and engagement.",
+      "catalyst": "",
+      "sources": [
+        {
+          "handle": "sapphirebooks",
+          "role": "Managing Director, Head of Macro & Investment Strategy at Rockefeller Global Investment Management",
+          "tier": "credible",
+          "url": "https://x.com/SapphireBooks/status/2062708100185182498"
+        },
+        {
+          "handle": "msc_1313",
+          "role": "",
+          "tier": "discovery",
+          "url": "https://x.com/msc_1313/status/2063977809844834343"
+        }
+      ],
+      "theme_keys": [
+        "big-tech"
+      ],
+      "prices": null,
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1,
+      "tier": "credible",
+      "score": 44.0,
+      "conviction": "low",
+      "active": true,
+      "on_watchlist": true,
+      "citations": [
+        "https://x.com/SapphireBooks/status/2062708100185182498",
+        "https://x.com/msc_1313/status/2063977809844834343"
+      ]
+    },
+    {
+      "ticker": "MU",
+      "direction": "long",
+      "thesis": "MU is the HBM memory supercycle leader with 2026 capacity sold out amid structural AI-driven shortages lasting through 2027+.",
+      "catalyst": "HBM3E ramp and record Cloud Memory margins",
+      "sources": [
+        {
+          "handle": "asksecondorder",
+          "role": "",
+          "tier": "discovery",
+          "url": "https://x.com/asksecondorder/status/2063984384341160023"
+        },
+        {
+          "handle": "stockoptioncole",
+          "role": "",
+          "tier": "discovery",
+          "url": "https://x.com/StockOptionCole/status/2063352190358712367"
+        },
+        {
+          "handle": "the1ballere",
+          "role": "",
+          "tier": "discovery",
+          "url": "https://x.com/The1ballerE/status/2062594818837287094"
+        }
+      ],
+      "theme_keys": [
+        "memory"
+      ],
+      "prices": null,
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1,
+      "tier": "discovery",
+      "score": 16.5,
+      "conviction": "low",
+      "active": true,
+      "on_watchlist": true,
+      "citations": [
+        "https://x.com/StockOptionCole/status/2063352190358712367",
+        "https://x.com/The1ballerE/status/2062594818837287094",
+        "https://x.com/asksecondorder/status/2063984384341160023"
       ]
     },
     {
@@ -151,20 +323,14 @@
     {
       "ticker": "AVGO",
       "direction": "long",
-      "thesis": "AVGO Q2 2026 revenue hit record $22.2B (+48% YoY) beating guidance on strong AI chip sales, supporting continued bullish stance.",
-      "catalyst": "Q2 earnings release and AI revenue momentum",
+      "thesis": "AVGO is the cleanest pure-play on the shift to custom ASICs for AI inference as hyperscalers diversify from Nvidia GPUs.",
+      "catalyst": "Anthropic expanded Google TPU partnership with AVGO-supplied chips adding multiple GW capacity starting 2027",
       "sources": [
         {
-          "handle": "tomreece4",
+          "handle": "themomentumplay",
           "role": "",
           "tier": "discovery",
-          "url": "https://x.com/TomReece4/status/2064497401264480704"
-        },
-        {
-          "handle": "thewealtharian",
-          "role": "",
-          "tier": "discovery",
-          "url": "https://x.com/TheWealtharian/status/2062817606092960130"
+          "url": "https://x.com/themomentumplay/status/2063883462143332363"
         }
       ],
       "theme_keys": [
@@ -180,21 +346,20 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/TheWealtharian/status/2062817606092960130",
-        "https://x.com/TomReece4/status/2064497401264480704"
+        "https://x.com/themomentumplay/status/2063883462143332363"
       ]
     },
     {
       "ticker": "QCOM",
       "direction": "long",
-      "thesis": "QCOM is strong in edge AI, smartphone and on-device AI chips; NVDA is exiting mobile chips and Jensen Huang explicitly recommends buying QCOM stock.",
-      "catalyst": "",
+      "thesis": "QCOM is well-positioned for edge AI inference with strong NPUs and device-side chips, directly endorsed by Nvidia CEO Jensen Huang.",
+      "catalyst": "Jensen Huang publicly recommended buying QCOM stock for its edge AI and smartphone AI strengths",
       "sources": [
         {
-          "handle": "bluejay87476298",
+          "handle": "theaishrink",
           "role": "",
           "tier": "discovery",
-          "url": "https://x.com/BlueJay87476298/status/2064493727046136273"
+          "url": "https://x.com/TheAIShrink/status/2064481741885018161"
         }
       ],
       "theme_keys": [
@@ -210,20 +375,20 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/BlueJay87476298/status/2064493727046136273"
+        "https://x.com/TheAIShrink/status/2064481741885018161"
       ]
     },
     {
       "ticker": "GLW",
       "direction": "long",
-      "thesis": "GLW signed three hyperscaler megadeals in 2026 (Meta $6bn, Nvidia $3.2bn, Amazon) for fiber cables amid AI datacenter buildout, up 115% YTD.",
+      "thesis": "GLW benefits from surging demand for fiber connectivity in AI cluster scaling.",
       "catalyst": "Multi-year procurement agreements and capacity expansions announced in 2026",
       "sources": [
         {
-          "handle": "newsfolio_hq",
-          "role": "",
+          "handle": "digitalxu",
+          "role": "Systems Engineer and AI entrepreneur",
           "tier": "discovery",
-          "url": "https://x.com/newsfolio_hq/status/2064120862165373302"
+          "url": "https://x.com/DigitalXU/status/2064106503007588563"
         }
       ],
       "theme_keys": [
@@ -239,20 +404,20 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/newsfolio_hq/status/2064120862165373302"
+        "https://x.com/DigitalXU/status/2064106503007588563"
       ]
     },
     {
       "ticker": "COHR",
       "direction": "long",
-      "thesis": "COHR builds optical transceivers and indium phosphide components for AI interconnects as copper limits are crossed in Rubin Ultra; NVDA holds strategic stake and orders extend to 2028.",
+      "thesis": "COHR provides diversified photonics exposure to the 800G/1.6T transceiver ramp and broader AI optical buildout.",
       "catalyst": "Hyperscaler shift to high-speed interconnects and co-packaged optics",
       "sources": [
         {
-          "handle": "luminalalpha",
-          "role": "",
+          "handle": "ckcapitalxx",
+          "role": "Investor focused on photonics and tech",
           "tier": "discovery",
-          "url": "https://x.com/Luminalalpha/status/2062094139060052151"
+          "url": "https://x.com/CKCapitalxx/status/2062189537493721382"
         }
       ],
       "theme_keys": [
@@ -268,7 +433,7 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/Luminalalpha/status/2062094139060052151"
+        "https://x.com/CKCapitalxx/status/2062189537493721382"
       ]
     },
     {
@@ -303,20 +468,20 @@
     {
       "ticker": "VRT",
       "direction": "long",
-      "thesis": "VRT liquid cooling and power systems lead AI data center buildout with hyperscaler contracts driving guidance raises.",
+      "thesis": "VRT benefits as the leader in liquid cooling and power systems for high-density AI data centers, with surging orders and backlog from hyperscalers.",
       "catalyst": "Major hyperscaler liquid cooling contract and full-year guidance upward revision",
       "sources": [
         {
-          "handle": "juliaxxxgenesis",
-          "role": "CMT, small-cap momentum trader",
+          "handle": "cryptoforniax",
+          "role": "Quant prop firm founder",
           "tier": "discovery",
-          "url": "https://x.com/juliaxxxgenesis/status/2064312406504026352"
+          "url": "https://x.com/CryptoforniaX/status/2063927796959773042"
         },
         {
-          "handle": "jamlee906",
-          "role": "charts and market clarity focus",
+          "handle": "openaudacious",
+          "role": "AI supply chain analyst",
           "tier": "discovery",
-          "url": "https://x.com/JamLee906/status/2062845811369599344"
+          "url": "https://x.com/OpenAudacious/status/2063902912238248258"
         }
       ],
       "theme_keys": [
@@ -332,19 +497,19 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/JamLee906/status/2062845811369599344",
-        "https://x.com/juliaxxxgenesis/status/2064312406504026352"
+        "https://x.com/CryptoforniaX/status/2063927796959773042",
+        "https://x.com/OpenAudacious/status/2063902912238248258"
       ]
     },
     {
       "ticker": "CMI",
       "direction": "long",
-      "thesis": "CMI upgraded to buy by UBS on datacenter backup generator demand plus trucking recovery.",
-      "catalyst": "UBS analyst upgrade with $850 PT",
+      "thesis": "UBS upgraded CMI to buy with $850 PT citing datacenter backup generator demand driving double-digit power segment growth alongside trucking recovery.",
+      "catalyst": "UBS analyst upgrade and PT raise",
       "sources": [
         {
           "handle": "topstockalerts1",
-          "role": "Trading community alerts account",
+          "role": "Trading community account",
           "tier": "discovery",
           "url": "https://x.com/TopStockAlerts1/status/2064043585591505247"
         }
@@ -368,14 +533,20 @@
     {
       "ticker": "ETN",
       "direction": "long",
-      "thesis": "ETN benefits from massive data center power demand with 240% surge in data center orders and grid-to-chip electrical equipment exposure.",
+      "thesis": "ETN is a key play on datacenter power distribution, grid upgrades, and backup systems amid the physical AI infrastructure buildout.",
       "catalyst": "Q1 2026 record results and 60% Electrical Americas order growth",
       "sources": [
         {
-          "handle": "ankcomandante",
-          "role": "15+ yrs markets, deep-tech/energy investor",
+          "handle": "cryptoforniax",
+          "role": "Quant prop firm founder",
           "tier": "discovery",
-          "url": "https://x.com/AnkComandante/status/2062107619569836210"
+          "url": "https://x.com/CryptoforniaX/status/2063927796959773042"
+        },
+        {
+          "handle": "openaudacious",
+          "role": "AI supply chain analyst",
+          "tier": "discovery",
+          "url": "https://x.com/OpenAudacious/status/2063902912238248258"
         }
       ],
       "theme_keys": [
@@ -391,7 +562,8 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/AnkComandante/status/2062107619569836210"
+        "https://x.com/CryptoforniaX/status/2063927796959773042",
+        "https://x.com/OpenAudacious/status/2063902912238248258"
       ]
     },
     {
@@ -424,123 +596,16 @@
       ]
     },
     {
-      "ticker": "CDNS",
-      "direction": "long",
-      "thesis": "Cadence is an asset-light picks-and-shovels play on AI-driven chip complexity with ~18% 10Y FCF/share CAGR.",
-      "catalyst": "",
-      "sources": [
-        {
-          "handle": "bramvgenechten",
-          "role": "Fundamental long-term investor",
-          "tier": "discovery",
-          "url": "https://x.com/BramVGenechten/status/2062181089930858743"
-        },
-        {
-          "handle": "libstephensonx",
-          "role": "",
-          "tier": "discovery",
-          "url": "https://x.com/libstephensonx/status/2064400284575522901"
-        }
-      ],
-      "theme_keys": [
-        "design-semicap"
-      ],
-      "prices": null,
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1,
-      "tier": "discovery",
-      "score": 16.5,
-      "conviction": "low",
-      "active": true,
-      "on_watchlist": true,
-      "citations": [
-        "https://x.com/BramVGenechten/status/2062181089930858743",
-        "https://x.com/libstephensonx/status/2064400284575522901"
-      ]
-    },
-    {
-      "ticker": "SNPS",
-      "direction": "long",
-      "thesis": "Agentic EDA is an overlooked growth driver for Synopsys that remains undervalued amid the Angstrom era and giga-cycle.",
-      "catalyst": "",
-      "sources": [
-        {
-          "handle": "libstephensonx",
-          "role": "",
-          "tier": "discovery",
-          "url": "https://x.com/libstephensonx/status/2064400284575522901"
-        }
-      ],
-      "theme_keys": [
-        "design-semicap"
-      ],
-      "prices": null,
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1,
-      "tier": "discovery",
-      "score": 16.5,
-      "conviction": "low",
-      "active": true,
-      "on_watchlist": true,
-      "citations": [
-        "https://x.com/libstephensonx/status/2064400284575522901"
-      ]
-    },
-    {
-      "ticker": "AMAT",
-      "direction": "long",
-      "thesis": "Applied Materials positioned at center of AI buildout with packaging revenue +50% in 2026 and EPIC partnerships.",
-      "catalyst": "Physical scaling challenges in chip production",
-      "sources": [
-        {
-          "handle": "sergeycyw",
-          "role": "Growth stock investor",
-          "tier": "discovery",
-          "url": "https://x.com/SergeyCYW/status/2062209775237235023"
-        },
-        {
-          "handle": "sly_dawg33",
-          "role": "Options & futures trader",
-          "tier": "discovery",
-          "url": "https://x.com/Sly_Dawg33/status/2062238134348435789"
-        }
-      ],
-      "theme_keys": [
-        "design-semicap"
-      ],
-      "prices": null,
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1,
-      "tier": "discovery",
-      "score": 16.5,
-      "conviction": "low",
-      "active": true,
-      "on_watchlist": true,
-      "citations": [
-        "https://x.com/SergeyCYW/status/2062209775237235023",
-        "https://x.com/Sly_Dawg33/status/2062238134348435789"
-      ]
-    },
-    {
       "ticker": "LRCX",
       "direction": "long",
-      "thesis": "Lam Research benefits from AI memory stack complexity, advanced packaging >50% revenue growth in 2026, and record service business.",
+      "thesis": "LRCX benefits from strong WFE momentum, NAND transitions and rising TSMC spending with analysts raising targets to $380+.",
       "catalyst": "",
       "sources": [
         {
-          "handle": "sergeycyw",
-          "role": "Growth stock investor",
+          "handle": "gaal_ai",
+          "role": "",
           "tier": "discovery",
-          "url": "https://x.com/SergeyCYW/status/2062209775237235023"
-        },
-        {
-          "handle": "sly_dawg33",
-          "role": "Options & futures trader",
-          "tier": "discovery",
-          "url": "https://x.com/Sly_Dawg33/status/2062238134348435789"
+          "url": "https://x.com/Gaal_ai/status/2062570293671969266"
         }
       ],
       "theme_keys": [
@@ -556,48 +621,18 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/SergeyCYW/status/2062209775237235023",
-        "https://x.com/Sly_Dawg33/status/2062238134348435789"
-      ]
-    },
-    {
-      "ticker": "KLAC",
-      "direction": "long",
-      "thesis": "Process control leader ensuring quality in advanced AI chip production.",
-      "catalyst": "",
-      "sources": [
-        {
-          "handle": "sly_dawg33",
-          "role": "Options & futures trader",
-          "tier": "discovery",
-          "url": "https://x.com/Sly_Dawg33/status/2062238134348435789"
-        }
-      ],
-      "theme_keys": [
-        "design-semicap"
-      ],
-      "prices": null,
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1,
-      "tier": "discovery",
-      "score": 16.5,
-      "conviction": "low",
-      "active": true,
-      "on_watchlist": true,
-      "citations": [
-        "https://x.com/Sly_Dawg33/status/2062238134348435789"
+        "https://x.com/Gaal_ai/status/2062570293671969266"
       ]
     },
     {
       "ticker": "GEV",
       "direction": "long",
-      "thesis": "$GEV positioned as top pick-and-shovels play on AI power supercycle with $163B backlog and massive demand for gas turbines and grid equipment driven by data centers.",
+      "thesis": "$GEV has $163B backlog with strong visibility, massive demand for gas turbines driven by AI data centers, plus exposure to grid, transmission, power infrastructure and SMRs.",
       "catalyst": "",
       "sources": [
         {
           "handle": "leifinvests",
-          "role": "",
+          "role": "Markets | Investing",
           "tier": "discovery",
           "url": "https://x.com/LeifInvests/status/2064485249589878981"
         }
@@ -621,14 +656,20 @@
     {
       "ticker": "VST",
       "direction": "long",
-      "thesis": "$VST signing massive long-term power agreements with hyperscalers and benefiting from rising power prices and ERCOT demand as one of the best ways to invest in the AI power boom.",
+      "thesis": "Expanding role as major power partner for hyperscale data centers through long-term energy agreements amid surging AI electricity demand.",
       "catalyst": "",
       "sources": [
         {
-          "handle": "leifinvests",
-          "role": "",
+          "handle": "selcuk9847",
+          "role": "Daily US Stock Market Hype & Deep Analysis",
           "tier": "discovery",
-          "url": "https://x.com/LeifInvests/status/2064485241792692235"
+          "url": "https://x.com/selcuk9847/status/2064110084158882220"
+        },
+        {
+          "handle": "chistesdelengua",
+          "role": "Experienced financial expert in wealth management",
+          "tier": "discovery",
+          "url": "https://x.com/chistesdelengua/status/2062263472755470681"
         }
       ],
       "theme_keys": [
@@ -644,20 +685,27 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/LeifInvests/status/2064485241792692235"
+        "https://x.com/chistesdelengua/status/2062263472755470681",
+        "https://x.com/selcuk9847/status/2064110084158882220"
       ]
     },
     {
       "ticker": "CEG",
       "direction": "long",
-      "thesis": "$CEG as America's largest nuclear operator is a key beneficiary of surging AI power demand from data centers.",
+      "thesis": "America's largest nuclear operator positioned as key beneficiary of rising AI power demand from data centers.",
       "catalyst": "",
       "sources": [
         {
           "handle": "selcuk9847",
-          "role": "",
+          "role": "Daily US Stock Market Hype & Deep Analysis",
           "tier": "discovery",
           "url": "https://x.com/selcuk9847/status/2064110084158882220"
+        },
+        {
+          "handle": "longgameequity",
+          "role": "Long-term investor focused on disruptive tech",
+          "tier": "discovery",
+          "url": "https://x.com/LongGameEquity/status/2063291890091389035"
         }
       ],
       "theme_keys": [
@@ -673,26 +721,33 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
+        "https://x.com/LongGameEquity/status/2063291890091389035",
         "https://x.com/selcuk9847/status/2064110084158882220"
       ]
     },
     {
       "ticker": "PWR",
       "direction": "long",
-      "thesis": "Quanta Services is the backbone electrical contractor for US data center and grid buildouts driven by AI demand, with record backlog growth and upwardly revised 2026 guidance after strong Q1 EPS beat.",
-      "catalyst": "Q2 2026 earnings in late July/early August",
+      "thesis": "AI data center boom is shifting the bottleneck to power grid expansion and electrical infrastructure upgrades, positioning Quanta Services as a core beneficiary with surging backlog.",
+      "catalyst": "Broadcom's 20GW+ AI compute deployments through 2028 requiring power shell and infrastructure",
       "sources": [
         {
-          "handle": "stock_duty",
-          "role": "Stock analysis account",
+          "handle": "thevalueist",
+          "role": "Equity analyst",
           "tier": "discovery",
-          "url": "https://x.com/stock_duty/status/2063356795880669280"
+          "url": "https://x.com/TheValueist/status/2062321946134503804"
         },
         {
           "handle": "xdorzz",
-          "role": "Crypto/stock trader",
+          "role": "",
           "tier": "discovery",
           "url": "https://x.com/XDOrzz/status/2063375563147071901"
+        },
+        {
+          "handle": "cafepatrone",
+          "role": "",
+          "tier": "discovery",
+          "url": "https://x.com/cafepatrone/status/2063839584115454000"
         }
       ],
       "theme_keys": [
@@ -708,21 +763,22 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
+        "https://x.com/TheValueist/status/2062321946134503804",
         "https://x.com/XDOrzz/status/2063375563147071901",
-        "https://x.com/stock_duty/status/2063356795880669280"
+        "https://x.com/cafepatrone/status/2063839584115454000"
       ]
     },
     {
       "ticker": "NOW",
       "direction": "long",
-      "thesis": "ServiceNow is well positioned for growth re-acceleration in the agentic AI era through workflow platforms that integrate AI thinking with action.",
-      "catalyst": "",
+      "thesis": "ServiceNow AI revenue accelerating sharply with Now Assist adoption up 55x YoY, 30% pricing premium, and FY26 guidance raised 50% to $1.5B.",
+      "catalyst": "July 29 earnings",
       "sources": [
         {
-          "handle": "roshan_gudapati",
-          "role": "Investor",
+          "handle": "peterli34923561",
+          "role": "investor",
           "tier": "discovery",
-          "url": "https://x.com/Roshan_Gudapati/status/2062860283970986157"
+          "url": "https://x.com/peterli34923561/status/2063105679548985529"
         }
       ],
       "theme_keys": [
@@ -738,7 +794,7 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/Roshan_Gudapati/status/2062860283970986157"
+        "https://x.com/peterli34923561/status/2063105679548985529"
       ]
     },
     {
@@ -773,14 +829,14 @@
     {
       "ticker": "DDOG",
       "direction": "long",
-      "thesis": "Observability becomes critical as AI workloads drive token costs and complexity, with DDOG positioned in the high-growth AI software infrastructure layer.",
+      "thesis": "As AI applications move into production at scale, Datadog benefits from increased demand for observability, monitoring, and performance management across complex AI environments.",
       "catalyst": "",
       "sources": [
         {
-          "handle": "emmanuelinvest",
-          "role": "Big Tech & AI Investor",
+          "handle": "jabranstwocents",
+          "role": "Investor and author",
           "tier": "discovery",
-          "url": "https://x.com/EmmanuelInvest/status/2063958543200288828"
+          "url": "https://x.com/jabranstwocents/status/2064029694421586230"
         }
       ],
       "theme_keys": [
@@ -796,13 +852,13 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/EmmanuelInvest/status/2063958543200288828"
+        "https://x.com/jabranstwocents/status/2064029694421586230"
       ]
     },
     {
       "ticker": "CRWD",
       "direction": "long",
-      "thesis": "AI adoption is driving resilient cybersecurity spending as enterprises need protection against new AI-driven threats and expanded attack surfaces, positioning CRWD for continued growth.",
+      "thesis": "AI expands attack surfaces and creates new demand for AI-driven security platforms, positioning CrowdStrike as a key beneficiary in the AI economy.",
       "catalyst": "",
       "sources": [
         {
@@ -810,12 +866,6 @@
           "role": "Global Equity Investor",
           "tier": "discovery",
           "url": "https://x.com/ssuyogk/status/2062513394188472529"
-        },
-        {
-          "handle": "emmanuelinvest",
-          "role": "Big Tech & AI Investor",
-          "tier": "discovery",
-          "url": "https://x.com/EmmanuelInvest/status/2064383364073672841"
         }
       ],
       "theme_keys": [
@@ -831,27 +881,26 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/EmmanuelInvest/status/2064383364073672841",
         "https://x.com/ssuyogk/status/2062513394188472529"
       ]
     },
     {
       "ticker": "PANW",
       "direction": "long",
-      "thesis": "PANW leads in AI cybersecurity with strong revenue growth and next-gen security ARR, benefiting from AI increasing cyber risks and demand for platform solutions.",
+      "thesis": "AI creates a security arms race where attackers move faster and defenses must react faster, driving demand for Palo Alto Networks' AI-powered platforms.",
       "catalyst": "",
       "sources": [
         {
-          "handle": "ultrastockpro",
-          "role": "AI-powered stock scanner",
+          "handle": "tanhef",
+          "role": "Investor",
           "tier": "discovery",
-          "url": "https://x.com/ultrastockpro/status/2064343173137092868"
+          "url": "https://x.com/TanHef/status/2064159606105084411"
         },
         {
-          "handle": "emmanuelinvest",
-          "role": "Big Tech & AI Investor",
+          "handle": "sentinelflash",
+          "role": "Investment analysis account",
           "tier": "discovery",
-          "url": "https://x.com/EmmanuelInvest/status/2063958543200288828"
+          "url": "https://x.com/SentinelFlash/status/2063634550878597174"
         }
       ],
       "theme_keys": [
@@ -867,37 +916,8 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/EmmanuelInvest/status/2063958543200288828",
-        "https://x.com/ultrastockpro/status/2064343173137092868"
-      ]
-    },
-    {
-      "ticker": "META",
-      "direction": "long",
-      "thesis": "Long-term bullish on META as it can successfully monetize internal AI compute at scale for ads and engagement despite ROI questions.",
-      "catalyst": "",
-      "sources": [
-        {
-          "handle": "msc_1313",
-          "role": "",
-          "tier": "discovery",
-          "url": "https://x.com/msc_1313/status/2063977809844834343"
-        }
-      ],
-      "theme_keys": [
-        "big-tech"
-      ],
-      "prices": null,
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1,
-      "tier": "discovery",
-      "score": 16.5,
-      "conviction": "low",
-      "active": true,
-      "on_watchlist": true,
-      "citations": [
-        "https://x.com/msc_1313/status/2063977809844834343"
+        "https://x.com/SentinelFlash/status/2063634550878597174",
+        "https://x.com/TanHef/status/2064159606105084411"
       ]
     },
     {
@@ -932,14 +952,14 @@
     {
       "ticker": "MSFT",
       "direction": "long",
-      "thesis": "MSFT leads hyperscaler AI capex and monetization via Azure scale and enterprise lock-in, part of the core basket to hold through froth.",
+      "thesis": "MSFT is underappreciated in the AI stack as Copilot monetization is early but Azure growth is reaccelerating, positioning it to capture consolidated enterprise AI spend via cloud and productivity suite.",
       "catalyst": "",
       "sources": [
         {
-          "handle": "grok",
-          "role": "AI assistant",
+          "handle": "killingtonone",
+          "role": "",
           "tier": "discovery",
-          "url": "https://x.com/grok/status/2062941889528045919"
+          "url": "https://x.com/killingtonone/status/2064445260617367789"
         }
       ],
       "theme_keys": [
@@ -955,20 +975,20 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/grok/status/2062941889528045919"
+        "https://x.com/killingtonone/status/2064445260617367789"
       ]
     },
     {
       "ticker": "GOOGL",
       "direction": "long",
-      "thesis": "GOOGL (Google Cloud) is a core long-hold pillar among hyperscalers dominating AI/data center capex.",
+      "thesis": "GOOGL is quietly becoming an AI infrastructure story with accelerating TPU buildout, expanding cloud margins, and intact search monetization that the market is discounting versus peers.",
       "catalyst": "",
       "sources": [
         {
-          "handle": "grok",
+          "handle": "kemal1945",
           "role": "",
           "tier": "discovery",
-          "url": "https://x.com/grok/status/2064045461078430208"
+          "url": "https://x.com/kemal1945/status/2064490354347221476"
         }
       ],
       "theme_keys": [
@@ -984,7 +1004,7 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/grok/status/2064045461078430208"
+        "https://x.com/kemal1945/status/2064490354347221476"
       ]
     },
     {
@@ -1048,14 +1068,14 @@
     {
       "ticker": "ANET",
       "direction": "long",
-      "thesis": "ANET is the cleanest pure-play on AI data-center networking with high-speed Ethernet switches; raised 2026 AI target to $3.5B (doubles YoY) and FY26 guide to $11.5B.",
+      "thesis": "ANET is the purest Ethernet switch play for hyperscaler AI clusters and just raised its 2026 AI revenue target to $3.5B.",
       "catalyst": "",
       "sources": [
         {
-          "handle": "alphametrixai",
-          "role": "",
+          "handle": "wallsteagle",
+          "role": "Ex-VP of Investments focused on AI & Tech disruptors",
           "tier": "discovery",
-          "url": "https://x.com/AlphaMetrixAi/status/2062029348392296931"
+          "url": "https://x.com/WallStEagle/status/2062554185317376406"
         }
       ],
       "theme_keys": [
@@ -1071,7 +1091,7 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/AlphaMetrixAi/status/2062029348392296931"
+        "https://x.com/WallStEagle/status/2062554185317376406"
       ]
     },
     {
@@ -1106,12 +1126,12 @@
     {
       "ticker": "TXN",
       "direction": "long",
-      "thesis": "TXN's analog and power-management portfolio is a key overlooked beneficiary inside AI data centers for efficient power regulation as racks become more power-intensive.",
+      "thesis": "$TXN is an overlooked AI beneficiary via its analog/power-management portfolio solving data center power regulation inside the rack.",
       "catalyst": "",
       "sources": [
         {
           "handle": "jabranstwocents",
-          "role": "Investing for passive income, sharing stock insights",
+          "role": "stock insights author",
           "tier": "discovery",
           "url": "https://x.com/jabranstwocents/status/2062526030796230904"
         }
@@ -1135,14 +1155,14 @@
     {
       "ticker": "MPWR",
       "direction": "long",
-      "thesis": "MPWR is a must-buy power management semiconductor specialist critical for AI servers and data centers over the next decade.",
+      "thesis": "UBS highlights $MPWR as power stages/VRM leader in exploding AI data center power semis TAM.",
       "catalyst": "",
       "sources": [
         {
-          "handle": "christo46444155",
-          "role": "30-Year Options & Futures Vet",
+          "handle": "bullofbritain",
+          "role": "stock commentator",
           "tier": "discovery",
-          "url": "https://x.com/Christo46444155/status/2062383843777110405"
+          "url": "https://x.com/BULLOFBRITAIN/status/2063309051652427839"
         }
       ],
       "theme_keys": [
@@ -1158,18 +1178,18 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/Christo46444155/status/2062383843777110405"
+        "https://x.com/BULLOFBRITAIN/status/2063309051652427839"
       ]
     },
     {
       "ticker": "ON",
       "direction": "long",
-      "thesis": "ON is among the power semiconductors evolving into a core pillar of AI computing infrastructure showing strong relative strength.",
+      "thesis": "Data center power semiconductors like $ON have shown strong relative strength as AI infrastructure pillar.",
       "catalyst": "",
       "sources": [
         {
           "handle": "traderwillhu",
-          "role": "Trader focusing on EPs and liquid leaders",
+          "role": "trader focusing on EPs",
           "tier": "discovery",
           "url": "https://x.com/traderwillhu/status/2062552391619072287"
         }
@@ -1287,14 +1307,14 @@
     {
       "ticker": "ADBE",
       "direction": "long",
-      "thesis": "Adobe could see AI turbocharge its software stocks as generative AI delivers value in creative and enterprise tools.",
-      "catalyst": "",
+      "thesis": "Adobe trading at deep discount (~9.5x P/FCF vs 30x historical) despite AI monetization potential and 40%+ FCF conversion.",
+      "catalyst": "Q2 earnings this Thursday",
       "sources": [
         {
-          "handle": "marketwise_inc",
-          "role": "Financial Research Platform",
+          "handle": "thejoshcornell",
+          "role": "investor",
           "tier": "discovery",
-          "url": "https://x.com/MarketWise_Inc/status/2062222460833988913"
+          "url": "https://x.com/thejoshcornell/status/2064453260463808556"
         }
       ],
       "theme_keys": [
@@ -1310,24 +1330,24 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/MarketWise_Inc/status/2062222460833988913"
+        "https://x.com/thejoshcornell/status/2064453260463808556"
       ]
     },
     {
       "ticker": "AMD",
       "direction": "long",
-      "thesis": "Hyperscalers and AI natives raising $500-700B in capex over next 12-18 months is massively bullish for AMD as a key semi beneficiary.",
-      "catalyst": "",
+      "thesis": "AMD is gaining AI accelerator share as the #2 player, with overflow demand and new hyperscaler deployments amid Nvidia supply constraints.",
+      "catalyst": "Recent major hyperscaler AI deployment wins and MI300X ramp continuing into 2026-2027",
       "sources": [
         {
-          "handle": "mikelongterm",
-          "role": "Long-term investor",
+          "handle": "themomentumplay",
+          "role": "",
           "tier": "discovery",
-          "url": "https://x.com/MikeLongTerm/status/2063015318251782391"
+          "url": "https://x.com/themomentumplay/status/2063883462143332363"
         }
       ],
       "theme_keys": [
-        "big-tech"
+        "digital-semis"
       ],
       "prices": null,
       "first_seen": "2026-06-10",
@@ -1339,7 +1359,72 @@
       "active": true,
       "on_watchlist": true,
       "citations": [
-        "https://x.com/MikeLongTerm/status/2063015318251782391"
+        "https://x.com/themomentumplay/status/2063883462143332363"
+      ]
+    },
+    {
+      "ticker": "LITE",
+      "direction": "long",
+      "thesis": "LITE supplies critical lasers and optical components replacing copper inside AI data centers amid the shift to optics.",
+      "catalyst": "",
+      "sources": [
+        {
+          "handle": "bdinvestingg",
+          "role": "Retail Analyst focused on AI infra and semis",
+          "tier": "discovery",
+          "url": "https://x.com/bdinvestingg/status/2063475788901453950"
+        }
+      ],
+      "theme_keys": [
+        "hardware-components"
+      ],
+      "prices": null,
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1,
+      "tier": "discovery",
+      "score": 16.5,
+      "conviction": "low",
+      "active": true,
+      "on_watchlist": true,
+      "citations": [
+        "https://x.com/bdinvestingg/status/2063475788901453950"
+      ]
+    },
+    {
+      "ticker": "SNDK",
+      "direction": "long",
+      "thesis": "SNDK offers pure-play NAND exposure at the inflection of AI data storage demand explosion with strong pricing power.",
+      "catalyst": "",
+      "sources": [
+        {
+          "handle": "bdinvestingg",
+          "role": "Retail Analyst",
+          "tier": "discovery",
+          "url": "https://x.com/bdinvestingg/status/2062378110155153666"
+        },
+        {
+          "handle": "noisetoalpha",
+          "role": "",
+          "tier": "discovery",
+          "url": "https://x.com/noisetoalpha/status/2062829851224989763"
+        }
+      ],
+      "theme_keys": [
+        "memory"
+      ],
+      "prices": null,
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1,
+      "tier": "discovery",
+      "score": 16.5,
+      "conviction": "low",
+      "active": true,
+      "on_watchlist": true,
+      "citations": [
+        "https://x.com/bdinvestingg/status/2062378110155153666",
+        "https://x.com/noisetoalpha/status/2062829851224989763"
       ]
     }
   ]
