@@ -1,4 +1,4 @@
-name: Refresh X Themes feed
+name: Refresh Twitter Monitor
 
 on:
   schedule:
@@ -29,22 +29,22 @@ jobs:
       - name: Install dependencies
         run: pip install -r spx_dashboard/pipeline/requirements.txt
 
-      - name: Scout X and refresh themes feed
+      - name: Scrape followed accounts and refresh the tweet store
         env:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-          # Optional: when set, the feed + history are mirrored into Supabase
-          # and the UI-editable followed list drives tiering.
+          # Optional: when set, the store + digests are mirrored into Supabase
+          # and the UI-editable (shared) followed list drives the scrape.
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: python spx_dashboard/pipeline/run_themes.py
+        run: python spx_dashboard/pipeline/run_twitter.py
 
-      - name: Commit refreshed feed (triggers Vercel redeploy)
+      - name: Commit refreshed store (triggers Vercel redeploy)
         run: |
-          if [ -n "$(git status --porcelain spx_dashboard/data/themes.json)" ]; then
+          if [ -n "$(git status --porcelain spx_dashboard/data/tweets.json)" ]; then
             git config user.name "spx-dashboard-bot"
             git config user.email "actions@github.com"
-            git add spx_dashboard/data/themes.json
-            git commit -m "data: refresh X Themes feed"
+            git add spx_dashboard/data/tweets.json
+            git commit -m "data: refresh Twitter Monitor store"
             git push
           else
             echo "No feed changes; nothing to deploy."

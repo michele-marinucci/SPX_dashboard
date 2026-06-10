@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
-import { getActiveIdeasCount, getGeneratedAtLabel } from "@/lib/themes";
+import { getGeneratedAtLabel, getTweetCount } from "@/lib/tweets";
 
 // The post-login launcher (Ledger "hub"): one ledger row per tool. Two are
-// live (SPX Monitor, X Themes); three are flagged work-in-progress.
+// live (SPX Monitor, Twitter Monitor); the rest are work-in-progress.
 export default function HomePage() {
-  const ideas = getActiveIdeasCount();
+  const tweets = getTweetCount();
   const asOf = getGeneratedAtLabel();
 
   return (
@@ -82,8 +82,8 @@ export default function HomePage() {
             <span className="v on">LIVE</span>
           </div>
           <div className="stat">
-            <span className="k">IDEAS</span>
-            <span className="v">{ideas}</span>
+            <span className="k">TWEETS</span>
+            <span className="v">{tweets}</span>
           </div>
           <div className="stat">
             <span className="k">UPDATED</span>

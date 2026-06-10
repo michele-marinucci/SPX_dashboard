@@ -6,7 +6,7 @@ import {
   dbSeedFollowed,
   supabaseEnabled,
 } from "@/lib/supabase";
-import { DEFAULT_FOLLOWED_HANDLES } from "@/lib/themes";
+import { DEFAULT_FOLLOWED_HANDLES } from "@/lib/tweets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
