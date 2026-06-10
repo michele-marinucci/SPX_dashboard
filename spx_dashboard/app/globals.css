@@ -1097,6 +1097,204 @@ thead .row-head {
   background: var(--tier, var(--accent));
 }
 
+/* ---------- X Themes: sidebar (explanation + followed-handle manager) ------ */
+.themes-sidebar {
+  padding: 16px 14px 28px;
+}
+.tsb-back {
+  display: inline-block;
+  margin: 0 0 14px 2px;
+}
+.themes-explain {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+.themes-explain > summary {
+  cursor: pointer;
+  font-weight: 650;
+  font-size: 13px;
+  color: var(--ink);
+  list-style: none;
+}
+.themes-explain > summary::-webkit-details-marker {
+  display: none;
+}
+.themes-explain > summary::before {
+  content: "▸ ";
+  color: var(--muted);
+}
+.themes-explain[open] > summary::before {
+  content: "▾ ";
+}
+.themes-explain p {
+  margin: 10px 0 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.themes-explain ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.handles-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.handles-count {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+.handle-add {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.handle-add input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+}
+.handle-add button {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.handle-add button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.handle-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.handle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+}
+.handle-row:hover {
+  background: var(--line-soft);
+}
+.handle-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.handle-name:hover {
+  color: var(--accent);
+}
+.handle-x {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+.handle-x:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.handles-note {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ---------- X Themes: key-themes rollup ---------- */
+.kt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.kt-item {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  background: var(--panel-2);
+}
+.kt-label {
+  font-size: 13px;
+  font-weight: 650;
+  margin-bottom: 6px;
+}
+.kt-n {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 1px 7px;
+  margin-left: 4px;
+}
+.kt-tickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.kt-t {
+  font-size: 12px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-weight: 600;
+}
+.kt-long {
+  color: #047857;
+}
+.kt-short {
+  color: var(--danger);
+}
+
+/* Company name beside the ticker on an idea card. */
+.idea-name {
+  font-size: 12.5px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
 /* ---------- X Themes: top-level view switch ---------- */
 /* Visually separate the SPX Monitor / X Themes switch from the filters below. */
 .view-switch {
