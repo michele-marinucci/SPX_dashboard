@@ -1,0 +1,55 @@
+name: Backfill Twitter Monitor (manual, one-time)
+
+# Manual-only: populates the tweet store with the trailing month so
+# recurring-theme detection has history from day one. Costs ~4-5x a normal
+# run in xAI credits — trigger deliberately, not on a schedule.
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "How many days back to backfill"
+        required: false
+        default: "30"
+
+concurrency:
+  group: refresh-themes
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r spx_dashboard/pipeline/requirements.txt
+
+      - name: Backfill the tweet store
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: >
+          python spx_dashboard/pipeline/backfill_tweets.py
+          --days "${{ inputs.days || '30' }}"
+
+      - name: Commit the backfilled store (triggers Vercel redeploy)
+        run: |
+          if [ -n "$(git status --porcelain spx_dashboard/data/tweets.json)" ]; then
+            git config user.name "spx-dashboard-bot"
+            git config user.email "actions@github.com"
+            git add spx_dashboard/data/tweets.json
+            git commit -m "data: backfill Twitter Monitor store"
+            git push
+          else
+            echo "No changes; nothing to commit."
+          fi
