@@ -2,8 +2,8 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getActiveIdeasCount, getGeneratedAtLabel } from "@/lib/themes";
 
-// The post-login launcher (Ledger "hub"): one ledger row per tool. Two are
-// live (SPX Monitor, X Themes); three are flagged work-in-progress.
+// The post-login launcher (Ledger "hub"): one ledger row per tool. Three are
+// live (SPX Monitor, X Themes, Diligence Tracker); the rest are work-in-progress.
 export default function HomePage() {
   const ideas = getActiveIdeasCount();
   const asOf = getGeneratedAtLabel();
@@ -117,19 +117,38 @@ export default function HomePage() {
         <div className="prev">Preview →</div>
       </Link>
 
-      <Link href="/diligence" className="hub-row wip">
+      <Link href="/diligence" className="hub-row live">
         <div className="hub-idx">04</div>
         <div>
-          <div className="rname">Diligence Tracker</div>
+          <div className="rname">
+            <span className="livedot" aria-hidden="true" />
+            Diligence Tracker
+          </div>
           <p className="rdesc">
-            Open questions, notes, and status as each idea moves through the
-            process.
+            Every position&apos;s Microsoft List in one place — click through to a
+            name&apos;s tracker, add or remove links, shared across the team.
           </p>
         </div>
-        <div>
-          <span className="wiptag">Work in progress</span>
+        <div className="stats">
+          <div className="stat">
+            <span className="k">STATUS</span>
+            <span className="v on">LIVE</span>
+          </div>
+          <div className="stat">
+            <span className="k">SOURCE</span>
+            <span className="v">MS LISTS</span>
+          </div>
+          <div className="stat">
+            <span className="k">ACCESS</span>
+            <span className="v">SHARED</span>
+          </div>
         </div>
-        <div className="prev">Preview →</div>
+        <div className="cta">
+          Open
+          <span className="arr" aria-hidden="true">
+            →
+          </span>
+        </div>
       </Link>
 
       <Link href="/podcast" className="hub-row wip">
@@ -179,7 +198,7 @@ export default function HomePage() {
 
       <div className="hub-foot">
         <span>{asOf ? `X THEMES AS OF ${asOf}` : "X THEMES"}</span>
-        <span>7 MODULES · 2 LIVE</span>
+        <span>7 MODULES · 3 LIVE</span>
       </div>
     </div>
   );
