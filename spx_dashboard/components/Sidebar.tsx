@@ -8,14 +8,25 @@ import { cx } from "@/lib/format";
 import { useCompounders } from "./CompoundersContext";
 import { useSidebarState } from "./SidebarStateContext";
 
-// Left rail: toggle between the aggregate SPX view and each category's
-// per-stock breakdown. Highlights whichever route is active. Collapsible —
-// collapsed by default on mobile, expanded by default on the desktop site.
-export function Sidebar({ nav }: { nav: NavGroup[] }) {
+// Left rail: a top-level switch between the SPX Monitor and the X Themes feed,
+// then (in SPX Monitor mode) the aggregate/compounders toggle and each
+// category's per-stock breakdown. Highlights whichever route is active.
+// Collapsible — collapsed by default on mobile, expanded on the desktop site.
+export function Sidebar({
+  nav,
+  themesCount = 0,
+}: {
+  nav: NavGroup[];
+  themesCount?: number;
+}) {
   const pathname = usePathname();
   const { on: compoundersOnly, set: setCompounders } = useCompounders();
   const { collapsed, setCollapsed, toggle: toggleSidebar } = useSidebarState();
   const [isMobile, setIsMobile] = useState(false);
+
+  // Which top-level view we're in. Everything SPX-specific is hidden on the
+  // themes feed so the two tools never bleed into each other.
+  const isThemes = pathname?.startsWith("/themes") ?? false;
 
   // Totals for the two top buttons, summed from the same per-category counts
   // shown below so the figures always reconcile.
@@ -87,63 +98,96 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
         </span>
       </div>
 
-      {/* Two mutually-exclusive blue toggles: show every SPX stock, or only the
-          compounders. Both reflect the same global filter, so exactly one is on. */}
-      <Link
-        href="/"
-        onClick={() => {
-          setCompounders(false);
-          handleSelect();
-        }}
-        className={cx("seg-btn", !compoundersOnly && "seg-btn-on")}
-        title="Show every stock in the tracked S&P 500 universe"
-      >
-        <span className="seg-label">Aggregate SPX</span>
-        <span className="seg-count">{totalStocks}</span>
-      </Link>
+      {/* Top-level view switch: the existing SPX Monitor vs. the X Themes feed.
+          Same segmented-button styling as the filter toggle below. */}
+      <div className="view-switch">
+        <Link
+          href="/"
+          onClick={handleSelect}
+          className={cx("seg-btn", !isThemes && "seg-btn-on")}
+          title="The S&P 500 AI-beneficiary dashboard"
+        >
+          <span className="seg-label">SPX Monitor</span>
+          <span className="seg-count">{totalStocks}</span>
+        </Link>
+        <Link
+          href="/themes"
+          onClick={() => {
+            // The themes feed has no compounders filter; reset it so the tag
+            // never bleeds across from the SPX views.
+            setCompounders(false);
+            handleSelect();
+          }}
+          className={cx("seg-btn", isThemes && "seg-btn-on")}
+          title="Daily curated investment ideas surfaced from X"
+        >
+          <span className="seg-label">X Themes</span>
+          <span className="seg-count">{themesCount}</span>
+        </Link>
+      </div>
 
-      <button
-        type="button"
-        onClick={() => {
-          setCompounders(true);
-          handleSelect();
-        }}
-        aria-pressed={compoundersOnly}
-        className={cx("seg-btn", compoundersOnly && "seg-btn-on")}
-        title="Show only stocks flagged as compounders"
-      >
-        <span className="seg-label">SPX Compounders</span>
-        <span className="seg-count">{totalCompounders}</span>
-      </button>
+      {/* SPX-specific controls: hidden on the themes feed. */}
+      {!isThemes && (
+        <>
+          {/* Two mutually-exclusive blue toggles: show every SPX stock, or only
+              the compounders. Both reflect the same global filter. */}
+          <Link
+            href="/"
+            onClick={() => {
+              setCompounders(false);
+              handleSelect();
+            }}
+            className={cx("seg-btn", !compoundersOnly && "seg-btn-on")}
+            title="Show every stock in the tracked S&P 500 universe"
+          >
+            <span className="seg-label">Aggregate SPX</span>
+            <span className="seg-count">{totalStocks}</span>
+          </Link>
 
-      <nav className="sidebar-nav">
-        {nav.map((g) => (
-          <div key={g.group} className="nav-group">
-            <div className="nav-group-title">{g.group}</div>
-            {g.items.map((it) => (
-              <Link
-                key={it.slug}
-                href={`/category/${it.slug}`}
-                prefetch={false}
-                onClick={handleSelect}
-                className={cx("nav-link", activeSlug === it.slug && "nav-link-active")}
-              >
-                <span className="nav-link-label">{it.label}</span>
-                <span
-                  className={cx("nav-count", compoundersOnly && "nav-count-c")}
-                  title={
-                    compoundersOnly
-                      ? `${it.compounderCount} compounders`
-                      : `${it.count} stocks`
-                  }
-                >
-                  {compoundersOnly ? it.compounderCount : it.count}
-                </span>
-              </Link>
+          <button
+            type="button"
+            onClick={() => {
+              setCompounders(true);
+              handleSelect();
+            }}
+            aria-pressed={compoundersOnly}
+            className={cx("seg-btn", compoundersOnly && "seg-btn-on")}
+            title="Show only stocks flagged as compounders"
+          >
+            <span className="seg-label">SPX Compounders</span>
+            <span className="seg-count">{totalCompounders}</span>
+          </button>
+
+          <nav className="sidebar-nav">
+            {nav.map((g) => (
+              <div key={g.group} className="nav-group">
+                <div className="nav-group-title">{g.group}</div>
+                {g.items.map((it) => (
+                  <Link
+                    key={it.slug}
+                    href={`/category/${it.slug}`}
+                    prefetch={false}
+                    onClick={handleSelect}
+                    className={cx("nav-link", activeSlug === it.slug && "nav-link-active")}
+                  >
+                    <span className="nav-link-label">{it.label}</span>
+                    <span
+                      className={cx("nav-count", compoundersOnly && "nav-count-c")}
+                      title={
+                        compoundersOnly
+                          ? `${it.compounderCount} compounders`
+                          : `${it.count} stocks`
+                      }
+                    >
+                      {compoundersOnly ? it.compounderCount : it.count}
+                    </span>
+                  </Link>
+                ))}
+              </div>
             ))}
-          </div>
-        ))}
-      </nav>
+          </nav>
+        </>
+      )}
     </aside>
   );
 }
