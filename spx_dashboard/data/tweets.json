@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T21:30:00.594019+00:00",
+  "generated_at": "2026-06-10T22:18:27.302517+00:00",
   "themes": [
     {
       "key": "digital-semis",
@@ -47,52 +47,24 @@
     }
   ],
   "followed_handles": [
-    "alexeheath",
     "altcap",
-    "apoorv03",
-    "artificialanlys",
-    "atelicinvest",
-    "austinsemis",
-    "benthompson",
+    "beth_kindig",
     "bgurley",
-    "chatgptapp",
-    "citrini",
-    "claudeai",
-    "coatuemgmt",
-    "contrariancurse",
-    "deepseek_ai",
-    "dharmesh",
+    "billackman",
+    "darioamodei",
+    "datacenterhawk",
+    "demishassabis",
     "dnystedt",
+    "dwarkesh_sp",
     "dylan522p",
-    "edzitron",
-    "elerianm",
-    "firstadopter",
-    "fundaai",
     "gavinsbaker",
-    "inflectionecon",
-    "insane_analyst",
-    "jukan05",
-    "julienbek",
-    "kevinweil",
-    "kimmonismus",
-    "kobeissiletter",
-    "macroedgeres",
+    "hhhypergrowth",
     "modestproposal1",
-    "mooremorrissemi",
-    "nicbstme",
-    "prismml",
+    "p_ferragu",
+    "patrick_oshag",
     "rihardjarc",
     "sama",
-    "satyanadella",
-    "similarweb",
-    "southernvalue95",
-    "techfundies",
-    "the_ai_investor",
-    "thehumanoidlab",
-    "tmtmoats",
-    "vikramskr",
-    "wccftech",
-    "wisemancap"
+    "stockmarketnerd"
   ],
   "portfolio": [
     "MSFT",
@@ -114,90 +86,80 @@
   ],
   "daily_summary": {
     "date": "2026-06-10",
-    "headline": "NVIDIA-SK Hynix multi-year HBM partnership and Claude Fable 5 launch advance AI buildout while Iran-Israel escalation spikes oil above $94 and erases $2T+ in equity value.",
+    "headline": "Memory market forecasts explode to $889B+ in 2026 with DRAM at $619B as AI demand drives SK Hynix capacity doubling and Nvidia to 20%+ of TSMC revenue.",
     "items": [
       {
         "theme": "memory",
         "label": "Memory & Storage",
-        "summary": "SK Hynix and NVIDIA announced a multi-year technology partnership covering HBM with language suggesting possible long-term agreements; SK Hynix rumored to have secured ~40% of NVIDIA HBM orders. Memory stocks remain up ~200% YTD despite recent selloff while NAND supercycle and Samsung foundry breakeven on 2nm/HBM base die are cited for Q3. Jensen stated entire supply chain remains short with shortage expected to persist several years.",
+        "summary": "TrendForce sees global memory market reaching $889.3B in 2026 (+296% YoY) and $1.28T in 2027, with DRAM at $618.7B (+303% YoY) and NAND at $270.1B; SK Hynix plans to double wafer capacity through 2030 amid ongoing shortage.",
         "tickers": [
+          "AMD",
+          "AVGO",
+          "MU",
           "NVDA"
         ],
         "tweet_ids": [
-          "2063758697348870336",
-          "2063640725980614757",
-          "2063464239889576125",
-          "2063639524669092251"
+          "2064483884847218962",
+          "2064075848026599810",
+          "2064009359965749508",
+          "2063715015274672354"
         ]
       },
       {
-        "theme": "hardware-components",
-        "label": "Hardware & Networking",
-        "summary": "NVIDIA scaling NPO due to CPO delays while LITE CEO noted NPO opportunity could exceed CPO; Lumentum removed Ayar after NVIDIA bought all its supply amid ongoing laser and transceiver yield debates. AMD committed to OCI MSA 2x4 wavelength spec alongside discussions of discrete lasers delivering 160mW with superior noise performance from AVGO and LITE.",
+        "theme": "digital-semis",
+        "label": "Digital Semis",
+        "summary": "Agentic AI shifts server CPU:GPU budget ratio toward 1:1, pitting NVDA, AMD, INTC and ARM against each other; Nvidia projected to exceed 20% of TSMC revenue in 2026.",
         "tickers": [
+          "AMD",
+          "ARM",
+          "INTC",
           "NVDA",
-          "LITE",
-          "AVGO",
-          "AMD"
+          "TSM"
         ],
         "tweet_ids": [
-          "2064475364802613343",
-          "2064493975235621342",
-          "2064086743155130402",
-          "2064069461997695317"
-        ]
-      },
-      {
-        "theme": "software-application",
-        "label": "Application Software",
-        "summary": "Anthropic released Claude Fable 5 (Mythos-class) now ranking #1 on GDPval-AA at 1932 and topping ProofBench at 77% vs specialist 71%; ChatGPT surpassed 600 million monthly active users with Claude visits reaching 952.5M in May (+15.67% MoM, +855% YoY). ChatGPT added on-device chart generation for data comparisons on mobile and web.",
-        "tickers": [],
-        "tweet_ids": [
-          "2064414308289937869",
-          "2063577704264352048",
-          "2064412408144134381",
-          "2064018770839113769"
-        ]
-      },
-      {
-        "theme": "big-tech",
-        "label": "AI Buildout Funders",
-        "summary": "NHS England scaling Microsoft 365 Copilot to >500k staff saving 43 minutes per day; Microsoft Research published cell-behavior AI work in Nature Methods for personalized cancer therapy. Hyperscaler AI spend described as early innings with Mag 7 revenue per employee rising 20% to $270k since 2023.",
-        "tickers": [
-          "MSFT"
-        ],
-        "tweet_ids": [
-          "2063633495302533158",
-          "2064395257148834152",
-          "2064472764027961548",
-          "2063590944079778248"
+          "2063758643762172250",
+          "2063653467059540089"
         ]
       },
       {
         "theme": "other",
         "label": "Other",
-        "summary": "US futures swung sharply after Israel-Iran escalation with WTI crude surging above $94 and Asia-US container rates up 109% since conflict start; US money-market assets hit record $8.29T. Rare-earth prices exploded with yttrium +14,000% to $1,100/kg since April 2025 amid China controls.",
-        "tickers": [],
+        "summary": "Musk outlines TeraFab ramp to 1TW annual chip output (100M sq ft) requiring massive memory and 1000GW/year power by late decade, starting from 1GW in 2027; META cited as severely mispriced.",
+        "tickers": [
+          "META",
+          "NVDA"
+        ],
         "tweet_ids": [
-          "2063743061704814742",
-          "2063768964946112813",
-          "2063666206788198702",
-          "2064435072250351944"
+          "2064214284788507092",
+          "2064214017074479602",
+          "2064419742882898338"
         ]
       }
     ]
   },
   "recurring": [
     {
-      "topic": "Claude Fable 5 / Mythos launch & Anthropic pricing/IPO",
-      "summary": "Heavy discussion erupted on June 9 with the public release of Claude Fable 5 (Mythos-class), benchmark leadership, and shift to usage-based billing after June 22; earlier threads on model capability and guardrails appeared on June 7, June 4 and May 31.",
-      "days_seen": 4,
+      "topic": "Claude Fable 5 / Anthropic Mythos release and pricing shift",
+      "summary": "Heavy discussion on June 9 around Anthropic's Fable 5 launch as top-tier model, benchmark leadership, guardrails, and transition to usage-based pricing post-June 22/23 ahead of potential IPO; earlier days referenced model comparisons and access limits.",
+      "days_seen": 5,
       "tickers": [],
       "tweet_ids": []
     },
     {
-      "topic": "Nvidia HBM/memory supply, SK Hynix partnership & Rubin demand",
-      "summary": "Recurring coverage of Nvidia securing HBM supply, SK Hynix multi-year deal, and multi-year shortage warnings ran on June 9, June 7, June 6 and May 31; Goldman forecast upgrades for SK Hynix/Samsung also surfaced.",
+      "topic": "AI memory/HBM/DRAM supercycle and supply constraints",
+      "summary": "Recurring coverage of exploding DRAM/NAND forecasts ($600B+ DRAM in 2026), SK Hynix-Nvidia multi-year partnership, shortages persisting years, and impact on NVDA/MU/AMD/AVGO; evolved from supply-chain notes to Goldman Sachs upward revisions across multiple dates.",
+      "days_seen": 6,
+      "tickers": [
+        "NVDA",
+        "MU",
+        "AMD",
+        "AVGO"
+      ],
+      "tweet_ids": []
+    },
+    {
+      "topic": "Nvidia optics/packaging (NPO vs CPO) and Rubin platform",
+      "summary": "Ongoing debate on NPO as scaling bridge while CPO delayed, NVDA shifting to NPO, power/thermal issues on Rubin, and interconnect/memory implications; discussion intensified around Computex and supply-chain updates.",
       "days_seen": 4,
       "tickers": [
         "NVDA"
@@ -205,32 +167,41 @@
       "tweet_ids": []
     },
     {
-      "topic": "Iran conflict, oil prices & Strait of Hormuz risk",
-      "summary": "Geopolitical escalation and oil spikes (> $94-$107) were tracked on June 9, June 7, June 6 and May 31, with repeated updates on missile exchanges, Trump statements and supply-disruption odds.",
+      "topic": "Iran conflict, oil prices, and market reaction",
+      "summary": "Multiple updates on strikes, missile exchanges, potential deals, and resulting oil spikes above $94-107 plus equity volatility; market impact (S&P/Nasdaq drawdowns) tracked in real time across dates.",
       "days_seen": 4,
       "tickers": [],
       "tweet_ids": []
     },
     {
-      "topic": "CPO vs NPO AI interconnect debate",
-      "summary": "Technical discussion on Nvidia scaling NPO because CPO is delayed, plus Kyber yield concerns, appeared on June 9 (multiple), June 8 and June 7.",
-      "days_seen": 3,
-      "tickers": [
-        "NVDA"
-      ],
-      "tweet_ids": []
-    },
-    {
-      "topic": "SpaceX valuation, Starlink cadence & IPO speculation",
-      "summary": "Coatue and other accounts analyzed SpaceX launch economics and valuation multiples on June 9, June 7 and June 6, with IPO timing chatter continuing from late May.",
-      "days_seen": 3,
+      "topic": "SpaceX valuation, Starship cadence, and IPO speculation",
+      "summary": "Recurring analysis of SpaceX per-launch economics, Starlink subscriber scaling, comparisons to Liberty ships, and path to IPO or public value; Coatue and others highlighted strategic importance.",
+      "days_seen": 4,
       "tickers": [],
       "tweet_ids": []
     },
     {
-      "topic": "Hyperscaler AI capex & power-constraint narrative",
-      "summary": "Debate on whether AI buildout resembles 1997 or 2000, power shortages, and \"follow the gigawatt\" thesis recurred on June 9, June 5 and May 30.",
+      "topic": "SaaS/AI bubble concerns and enterprise adoption",
+      "summary": "Ed Zitron and Coatue commentary on SaaSpocalypse, data-center fragility, agentic shift from GPU- to CPU-heavy workloads, and ROI questions; evolved from hype skepticism to focus on usage-based billing and productivity gains.",
+      "days_seen": 4,
+      "tickers": [],
+      "tweet_ids": []
+    },
+    {
+      "topic": "TSMC advanced packaging and AI server supply chain",
+      "summary": "TSMC COUPE, CoWoS, EMIB, ABF substrate shortages, and capacity visibility to 2030 discussed repeatedly; linked to Nvidia/AMD demand and potential strikes or bonus issues.",
       "days_seen": 3,
+      "tickers": [
+        "TSM",
+        "NVDA",
+        "AMD"
+      ],
+      "tweet_ids": []
+    },
+    {
+      "topic": "New AI model benchmarks and open-weight competition",
+      "summary": "Frequent posts comparing Claude, Gemini, DeepSeek, Nemotron, and others on coding/math/image/speech benchmarks plus pricing; shifted toward agentic coding performance and China open models.",
+      "days_seen": 4,
       "tickers": [],
       "tweet_ids": []
     }
@@ -241,7 +212,7 @@
     "AMAT": null,
     "AMD": null,
     "AMGN": null,
-    "AMZN": null,
+    "AMZN": -4.8,
     "AON": null,
     "ARM": null,
     "ASML": null,
@@ -292,7 +263,7 @@
     "QCOM": null,
     "RBRK": null,
     "RDDT": null,
-    "SMCI": null,
+    "SMCI": -38.3,
     "SMH": null,
     "SMTC": null,
     "SNDK": null,
@@ -461,6 +432,44 @@
       "seen_count": 1
     },
     {
+      "id": "2064490009369936051",
+      "url": "https://x.com/p_ferragu/status/2064490009369936051",
+      "handle": "p_ferragu",
+      "author_name": "Pierre Ferragu",
+      "posted_at": "2026-06-09T23:29:09Z",
+      "text": "One aspect to consider: Starships will be to the next global confrontation what liberty ships were to WWII. When you look at SpaceX dont underestimate the strategic value of what they do.",
+      "views": 2404,
+      "has_media": false,
+      "summary": "Starships compared to WWII liberty ships; SpaceX strategic value highlighted.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2064487844161147324",
+      "url": "https://x.com/patrick_oshag/status/2064487844161147324",
+      "handle": "patrick_oshag",
+      "author_name": "Patrick OShaughnessy",
+      "posted_at": "2026-06-09T23:20:33Z",
+      "text": "Another great example of the alpha in seeing things firsthand.\n\nAlex explains the difference between spotting consumer and enterprise trends:\n\n\"Andy Grove says when you have strategic inflection points, you can't trust the data. \n\nAnd strategic inflection points are about intuition and anecdotal evidence. \n\nWe invested in the mobile video game S-curve for so long. \n\nThe screens were small and the processing power wasn't good, so you had all these casual games.  \n\nBut then I was in China and I saw this little 12-year-old boy with a huge phone playing an awesome video game. \n\nI'm like, \"It's now coming to the phone.\" So it's visual. \n\nEnterprise is hard because you can't see it. \n\nSo we go to the Gartner IT Symposium, 30,000 American CIOs go there. \n\nWe saw this happen with Splunk - the room where they were explaining it was standing room only. \n\nAnd with AWS, we went there and the grand ballroom was completely packed, and that was at nine o'clock. And at 10 o'clock the grand ballroom was completely packed. \n\nSo you could see the demand exploding before it happened.\"",
+      "views": 71337,
+      "has_media": false,
+      "summary": "Alex notes strategic inflection points require intuition; examples from mobile games, Splunk, AWS.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [
+        "AMZN"
+      ],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2064487588082352565",
       "url": "https://x.com/coatuemgmt/status/2064487588082352565",
       "handle": "coatuemgmt",
@@ -545,6 +554,31 @@
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2064483884847218962",
+      "url": "https://x.com/Beth_Kindig/status/2064483884847218962",
+      "handle": "beth_kindig",
+      "author_name": "Beth Kindig",
+      "posted_at": "2026-06-09T23:04:49Z",
+      "text": "For 2027, TrendForce now projects the global memory market to reach $1.28 trillion, up 44% YoY, with DRAM revenue forecast to surpass $900 billion. \n\nThis would be more than 5X larger than the memory market in 2025, at $224.7 billion.\n\n$MU $AMD $NVDA $AVGO",
+      "views": 62603,
+      "has_media": false,
+      "summary": "TrendForce projects global memory market at $1.28T in 2027 (+44% YoY), DRAM >$900B, 5X larger than 2025's $224.7B.",
+      "sentiment": "positive",
+      "themes": [
+        "memory"
+      ],
+      "tickers": [
+        "AMD",
+        "AVGO",
+        "MU",
+        "NVDA"
+      ],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
@@ -1316,9 +1350,9 @@
       "author_name": "Dylan Patel",
       "posted_at": "2026-06-09T20:36:31Z",
       "text": "InferenceX has run every day for 9 months on all the latest models and all the leading AI chips!",
-      "views": 546,
+      "views": 552,
       "has_media": false,
-      "summary": "InferenceX benchmarked latest models on leading AI chips daily for 9 months.",
+      "summary": "InferenceX benchmarked latest models and AI chips daily for 9 months.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -1334,12 +1368,12 @@
       "author_name": "Gavin Baker",
       "posted_at": "2026-06-09T20:30:04Z",
       "text": "383 days from company formation to first PO for a hardware company was impressive.\n\nAria can help optimize Nvidia clusters for unified front-end/scale-out networking use cases especially around observability.\n\nBut Mansour, you still have a lot of wood to chop. Keep chopping!",
-      "views": 6103,
+      "views": 6110,
       "has_media": false,
-      "summary": "Aria optimizes Nvidia clusters for networking; 383 days from formation to first PO impressive.",
+      "summary": "Aria reached first PO 383 days after formation; optimizes Nvidia clusters for networking.",
       "sentiment": "positive",
       "themes": [
-        "digital-semis"
+        "hardware-components"
       ],
       "tickers": [
         "NVDA"
@@ -1646,9 +1680,9 @@
       "author_name": "Dylan Patel",
       "posted_at": "2026-06-09T19:16:30Z",
       "text": "Ye here\nhttps://semianalysis.com/tokenomics-model/",
-      "views": 605,
+      "views": 610,
       "has_media": false,
-      "summary": "Link to semianalysis tokenomics model.",
+      "summary": "Tweet shares tokenomics model link.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -1690,6 +1724,24 @@
       "tickers": [
         "SPACEX"
       ],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2064425360465219934",
+      "url": "https://x.com/stockmarketnerd/status/2064425360465219934",
+      "handle": "stockmarketnerd",
+      "author_name": "Stock Market Nerd",
+      "posted_at": "2026-06-09T19:12:15Z",
+      "text": "This is the best counter argument",
+      "views": 384,
+      "has_media": false,
+      "summary": "Tweet calls content the best counter-argument.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
@@ -1769,15 +1821,51 @@
       "seen_count": 1
     },
     {
+      "id": "2064422596620472560",
+      "url": "https://x.com/dwarkesh_sp/status/2064422596620472560",
+      "handle": "dwarkesh_sp",
+      "author_name": "Dwarkesh Patel",
+      "posted_at": "2026-06-09T19:01:16Z",
+      "text": "Full episode:\nhttps://www.dwarkesh.com/p/sholto-trenton-2",
+      "views": 11543,
+      "has_media": false,
+      "summary": "Tweet shares full episode link only.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2064422583731421376",
+      "url": "https://x.com/dwarkesh_sp/status/2064422583731421376",
+      "handle": "dwarkesh_sp",
+      "author_name": "Dwarkesh Patel",
+      "posted_at": "2026-06-09T19:01:13Z",
+      "text": "Whatever AI sceptics say, LLMs really can reason. They're not just doing an imitation that looks like reasoning, it's the real deal.\n\nBut even though they are able to reason, sometimes they won't! If you ask an LLM a question it can't answer, sometimes it will just try to imitate reasoning without doing it.\n\nThe chain of thought looks basically indistinguishable from actual reasoning. But under the hood something very different is going on.\n\n@TrentonBricken talked with me about what work on circuits inside LLMs has revealed:",
+      "views": 96722,
+      "has_media": true,
+      "summary": "LLMs can reason but sometimes imitate without actual reasoning; circuits research discussed.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2064419742882898338",
       "url": "https://x.com/rihardjarc/status/2064419742882898338",
       "handle": "rihardjarc",
       "author_name": "Rihard Jarc",
       "posted_at": "2026-06-09T18:49:56Z",
       "text": "No, I think there is a severe mispricing on $META.",
-      "views": 1230,
+      "views": 1233,
       "has_media": false,
-      "summary": "Severe mispricing on $META.",
+      "summary": "Tweet asserts severe mispricing on META.",
       "sentiment": "positive",
       "themes": [
         "big-tech"
@@ -1788,6 +1876,24 @@
       "portfolio": [
         "META"
       ],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2064419582576578618",
+      "url": "https://x.com/stockmarketnerd/status/2064419582576578618",
+      "handle": "stockmarketnerd",
+      "author_name": "Stock Market Nerd",
+      "posted_at": "2026-06-09T18:49:18Z",
+      "text": "It\u2019s definitely a lot of new supply to digest for the entire market. Mega-cap raises too. It\u2019s the consensus view right now but it\u2019s a view that does make sense",
+      "views": 185,
+      "has_media": false,
+      "summary": "Mega-cap raises create substantial new supply for market to digest.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
       "seen_count": 1
@@ -1817,16 +1923,15 @@
       "author_name": "Dylan Patel",
       "posted_at": "2026-06-09T18:44:35Z",
       "text": "DeepSeek Inference Analysis\nDay 0 GB200 NVL72, Blackwell, AMD MI355X\nHuawei performance analysis\nPerformance every day over time for the past 44 days",
-      "views": 35034,
+      "views": 35247,
       "has_media": false,
-      "summary": "DeepSeek inference analysis on GB200, Blackwell, MI355X and Huawei over 44 days.",
+      "summary": "DeepSeek inference analysis covers GB200, Blackwell, AMD MI355X, Huawei over 44 days.",
       "sentiment": "neutral",
       "themes": [
         "digital-semis"
       ],
       "tickers": [
-        "AMD",
-        "NVDA"
+        "AMD"
       ],
       "portfolio": [],
       "first_seen": "2026-06-10",
@@ -1840,16 +1945,17 @@
       "author_name": "Rihard Jarc",
       "posted_at": "2026-06-09T18:32:56Z",
       "text": "Recursive self-improvement around the corner?\n\nAnthropic limiting Claude\u2019s ability to help with frontier LLM development.",
-      "views": 9731,
+      "views": 9764,
       "has_media": false,
-      "summary": "Anthropic limiting Claude ability to help with frontier LLM development signals recursive self-improvement.",
+      "summary": "Anthropic limits Claude assistance for frontier LLM development amid recursive self-improvement speculation.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
-      "seen_count": 1
+      "seen_count": 1,
+      "media_summary": "Anthropic policy text on AI safeguards limiting Claude for frontier LLM development."
     },
     {
       "id": "2064415425362808884",
@@ -2076,6 +2182,24 @@
       "seen_count": 1
     },
     {
+      "id": "2064405614873215307",
+      "url": "https://x.com/stockmarketnerd/status/2064405614873215307",
+      "handle": "stockmarketnerd",
+      "author_name": "Stock Market Nerd",
+      "posted_at": "2026-06-09T17:53:48Z",
+      "text": "That was a much more reasonably-priced IPO",
+      "views": 126,
+      "has_media": false,
+      "summary": "Tweet notes recent IPO was reasonably priced.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2064404934276391206",
       "url": "https://x.com/gavinsbaker/status/2064404934276391206",
       "handle": "gavinsbaker",
@@ -2118,10 +2242,10 @@
       "author_name": "Rihard Jarc",
       "posted_at": "2026-06-09T17:49:55Z",
       "text": "Big performance leap for Anthropic again with Mythos and Fable 5. \n\nAlso giving access to the model to Pro, Max, Team, and seat-based Enterprise plans until 22th June, then only via usage credits, is the biggest signal that the frontier models are moving to usage-based pricing, end of the subsidizing AI era, as the IPOs are coming.",
-      "views": 21623,
+      "views": 21635,
       "has_media": false,
-      "summary": "Big performance leap for Anthropic with Mythos and Fable 5; signals usage-based pricing shift ahead of IPOs.",
-      "sentiment": "positive",
+      "summary": "Anthropic launches Mythos and Fable 5; shifts frontier models to usage-based pricing.",
+      "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
@@ -2172,17 +2296,17 @@
       "author_name": "Gavin Baker",
       "posted_at": "2026-06-09T17:22:46Z",
       "text": "Evidently prices will go up in about two weeks. \n\nAlso I preferred Mythos to Fable. \n\nFable makes me think of fabulist, which is not the best association.\n\nExcited to try it!",
-      "views": 69459,
+      "views": 69545,
       "has_media": true,
-      "summary": "Prices will rise in two weeks; preferred Mythos to Fable; excited to try.",
-      "sentiment": "positive",
+      "summary": "Prices expected to rise in two weeks; preference for Mythos over Fable noted.",
+      "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
       "seen_count": 1,
-      "media_summary": "AI model selection menu (Fable 5, Opus, Sonnet, Haiku) in a mobile app interface."
+      "media_summary": "AI model selection menu (Fable 5, Opus, etc.) in a mobile app."
     },
     {
       "id": "2064396974061957175",
@@ -2454,9 +2578,9 @@
       "author_name": "Dylan Patel",
       "posted_at": "2026-06-09T16:50:33Z",
       "text": "What EU regulations does to AI",
-      "views": 37478,
+      "views": 37640,
       "has_media": true,
-      "summary": "What EU regulations does to AI.",
+      "summary": "Tweet questions impact of EU regulations on AI.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -2464,7 +2588,7 @@
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
       "seen_count": 1,
-      "media_summary": "Meme/satirical image criticizing Siri\u2019s EU limitations on iOS/iPadOS due to regulations. Not finance-relevant."
+      "media_summary": "Meme mocking Siri's EU restrictions on iOS/iPadOS (Grok branding)."
     },
     {
       "id": "2064388587206938945",
@@ -2653,6 +2777,26 @@
       "seen_count": 1
     },
     {
+      "id": "2064366857109356688",
+      "url": "https://x.com/patrick_oshag/status/2064366857109356688",
+      "handle": "patrick_oshag",
+      "author_name": "Patrick OShaughnessy",
+      "posted_at": "2026-06-09T15:19:47Z",
+      "text": "\"I think there's tremendous alpha in the largest cap.\"\n\nAlex manages $17B and runs one of the best performing hedge funds over the last 3 years.\n\n\"There's a huge structural underweight of the largest tech companies in the world.\n\nWe also realized that a lot of our performance over the years was from some of the largest companies.\n\nThere's a belief that there's no alpha in large cap, so the largest pools of capital are underweight this. \n\nThey have a lot of small and mid managers that are stock pickers because it's intuitive that large cap can't have alpha.\n\nIn tech, the leader usually grows bigger and wins and develops very high market share quickly, and there's great competitive advantages.\n\nSo this is gonna lead to massive profit pools and massive market caps.\n\nMost endowments are betting against this because they're completely underweight this.\n\nI think there's tremendous alpha in the largest cap because a small cap, it just takes one person to figure out it's good and move it up. \n\nBut it takes a hundred diversified PMs to realize Google's not a loser, it's a winner.\n\nAnd can we figure that out before 95% of those generalist PMs, and we've been able to do it.\"",
+      "views": 148578,
+      "has_media": false,
+      "summary": "Alex argues alpha exists in largest-cap tech due to structural underweight and winner-take-most dynamics.",
+      "sentiment": "positive",
+      "themes": [
+        "big-tech"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2064360619789238461",
       "url": "https://x.com/kobeissiletter/status/2064360619789238461",
       "handle": "kobeissiletter",
@@ -2690,6 +2834,42 @@
       "portfolio": [
         "AMZN"
       ],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2064356521182703845",
+      "url": "https://x.com/gavinsbaker/status/2064356521182703845",
+      "handle": "gavinsbaker",
+      "author_name": "Gavin Baker",
+      "posted_at": "2026-06-09T14:38:43Z",
+      "text": "Dyson Sphere this millennium looking more likely.",
+      "views": 1739,
+      "has_media": false,
+      "summary": "Tweet states Dyson Sphere this millennium now appears more likely.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2064356403633078512",
+      "url": "https://x.com/gavinsbaker/status/2064356403633078512",
+      "handle": "gavinsbaker",
+      "author_name": "Gavin Baker",
+      "posted_at": "2026-06-09T14:38:15Z",
+      "text": "That is a very interesting thought. Economic limitations may be preventing us from hitting ASI with the current models.",
+      "views": 1261,
+      "has_media": false,
+      "summary": "Economic limits may block ASI with current models.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
       "seen_count": 1
@@ -2979,6 +3159,26 @@
       "seen_count": 1
     },
     {
+      "id": "2064316586106708018",
+      "url": "https://x.com/patrick_oshag/status/2064316586106708018",
+      "handle": "patrick_oshag",
+      "author_name": "Patrick OShaughnessy",
+      "posted_at": "2026-06-09T12:00:01Z",
+      "text": "My conversation with Alex Sacerdote, founder of Whale Rock Capital Management.\n\nAlex runs more than $17B and has been one of the best performing tech investors for years, though he keeps a low public profile.\n\nAs you'll hear, he is singular in how he thinks about investing through technology cycles. \n\nFor over 25 years, he has built his entire investment framework around a single idea, the S-curve.\n\nWe discuss:\n- The AI L-Curve \n- When to buy into an S-curve and when to sell out\n- The de-commoditization of data center hardware\n- Why he went net short software\n- His two models for tech adoption\n- Finding alpha\n\nEnjoy!\n\nTimestamps\n0:00 Intro\n9:55 AI's L-Curve\n19:31 Whale Rock's S-Curve Playbook\n26:14 Spotting Inflection Points\n32:02 Finding AI Winners\n40:04 AI vs Software\n48:13 The Hardware Renaissance\n58:04 Why Investors Miss AI\n1:05:18 Whale Rock's Research Machine",
+      "views": 439184,
+      "has_media": false,
+      "summary": "Alex Sacerdote discusses AI L-curve, S-curve playbook, hardware renaissance, and net-short software stance.",
+      "sentiment": "neutral",
+      "themes": [
+        "hardware-components"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2064300529690243234",
       "url": "https://x.com/inflectionecon/status/2064300529690243234",
       "handle": "inflectionecon",
@@ -3237,7 +3437,7 @@
       "text": "They've said they would make memory, too. Would surely have to partner or license the tech. They did announce a $16.5B deal with Samsung last July (2025), so there's that.",
       "views": 84,
       "has_media": false,
-      "summary": "They've said they would make memory, too. Would surely have to partner or license the tech. They did announce a $16.5B deal with Samsung las",
+      "summary": "Company may partner or license memory tech; $16.5B Samsung deal noted.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -3290,10 +3490,10 @@
       "handle": "dnystedt",
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-09T05:26:26Z",
-      "text": "They've said they would make memory, too. Would surely have to partner or license the tech. They did announce a $16.5B deal with Samsung last July (2025), so there's that.",
-      "views": 84,
+      "text": "All-in-One:",
+      "views": 3527,
       "has_media": false,
-      "summary": "SpaceX may partner on memory; announced $16.5B Samsung deal in 2025.",
+      "summary": "Tweet states \"All-in-One:\" with no further detail.",
       "sentiment": "neutral",
       "themes": [
         "memory"
@@ -3312,10 +3512,10 @@
       "handle": "dnystedt",
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-09T05:25:36Z",
-      "text": "All-in-One:",
-      "views": 3523,
+      "text": "https://x.com/i/article/2064214749513146368",
+      "views": 12932,
       "has_media": false,
-      "summary": "All-in-One.",
+      "summary": "Tweet shares article link only.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -3330,10 +3530,10 @@
       "handle": "dnystedt",
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-09T05:14:57Z",
-      "text": "https://x.com/i/article/2064214749513146368",
-      "views": 12902,
+      "text": "Link:",
+      "views": 5028,
       "has_media": false,
-      "summary": "Shared article link.",
+      "summary": "Tweet states \"Link:\" only.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -3351,14 +3551,15 @@
       "text": "7/7 SpaceX AI1 satellite computing modules:",
       "views": 1462,
       "has_media": true,
-      "summary": "7/7 SpaceX AI1 satellite computing modules:",
+      "summary": "Tweet references SpaceX AI1 satellite computing modules.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
-      "seen_count": 1
+      "seen_count": 1,
+      "media_summary": "Industrial automation machinery (robotic arms/assembly equipment). Not finance-relevant."
     },
     {
       "id": "2064214400605794516",
@@ -3366,17 +3567,18 @@
       "handle": "dnystedt",
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-09T05:13:59Z",
-      "text": "All-in-One:",
-      "views": 5025,
+      "text": "6/7 The biggest part of the AI1 satellite is the solar panels, 70-meter-wingspan, attached to a server bay filled with computing modules and radiator to dissipate heat. Terabit connectivity laser links will move data, which Starlink can send to the ground at very low latency because they\u2019re about 3-milliseconds away, said Musk.",
+      "views": 1166,
       "has_media": true,
-      "summary": "All-in-One.",
+      "summary": "Describes AI1 satellite solar panels, server bay, radiator, and low-latency Starlink links.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
-      "seen_count": 1
+      "seen_count": 1,
+      "media_summary": "Server internals (data center hardware); not finance-relevant."
     },
     {
       "id": "2064214284788507092",
@@ -3384,12 +3586,14 @@
       "handle": "dnystedt",
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-09T05:13:31Z",
-      "text": "Link:",
-      "views": 1462,
+      "text": "5/7 A TeraWatt of chip output per year: \u201cWell, I think over time there\u2019s going to be a lot of technology evolution with the TeraFab, but fundamentally, it\u2019s about scale. So even if there were no fundamental technology breakthroughs, you could simply scale the existing chip making technology \u2013 with a lot of difficulty \u2013 to a TeraWatt of chip output per year. If you look at it just from a logic die standpoint, that\u2019s like having a billion chips per year with a kilowatt-per-reticle, so a billion full-reticle equivalent chips, each doing a kilowatt, and then you\u2019re going to need a lot of memory to go with that,\u201d Musk said.",
+      "views": 1148,
       "has_media": true,
-      "summary": "Shared link.",
+      "summary": "Musk discusses scaling to TeraWatt chip output and need for massive memory.",
       "sentiment": "neutral",
-      "themes": [],
+      "themes": [
+        "memory"
+      ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
@@ -3402,10 +3606,10 @@
       "handle": "dnystedt",
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-09T05:12:55Z",
-      "text": "7/7 SpaceX AI1 satellite computing modules:",
-      "views": 1166,
+      "text": "4/6 \u201cIn order to get to the next order of magnitude, you need a gigantic chip factory. To give you a sense of scale here, we expect the TeraFab is going to be somewhere around 100 million square feet, which is 10-times the size of Tesla GigaFactory Texas,\u201d said Musk.",
+      "views": 1485,
       "has_media": true,
-      "summary": "SpaceX AI1 satellite computing modules shown.",
+      "summary": "TeraFab projected at 100M sq ft, 10x Tesla Giga Texas size.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -3413,7 +3617,7 @@
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
       "seen_count": 1,
-      "media_summary": "Close-up of industrial robotic/mechanical assembly components (not finance-relevant)."
+      "media_summary": "Torafab's 100M ft\u00b2 array produces 1 TW/year\u2014double current U.S. consumption\u2014highlighting vast renewable supply potential and market disruption risk."
     },
     {
       "id": "2064214017074479602",
@@ -3421,10 +3625,10 @@
       "handle": "dnystedt",
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-09T05:12:27Z",
-      "text": "6/7 The biggest part of the AI1 satellite is the solar panels, 70-meter-wingspan, attached to a server bay filled with computing modules and radiator to dissipate heat. Terabit connectivity laser links will move data, which Starlink can send to the ground at very low latency because they\u2019re about 3-milliseconds away, said Musk.",
-      "views": 1148,
+      "text": "3/6 TeraFab: \u201cThe current industry seems like it\u2019s going to get to maybe around 100GW a year of AI compute. But that doesn\u2019t answer the question of, \u2018well how do you get to a TeraWatt?\u2019 That\u2019s why you need a TeraFab,\u201d Musk said.\n\nA TeraWatt is \u201ctwice the current electricity consumption of the United States. I think there will be an appetite for that, but we\u2019ll see,\u201d he said.",
+      "views": 2225,
       "has_media": false,
-      "summary": "Musk: AI1 satellite has 70m solar wings, server bay, radiators, terabit laser links.",
+      "summary": "Industry AI compute at ~100GW/year; TeraFab needed to reach 1TW (2x US electricity use).",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -3440,10 +3644,10 @@
       "handle": "dnystedt",
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-09T05:12:27Z",
-      "text": "4/6 \u201cIn order to get to the next order of magnitude, you need a gigantic chip factory. To give you a sense of scale here, we expect the TeraFab is going to be somewhere around 100 million square feet, which is 10-times the size of Tesla GigaFactory Texas,\u201d said Musk.",
-      "views": 2224,
+      "text": "Wtf is this lmfao",
+      "views": 5774,
       "has_media": true,
-      "summary": "Musk: TeraFab ~100M sq ft, 10x Tesla Giga Texas for next compute order of magnitude.",
+      "summary": "Tweet expresses surprise at unspecified content.",
       "sentiment": "neutral",
       "themes": [
         "digital-semis"
@@ -3461,10 +3665,10 @@
       "handle": "dnystedt",
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-09T05:11:57Z",
-      "text": "5/7 A TeraWatt of chip output per year: \u201cWell, I think over time there\u2019s going to be a lot of technology evolution with the TeraFab, but fundamentally, it\u2019s about scale. So even if there were no fundamental technology breakthroughs, you could simply scale the existing chip making technology \u2013 with a lot of difficulty \u2013 to a TeraWatt of chip output per year. If you look at it just from a logic die standpoint, that\u2019s like having a billion chips per year with a kilowatt-per-reticle, so a billion full-reticle equivalent chips, each doing a kilowatt, and then you\u2019re going to need a lot of memory to go with that,\u201d Musk said.",
-      "views": 1484,
+      "text": "2/6 SpaceX\u2019s AI1 satellites, for AI compute in space, are a key reason why the TeraFab is necessary. Musk\u2019s best launch guess is \u201croughly an annualized rate of a GigaWatt (GW) per year by the end of next year\u201d, expanding exponentially:\n\u2022Baseline (End-2027): 1 GW per year.\n\u2022+1 Year (2.5 years from now, 2028): 10GW/ year\n\u2022+2 Years (in 3.5 years, Dec 2029): 100GW/year\n\u2022Then scale to a TeraWatt (TW) per year, 1,000 GW",
+      "views": 2410,
       "has_media": false,
-      "summary": "Musk: TeraFab targets 1TW chip output/year needing billion kW-reticle chips plus memory.",
+      "summary": "SpaceX AI1 satellites drive TeraFab need; ramp from 1GW (2027) to 1000GW/year.",
       "sentiment": "neutral",
       "themes": [
         "digital-semis",
@@ -3483,9 +3687,9 @@
       "author_name": "Dylan Patel",
       "posted_at": "2026-06-09T05:04:24Z",
       "text": "Ah old school Nvidia trick",
-      "views": 2347,
+      "views": 2349,
       "has_media": false,
-      "summary": "Ah old school Nvidia trick.",
+      "summary": "Tweet references old-school Nvidia technique.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [
@@ -3503,9 +3707,9 @@
       "author_name": "Dylan Patel",
       "posted_at": "2026-06-09T05:04:10Z",
       "text": "Tbf they use a ton of global foundries",
-      "views": 6153,
+      "views": 6162,
       "has_media": false,
-      "summary": "They use a ton of GlobalFoundries.",
+      "summary": "Tweet notes heavy use of GlobalFoundries.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -3521,9 +3725,9 @@
       "author_name": "Dylan Patel",
       "posted_at": "2026-06-09T05:02:33Z",
       "text": "What happened there?",
-      "views": 2756,
+      "views": 2758,
       "has_media": false,
-      "summary": "What happened there?",
+      "summary": "Tweet asks what happened at unspecified event.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -3539,9 +3743,9 @@
       "author_name": "Dylan Patel",
       "posted_at": "2026-06-09T05:00:19Z",
       "text": "Banger",
-      "views": 4446,
+      "views": 4464,
       "has_media": false,
-      "summary": "Banger.",
+      "summary": "Tweet calls content a \"banger\".",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -3685,12 +3889,12 @@
       "author_name": "Dylan Patel",
       "posted_at": "2026-06-09T00:39:37Z",
       "text": "Qualcomm is a piece of shit supplier to anyone trying to innovate on the edge, especially startups.\nMy client is trying to buying ~500,000 of SoCs and wants them to be American because patriotism.\nInstead Qualcomm has them waiting months to even get pricing, just to be quoted with 80% margins at lead times that are not competitive with overseas suppliers.\nThey're about to ship the M1: 37g, IMU, Camera, NPU, CPU, WiFi/BT, entirely hardware synchronized and designed for mass-manufacturing.\nHundreds of thousands pre-ordered, scaling to millions, for next-gen devices for robotics, automotive, night vision...\nClient wants to build American but the way Qualcomm is engaging right now means we have to keep building perception and compute systems with overseas suppliers.\nMediatek priced it better and more competitive lead times.\nThe China suppliers such as Rockchip are even faster but cant do that.",
-      "views": 314797,
+      "views": 315337,
       "has_media": false,
-      "summary": "Qualcomm's high margins and slow quotes push client to overseas SoC suppliers like MediaTek.",
+      "summary": "Qualcomm criticized for high margins, long lead times vs overseas suppliers for robotics SoCs.",
       "sentiment": "negative",
       "themes": [
-        "analog-mcu"
+        "digital-semis"
       ],
       "tickers": [
         "QCOM"
@@ -3853,16 +4057,17 @@
       "author_name": "modest proposal",
       "posted_at": "2026-06-08T21:16:21Z",
       "text": "4 out of the last 5 days. More days with 5% spread in the last month than there was in the 5 years before Claude Code captured investors attention.",
-      "views": 3538,
+      "views": 3542,
       "has_media": true,
-      "summary": "4 out of last 5 days with 5% spread; more such days in last month than prior 5 years.",
+      "summary": "4 of last 5 days showed 5% spread, exceeding prior 5-year frequency.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
-      "seen_count": 1
+      "seen_count": 1,
+      "media_summary": "SMH-IGV spread (daily diffs) shows rising volatility & negative bias into 2026, signaling semis lagging software ETFs. \n\n(The image is a bar chart of financial time-series data.)"
     },
     {
       "id": "2064088940932641225",
@@ -3871,9 +4076,9 @@
       "author_name": "Sam Altman",
       "posted_at": "2026-06-08T20:55:27Z",
       "text": "Here is our current plan for OpenAI:\n\nhttps://openai.com/index/built-to-benefit-everyone-our-plan/",
-      "views": 1474199,
+      "views": 1475130,
       "has_media": false,
-      "summary": "Shared OpenAI current plan link.",
+      "summary": "Tweet shares OpenAI current plan link.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -4021,6 +4226,31 @@
       "seen_count": 1
     },
     {
+      "id": "2064075848026599810",
+      "url": "https://x.com/Beth_Kindig/status/2064075848026599810",
+      "handle": "beth_kindig",
+      "author_name": "Beth Kindig",
+      "posted_at": "2026-06-08T20:03:25Z",
+      "text": "DRAM is expected to account for the majority of the market, reaching $618.7 billion in 2026, up nearly 303% YoY, while NAND is projected to grow nearly 281% to $270.1 billion. \n\n$MU $NVDA $AMD $AVGO",
+      "views": 58698,
+      "has_media": false,
+      "summary": "DRAM forecast at $618.7B in 2026 (+303% YoY); NAND at $270.1B (+281% YoY).",
+      "sentiment": "positive",
+      "themes": [
+        "memory"
+      ],
+      "tickers": [
+        "AMD",
+        "AVGO",
+        "MU",
+        "NVDA"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2064075160458822142",
       "url": "https://x.com/coatuemgmt/status/2064075160458822142",
       "handle": "coatuemgmt",
@@ -4138,6 +4368,24 @@
       "seen_count": 1
     },
     {
+      "id": "2064066639998358003",
+      "url": "https://x.com/patrick_oshag/status/2064066639998358003",
+      "handle": "patrick_oshag",
+      "author_name": "Patrick OShaughnessy",
+      "posted_at": "2026-06-08T19:26:50Z",
+      "text": "\"Since when is life about happiness? It's about impact.\"\n\nWhat Daniel Ek (@eldsjal) told Dara at Allen & Company Sun Valley in 2017 to convince him to take the Uber CEO job.\n\nDaniel was also the one who recommended Dara to the headhunter.",
+      "views": 85486,
+      "has_media": false,
+      "summary": "Daniel Ek told Dara life is about impact, not happiness, when recruiting for Uber CEO role.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2064066007912661214",
       "url": "https://x.com/inflectionecon/status/2064066007912661214",
       "handle": "inflectionecon",
@@ -4249,6 +4497,42 @@
       "seen_count": 1
     },
     {
+      "id": "2064047489075077537",
+      "url": "https://x.com/dwarkesh_sp/status/2064047489075077537",
+      "handle": "dwarkesh_sp",
+      "author_name": "Dwarkesh Patel",
+      "posted_at": "2026-06-08T18:10:44Z",
+      "text": "https://www.dwarkesh.com/p/the-sample-efficiency-black-hole",
+      "views": 13929,
+      "has_media": false,
+      "summary": "Tweet shares blog post link only.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2064047458708308024",
+      "url": "https://x.com/dwarkesh_sp/status/2064047458708308024",
+      "handle": "dwarkesh_sp",
+      "author_name": "Dwarkesh Patel",
+      "posted_at": "2026-06-08T18:10:36Z",
+      "text": "New blog post: on the million-x sample efficiency gap between AIs and humans, and whether it matters:\n\n\"The reason it is relatively easy for open source and previous laggards to catch up to within months of the frontier is that data is the real driver of progress. \n\nAnd data can be easily distilled from public APIs, whereas hyper-parameters and training tricks and architectural micro-optimizations cannot - if the latter were driving most of progress, then catching up would be harder than we are observing it to be.\n\nIt is easy to forget how much data these models are trained on, and how much more it is than what we humans see in our lifetimes. \n\nWe see these AIs as a galaxy glittering with capabilities, but at their center, invisible to the naked eye, holding all the constellations together, is an unimaginably massive black hole of data.\"\n\nPost in link below",
+      "views": 145851,
+      "has_media": false,
+      "summary": "Data drives AI progress; million-x sample efficiency gap vs humans analyzed.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2064039444739436608",
       "url": "https://x.com/benthompson/status/2064039444739436608",
       "handle": "benthompson",
@@ -4305,6 +4589,31 @@
       "seen_count": 1
     },
     {
+      "id": "2064009359965749508",
+      "url": "https://x.com/Beth_Kindig/status/2064009359965749508",
+      "handle": "beth_kindig",
+      "author_name": "Beth Kindig",
+      "posted_at": "2026-06-08T15:39:13Z",
+      "text": "The global memory market is now projected to reach as much as $889.3 billion in 2026, per TrendForce, up 296% YoY and a substantial 61.2% increase from its prior forecast for $551.6 billion.\n\n$MU $AMD $NVDA $AVGO",
+      "views": 119553,
+      "has_media": false,
+      "summary": "Global memory market projected at $889.3B in 2026 (+296% YoY), 61.2% above prior $551.6B forecast.",
+      "sentiment": "positive",
+      "themes": [
+        "memory"
+      ],
+      "tickers": [
+        "AMD",
+        "AVGO",
+        "MU",
+        "NVDA"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2063998273795293413",
       "url": "https://x.com/elerianm/status/2063998273795293413",
       "handle": "elerianm",
@@ -4315,6 +4624,24 @@
       "has_media": true,
       "summary": "Economist warns Treasury market risks losing global finance benchmark status.",
       "sentiment": "negative",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2063992938380595388",
+      "url": "https://x.com/patrick_oshag/status/2063992938380595388",
+      "handle": "patrick_oshag",
+      "author_name": "Patrick OShaughnessy",
+      "posted_at": "2026-06-08T14:33:58Z",
+      "text": "Worth a listen with Bending Spoons filing to go public today. \n\nWe talk about their origins, playbook, talent and everything in between.\n\nCouple things I liked from their S-1:\n- Luck plays a big role in finding PMF\n\n- Luck is irrelevant when pursuing operational excellence\n\n- Talent > experience: \"Nearly all of our businesses and functions are led by people in their twenties or thirties, most of whom had little or no work experience prior to joining Bending Spoons.\"",
+      "views": 52276,
+      "has_media": false,
+      "summary": "Bending Spoons S-1 notes luck in PMF but irrelevance to operational excellence; talent over experience.",
+      "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
@@ -4483,9 +4810,9 @@
       "author_name": "Sam Altman",
       "posted_at": "2026-06-08T00:25:45Z",
       "text": "interesting recursive loop here maybe",
-      "views": 703332,
+      "views": 703741,
       "has_media": false,
-      "summary": "Interesting recursive loop here maybe.",
+      "summary": "Tweet notes possible interesting recursive loop.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
@@ -4622,6 +4949,31 @@
         "memory"
       ],
       "tickers": [
+        "NVDA"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2063758643762172250",
+      "url": "https://x.com/Beth_Kindig/status/2063758643762172250",
+      "handle": "beth_kindig",
+      "author_name": "Beth Kindig",
+      "posted_at": "2026-06-07T23:02:58Z",
+      "text": "3 months ago, the idea that CPUs could challenge GPUs on AI budget share was unfathomable \u2013 yet agentic AI has flipped the script. \n\nFind out how agentic AI is rewriting the story for CPUs as the CPU:GPU ratio moves towards 1:1 and how $NVDA, $AMD, $INTC, and $ARM each aim to win in the server CPU market.",
+      "views": 29619,
+      "has_media": false,
+      "summary": "Agentic AI shifts CPU:GPU budget ratio toward 1:1; NVDA, AMD, INTC, ARM compete in server CPUs.",
+      "sentiment": "neutral",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "AMD",
+        "ARM",
+        "INTC",
         "NVDA"
       ],
       "portfolio": [],
@@ -4825,6 +5177,30 @@
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
+      "id": "2063715015274672354",
+      "url": "https://x.com/Beth_Kindig/status/2063715015274672354",
+      "handle": "beth_kindig",
+      "author_name": "Beth Kindig",
+      "posted_at": "2026-06-07T20:09:36Z",
+      "text": "SK Hynix Chairman Chey Tae-won believes the memory shortage could continue until 2030, with SK Hynix planning to double its memory wafer capacity over the next five years to help meet demand.\n\n$MU $NVDA $AMD",
+      "views": 36886,
+      "has_media": false,
+      "summary": "SK Hynix sees memory shortage to 2030; plans to double wafer capacity over five years.",
+      "sentiment": "positive",
+      "themes": [
+        "memory"
+      ],
+      "tickers": [
+        "AMD",
+        "MU",
+        "NVDA"
+      ],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
@@ -5145,6 +5521,31 @@
       "seen_count": 1
     },
     {
+      "id": "2063653467059540089",
+      "url": "https://x.com/Beth_Kindig/status/2063653467059540089",
+      "handle": "beth_kindig",
+      "author_name": "Beth Kindig",
+      "posted_at": "2026-06-07T16:05:02Z",
+      "text": "Nvidia is reportedly expected to account for over 20% of TSMC\u2019s revenue in 2026. \n\n$NVDA $TSM $AVGO $AAPL",
+      "views": 28956,
+      "has_media": false,
+      "summary": "Nvidia expected to exceed 20% of TSMC revenue in 2026.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "AAPL",
+        "AVGO",
+        "NVDA",
+        "TSM"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-10",
+      "last_seen": "2026-06-10",
+      "seen_count": 1
+    },
+    {
       "id": "2063643204893970715",
       "url": "https://x.com/wccftech/status/2063643204893970715",
       "handle": "wccftech",
@@ -5363,16 +5764,17 @@
       "author_name": "modest proposal",
       "posted_at": "2026-06-07T14:06:18Z",
       "text": "so you're telling me there's a chance",
-      "views": 9369,
+      "views": 9373,
       "has_media": true,
-      "summary": "So you're telling me there's a chance.",
+      "summary": "Tweet references slim chance in context of prior discussion.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
-      "seen_count": 1
+      "seen_count": 1,
+      "media_summary": "Virtual queue for NBA Finals tickets: 547,909 ahead signals extreme demand/scalping potential."
     },
     {
       "id": "2063621369611657478",
