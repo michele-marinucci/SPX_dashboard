@@ -20,13 +20,14 @@ export function ViewHeading({
 }) {
   const { on } = useCompounders();
 
-  const parts: string[] = [];
-  if (meta) parts.push(meta);
+  // Lead parts render as plain text; the "Bloomberg data as of …" trailing
+  // segment renders in the mono face per the Ledger spec.
+  const lead: string[] = [];
+  if (meta) lead.push(meta);
   if (stockCount !== undefined) {
     const n = on ? compounderCount ?? 0 : stockCount;
-    parts.push(`${n} ${n === 1 ? "stock" : "stocks"}`);
+    lead.push(`${n} ${n === 1 ? "stock" : "stocks"}`);
   }
-  if (trailing) parts.push(trailing);
 
   return (
     <div>
@@ -34,7 +35,13 @@ export function ViewHeading({
         {title}
         {on && <span className="title-tag">Compounders only</span>}
       </h1>
-      {parts.length > 0 && <p className="subtitle">{parts.join(" · ")}</p>}
+      {(lead.length > 0 || trailing) && (
+        <p className="subtitle">
+          {lead.join(" · ")}
+          {lead.length > 0 && trailing ? " · " : ""}
+          {trailing && <span className="mono">{trailing}</span>}
+        </p>
+      )}
     </div>
   );
 }

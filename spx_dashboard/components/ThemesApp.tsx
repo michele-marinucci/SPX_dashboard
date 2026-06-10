@@ -201,8 +201,16 @@ export function ThemesApp({
   return (
     <div className="shell">
       <aside className="sidebar themes-sidebar">
-        <Link href="/" className="back-link tsb-back">
-          ← All views
+        <div className="sidebar-head">
+          <Link href="/" className="sidebar-brand" title="Back to all views">
+            <span className="sidebar-brand-text">Mendo Monitor</span>
+          </Link>
+          <span className="sidebar-sys" aria-hidden="true">
+            X THEMES
+          </span>
+        </div>
+        <Link href="/" className="rail-back">
+          ← All tools
         </Link>
 
         <details className="themes-explain" open>
@@ -279,7 +287,11 @@ export function ThemesApp({
           <div>
             <h1>X Themes</h1>
             <p className="subtitle">
-              Daily idea briefing from X · {asOf ? `as of ${asOf}` : "awaiting first run"}
+              Daily idea briefing from X ·{" "}
+              <span className="mono">
+                {asOf ? `as of ${asOf}` : "awaiting first run"}
+              </span>{" "}
+              · {active.length} {active.length === 1 ? "idea" : "ideas"}
             </p>
           </div>
           <div className="header-actions">
@@ -297,7 +309,13 @@ export function ThemesApp({
         ) : (
           <>
             <section className="section keythemes">
-              <h2 className="section-title">Key themes today</h2>
+              <div className="section-head">
+                <span className="section-num">·</span>
+                <h2 className="section-title">Key themes today</h2>
+                <span className="section-note">
+                  {themeRollup.length} themes · ▲ long ▼ short
+                </span>
+              </div>
               <div className="kt-grid">
                 {themeRollup.map(([k, e]) => (
                   <div key={k} className="kt-item">
@@ -339,6 +357,11 @@ export function ThemesApp({
             />
           </>
         )}
+
+        <footer className="view-foot">
+          <span>X Themes as of {asOf ?? "—"}</span>
+          <span>MERITAGE · INTERNAL</span>
+        </footer>
       </div>
     </div>
   );
@@ -364,10 +387,10 @@ function IdeaSectionView({
       <div className="tier-head">
         <h2 className="section-title">
           {title}
-          <span className="tier-pill tier-priority">{ideas.length}</span>
+          <span className="tier-pill">{ideas.length}</span>
         </h2>
-        <p className="tier-blurb">{blurb}</p>
       </div>
+      <p className="tier-blurb">{blurb}</p>
       {ideas.length === 0 ? (
         <p className="muted">Nothing here today.</p>
       ) : (

@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { cellStyle, computeScale, HeatMode } from "@/lib/heatmap";
 import { cx, fmtMoney, fmtNum, fmtPct, fmtSignedMoney } from "@/lib/format";
-import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
+import { NO_SORT, nextSort, sortRows } from "@/lib/sort";
+import { SortGlyph } from "./SortGlyph";
 import { useCompounders } from "./CompoundersContext";
 
 export type CellFormat = "money" | "signedMoney" | "pct" | "num";
@@ -80,6 +81,11 @@ export function DataTable({
 
   const hasGroups = columns.some((c) => c.groupLabel);
 
+  // A column begins a new group (gets a left hairline divider) when its group
+  // label differs from the column before it — skipping the very first column.
+  const isDivider = (ci: number) =>
+    ci > 0 && (columns[ci].groupLabel ?? "") !== (columns[ci - 1].groupLabel ?? "");
+
   // Only the leading block of rows (those above the first subtotal, e.g.
   // "Total AI Capex Beneficiaries") reorders. Everything from that subtotal
   // down — the funders, software, Other and the grand total — keeps its
@@ -103,7 +109,11 @@ export function DataTable({
             <tr className="group-row">
               <th className="row-head" />
               {groupSpans(columns).map((g, i) => (
-                <th key={i} colSpan={g.span} className="group-th">
+                <th
+                  key={i}
+                  colSpan={g.span}
+                  className={cx("group-th", i > 0 && "col-divider")}
+                >
                   {g.label}
                 </th>
               ))}
@@ -115,17 +125,17 @@ export function DataTable({
               onClick={() => setSort((s) => nextSort(s, LABEL_KEY))}
               title="Sort by name"
             >
-              {sortGlyph(sort, LABEL_KEY)}
+              <SortGlyph sort={sort} sortKey={LABEL_KEY} />
             </th>
             {columns.map((c, ci) => (
               <th
                 key={c.key}
-                className="num-th sortable"
+                className={cx("num-th sortable", isDivider(ci) && "col-divider")}
                 onClick={() => setSort((s) => nextSort(s, String(ci)))}
                 title="Sort by this column"
               >
                 {c.label}
-                {sortGlyph(sort, String(ci))}
+                <SortGlyph sort={sort} sortKey={String(ci)} />
               </th>
             ))}
           </tr>
@@ -154,7 +164,11 @@ export function DataTable({
                   ? {}
                   : cellStyle(v, col.heat, scales[ci]);
                 return (
-                  <td key={ci} className="num-td" style={style}>
+                  <td
+                    key={ci}
+                    className={cx("num-td", isDivider(ci) && "col-divider")}
+                    style={style}
+                  >
                     {formatCell(v, col.format, col.digits)}
                   </td>
                 );

@@ -95,10 +95,17 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
         >
           <span className="sidebar-brand-text">Mendo Monitor</span>
         </Link>
+        <span className="sidebar-sys" aria-hidden="true">
+          SPX
+        </span>
         <span className="sidebar-hint" aria-hidden="true">
           Click to filter
         </span>
       </div>
+
+      <Link href="/" className="rail-back" onClick={handleSelect}>
+        ← All tools
+      </Link>
 
       {/* SPX-specific controls: hidden on the themes feed. */}
       {!isThemes && (

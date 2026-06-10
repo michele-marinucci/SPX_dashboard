@@ -104,7 +104,11 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       }
     >
       <section className="section">
-        <h2 className="section-title">Stock Performance</h2>
+        <div className="section-head">
+          <span className="section-num">01</span>
+          <h2 className="section-title">Stock Performance</h2>
+          <span className="section-note">Market cap ($b) · diverging Δ heatmaps</span>
+        </div>
         <DataTable
           columns={perfColumns(t.stock_performance.dates)}
           rows={metricRows(stocks, (s) => s.performance)}
@@ -113,7 +117,11 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       </section>
 
       <section className="section">
-        <h2 className="section-title">Earnings Growth</h2>
+        <div className="section-head">
+          <span className="section-num">02</span>
+          <h2 className="section-title">Earnings Growth</h2>
+          <span className="section-note">Adjusted net income ($b)</span>
+        </div>
         <DataTable
           columns={earnColumns(t.earnings_growth.years, t.earnings_growth.delta_years)}
           rows={metricRows(stocks, (s) => s.earnings)}
@@ -122,7 +130,11 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       </section>
 
       <section className="section">
-        <h2 className="section-title">Estimate Revisions 2026</h2>
+        <div className="section-head">
+          <span className="section-num">03</span>
+          <h2 className="section-title">Estimate Revisions · 2026</h2>
+          <span className="section-note">Consensus adj. NI ($b)</span>
+        </div>
         <DataTable
           columns={estColumns(t.est_rev_2026.dates, "Consensus Adj. NI ($b)")}
           rows={metricRows(stocks, (s) => s.est_2026)}
@@ -131,7 +143,11 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       </section>
 
       <section className="section">
-        <h2 className="section-title">Estimate Revisions 2027</h2>
+        <div className="section-head">
+          <span className="section-num">04</span>
+          <h2 className="section-title">Estimate Revisions · 2027</h2>
+          <span className="section-note">Consensus adj. NI ($b)</span>
+        </div>
         <DataTable
           columns={estColumns(t.est_rev_2027.dates, "Consensus Adj. NI ($b)")}
           rows={metricRows(stocks, (s) => s.est_2027)}
@@ -141,7 +157,11 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
 
       {showPe && (
         <section className="section">
-          <h2 className="section-title">NTM P/E</h2>
+          <div className="section-head">
+            <span className="section-num">05</span>
+            <h2 className="section-title">NTM P/E</h2>
+            <span className="section-note">Current vs historical averages · P/E history</span>
+          </div>
           <StockPeTable stocks={stocks} />
         </section>
       )}

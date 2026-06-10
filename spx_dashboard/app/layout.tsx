@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { CompoundersProvider } from "@/components/CompoundersContext";
 import { SidebarStateProvider } from "@/components/SidebarStateContext";
 import { ZoomLock } from "@/components/ZoomLock";
 
-const inter = Inter({
+// Ledger type system: Hanken Grotesk (UI/body) + JetBrains Mono (data/labels).
+const sans = Hanken_Grotesk({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-sans",
   display: "swap",
 });
@@ -36,8 +38,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <body>
+        <div className="accent-bar" />
         <ZoomLock />
         <CompoundersProvider>
           <SidebarStateProvider>{children}</SidebarStateProvider>
