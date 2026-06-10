@@ -50,44 +50,143 @@ SOURCE_WEIGHTS = {
 
 # Tickers you actively track. Used only as a prompt hint + an `on_watchlist`
 # flag on the card — it is NOT a whitelist. Keep ticker symbols upper-case.
+# This mirrors the AI-beneficiary universe tracked in the SPX Monitor.
 WATCHLIST = [
-    "NVDA", "AMD", "AVGO", "TSM", "MU", "ARM", "SMCI", "DELL", "ANET",
-    "MSFT", "GOOGL", "AMZN", "META", "ORCL", "PLTR", "SNOW", "CRM", "NOW",
-    "VRT", "ETN", "CEG", "VST", "TSLA", "ASML", "KLAC", "LRCX", "AMAT",
+    # Digital semis / hardware / memory / analog
+    "NVDA", "AVGO", "AMD", "INTC", "QCOM", "ARM", "TSM",
+    "CSCO", "ANET", "DELL", "SMCI", "HPE", "CIEN", "COHR", "LITE", "GLW", "APH",
+    "MU", "WDC", "STX", "SNDK",
+    "TXN", "ADI", "MPWR", "MCHP", "ON",
+    # Electrical / cooling / power / construction
+    "ETN", "VRT", "TT", "EMR", "JCI", "CARR", "CMI", "FIX",
+    "GEV", "CEG", "VST", "ETR", "CAT", "PWR", "EME",
+    # EDA / semicap
+    "CDNS", "SNPS", "KEYS", "LRCX", "AMAT", "KLAC", "TER",
+    # Software (application + infrastructure)
+    "CRM", "NOW", "ADBE", "INTU", "WDAY", "PTC", "ADSK",
+    "PANW", "CRWD", "FTNT", "DDOG", "VRSN",
+    # AI buildout funders (big tech)
+    "MSFT", "AMZN", "GOOGL", "META", "ORCL", "TSLA",
 ]
 
-# The themes scouted every run.
+# The themes scouted every run. These mirror the AI-beneficiary categories in
+# the SPX Monitor; the X Themes view renders them dynamically from the data, so
+# adding/removing a theme here flows straight through to the UI.
 #   key               stable slug used for dedup attribution + logging.
+#   label             human-readable name shown in the interface.
 #   prompt            natural-language intent handed to Grok.
 #   priority_handles  X usernames (no '@') you trust most for THIS theme. Used
 #                     only for tier bucketing, never to restrict the search.
 THEMES = [
     {
-        "key": "ai-infra",
+        "key": "digital-semis",
+        "label": "Digital Semis",
         "prompt": (
-            "Surface concrete, actionable investment ideas about AI compute "
-            "infrastructure: GPUs/accelerators, custom silicon, networking, "
-            "memory (HBM), and the semiconductor supply chain. Favor specific "
-            "names with a clear bull or bear thesis and a near-term catalyst."
+            "Surface concrete, actionable investment ideas about digital "
+            "semiconductors: AI GPUs/accelerators, custom silicon (ASICs), and "
+            "compute processors (e.g. NVDA, AVGO, AMD, INTC, QCOM). Favor a "
+            "clear bull or bear thesis with a near-term catalyst."
         ),
-        "priority_handles": ["dnystedt", "firstadopter", "morethanmoore"],
+        "priority_handles": ["GavinSBaker", "dnystedt", "dylan522p", "Beth_Kindig"],
     },
     {
-        "key": "ai-power",
+        "key": "hardware-components",
+        "label": "Hardware & Networking",
         "prompt": (
-            "Surface investment ideas about the power and datacenter buildout "
-            "behind AI: electrical equipment, grid, cooling, utilities exposed "
-            "to datacenter demand, and independent power producers."
+            "Surface investment ideas about AI datacenter hardware and "
+            "networking: switches, optics/transceivers, servers, cabling and "
+            "components (e.g. ANET, CSCO, DELL, SMCI, CIEN, COHR, LITE, GLW, "
+            "APH, HPE)."
         ),
-        "priority_handles": ["DataCenterHawk", "Josh_Young_1"],
+        "priority_handles": ["dnystedt", "p_ferragu", "dylan522p"],
     },
     {
-        "key": "ai-software",
+        "key": "memory",
+        "label": "Memory & Storage",
         "prompt": (
-            "Surface investment ideas about AI-monetizing software: enterprise "
-            "AI adoption, inference demand, agents, and software names whose "
-            "revenue is accelerating (or decelerating) because of AI."
+            "Surface investment ideas about memory and storage exposed to AI "
+            "demand: HBM, DRAM, NAND and hard drives (e.g. MU, WDC, STX, SNDK)."
         ),
-        "priority_handles": ["jasonlk", "garrytan", "modestproposal1"],
+        "priority_handles": ["dnystedt", "Beth_Kindig", "dylan522p"],
+    },
+    {
+        "key": "analog-mcu",
+        "label": "Analog & MCU",
+        "prompt": (
+            "Surface investment ideas about analog and microcontroller "
+            "semiconductors and the broader analog cycle (e.g. TXN, ADI, "
+            "MPWR, MCHP, ON), especially power-management content for AI."
+        ),
+        "priority_handles": ["p_ferragu", "dnystedt"],
+    },
+    {
+        "key": "electric-cooling",
+        "label": "Electrical & Cooling",
+        "prompt": (
+            "Surface investment ideas about datacenter electrical equipment "
+            "and thermal/cooling: power distribution, liquid cooling, HVAC and "
+            "backup power (e.g. ETN, VRT, TT, EMR, JCI, CARR, CMI, FIX)."
+        ),
+        "priority_handles": ["DataCenterHawk", "GavinSBaker"],
+    },
+    {
+        "key": "design-semicap",
+        "label": "EDA & Semicap",
+        "prompt": (
+            "Surface investment ideas about chip design software (EDA) and "
+            "semiconductor capital equipment (e.g. CDNS, SNPS, KEYS, LRCX, "
+            "AMAT, KLAC, TER), including WFE spend and leading-edge capacity."
+        ),
+        "priority_handles": ["dylan522p", "p_ferragu"],
+    },
+    {
+        "key": "power",
+        "label": "Power & Utilities",
+        "prompt": (
+            "Surface investment ideas about power generation for AI datacenters: "
+            "utilities and independent power producers, nuclear, gas turbines "
+            "and grid buildout (e.g. CEG, VST, GEV, ETR, CAT)."
+        ),
+        "priority_handles": ["DataCenterHawk", "GavinSBaker"],
+    },
+    {
+        "key": "construction",
+        "label": "Datacenter Construction",
+        "prompt": (
+            "Surface investment ideas about datacenter construction and "
+            "engineering: electrical contractors and infrastructure builders "
+            "(e.g. PWR, EME) riding the AI buildout."
+        ),
+        "priority_handles": ["DataCenterHawk"],
+    },
+    {
+        "key": "software-application",
+        "label": "Application Software",
+        "prompt": (
+            "Surface investment ideas about application software monetizing AI: "
+            "enterprise SaaS whose revenue is accelerating (or decelerating) "
+            "from AI/agents (e.g. CRM, NOW, ADBE, INTU, WDAY, PTC, ADSK)."
+        ),
+        "priority_handles": ["GavinSBaker", "altcap", "rihardjarc", "StockMarketNerd"],
+    },
+    {
+        "key": "software-infrastructure",
+        "label": "Infrastructure Software",
+        "prompt": (
+            "Surface investment ideas about infrastructure software benefiting "
+            "from AI: cybersecurity, observability and developer/cloud "
+            "infrastructure (e.g. PANW, CRWD, FTNT, DDOG, VRSN)."
+        ),
+        "priority_handles": ["hhhypergrowth", "rihardjarc", "GavinSBaker"],
+    },
+    {
+        "key": "big-tech",
+        "label": "AI Buildout Funders",
+        "prompt": (
+            "Surface investment ideas about the hyperscalers and big-tech "
+            "funders of the AI buildout: capex, cloud growth and AI "
+            "monetization (e.g. MSFT, AMZN, GOOGL, META, ORCL, TSLA)."
+        ),
+        "priority_handles": ["GavinSBaker", "altcap", "modestproposal1"],
     },
 ]

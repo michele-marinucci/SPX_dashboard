@@ -494,7 +494,11 @@ def build_feed(prior: Optional[dict], now: Optional[dt.datetime] = None) -> Opti
 
     return {
         "generated_at": now.isoformat(),
-        "themes": [t["key"] for t in cfg.THEMES],
+        # The configured themes, carried into the file so the UI renders theme
+        # labels/filters dynamically rather than hardcoding them.
+        "themes": [
+            {"key": t["key"], "label": t.get("label", t["key"])} for t in cfg.THEMES
+        ],
         "ideas": records,
     }
 
