@@ -73,9 +73,21 @@ create table if not exists idea_snapshots (
 create index if not exists idea_snapshots_ticker_idx
   on idea_snapshots (ticker, direction);
 
+-- ---------------------------------------------------------------------------
+-- Diligence Tracker: one shared link per position to its Microsoft List
+-- ---------------------------------------------------------------------------
+create table if not exists diligence_links (
+  ticker      text primary key,            -- uppercased symbol, e.g. "MSFT"
+  name        text not null default '',    -- company name
+  url         text not null,               -- Microsoft List URL
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
 -- Lock everything down (service role bypasses RLS; anon/authenticated get nothing).
 alter table followed_handles enable row level security;
 alter table themes           enable row level security;
 alter table ideas            enable row level security;
 alter table runs             enable row level security;
 alter table idea_snapshots   enable row level security;
+alter table diligence_links  enable row level security;
