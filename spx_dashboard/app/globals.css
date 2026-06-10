@@ -1045,6 +1045,58 @@ thead .row-head {
   color: var(--muted);
 }
 
+/* ---------- Standalone view (X Themes: no sidebar) ---------- */
+.solo {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 22px 24px 72px;
+}
+.solo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.solo-title {
+  margin-bottom: 18px;
+}
+.solo-title h1 {
+  font-size: 25px;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Neutral "back to chooser" button, used on every view. */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-soft);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+}
+.btn-back:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Tier dot used inside the X Themes how-to explainer. */
+.tier-dot {
+  display: block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--tier, var(--accent));
+}
+
 /* ---------- X Themes: top-level view switch ---------- */
 /* Visually separate the SPX Monitor / X Themes switch from the filters below. */
 .view-switch {
