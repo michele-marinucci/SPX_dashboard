@@ -136,6 +136,21 @@ export function getCategoryBySlug(slug: string): ResolvedCategory | null {
 
 // Slugs of categories that have per-stock detail (every category does now,
 // including Miscellaneous = the rest of the S&P 500).
+// Map of ticker symbol -> company name, drawn from the tracked S&P 500
+// universe (tickers are stored Bloomberg-style, e.g. "NVDA US Equity").
+export function getStockNameMap(): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const g of getDashboard().tables.categories.groups) {
+    for (const c of g.categories) {
+      for (const s of c.stocks ?? []) {
+        const sym = (s.ticker || "").split(" ")[0].toUpperCase();
+        if (sym && s.name) out[sym] = s.name;
+      }
+    }
+  }
+  return out;
+}
+
 export function getCategorySlugs(): string[] {
   const { groups } = getDashboard().tables.categories;
   const slugs: string[] = [];

@@ -48,6 +48,22 @@ SOURCE_WEIGHTS = {
     "discovery": 0.25,
 }
 
+# Curated "Followed accounts": the handles you trust. An idea is shown under
+# "Followed accounts" (vs "Discovery") when any of its source posts is from one
+# of these. Seeds the X Themes UI, which lets you add/remove handles in-browser.
+# Handles are case-insensitive and stored without the leading '@'.
+FOLLOWED_HANDLES = [
+    # AI labs
+    "sama", "demishassabis", "DarioAmodei",
+    # Prominent investors
+    "GavinSBaker", "bgurley", "BillAckman", "altcap", "modestproposal1",
+    # Podcasters / research
+    "patrick_oshag", "dwarkesh_sp",
+    # Sector specialists
+    "dnystedt", "dylan522p", "Beth_Kindig", "p_ferragu",
+    "DataCenterHawk", "hhhypergrowth", "rihardjarc", "StockMarketNerd",
+]
+
 # Tickers you actively track. Used only as a prompt hint + an `on_watchlist`
 # flag on the card — it is NOT a whitelist. Keep ticker symbols upper-case.
 # This mirrors the AI-beneficiary universe tracked in the SPX Monitor.

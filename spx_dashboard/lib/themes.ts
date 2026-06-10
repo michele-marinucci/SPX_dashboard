@@ -50,7 +50,25 @@ export interface ThemesData {
   // ISO timestamp of the last successful run, or null before the first run.
   generated_at: string | null;
   themes: ThemeRef[];
+  // Curated followed accounts (handles, no '@') seeding the UI's followed set.
+  followed_handles?: string[];
   ideas: ThemeIdea[];
+}
+
+// Fallback followed set if the data file predates `followed_handles`. Kept in
+// sync with pipeline/themes_config.py FOLLOWED_HANDLES.
+export const DEFAULT_FOLLOWED_HANDLES = [
+  "sama", "demishassabis", "darioamodei",
+  "gavinsbaker", "bgurley", "billackman", "altcap", "modestproposal1",
+  "patrick_oshag", "dwarkesh_sp",
+  "dnystedt", "dylan522p", "beth_kindig", "p_ferragu",
+  "datacenterhawk", "hhhypergrowth", "rihardjarc", "stockmarketnerd",
+];
+
+export function getFollowedHandles(): string[] {
+  const fromData = getThemesData().followed_handles;
+  const list = fromData && fromData.length ? fromData : DEFAULT_FOLLOWED_HANDLES;
+  return list.map((h) => h.toLowerCase().replace(/^@/, ""));
 }
 
 export function getThemesData(): ThemesData {

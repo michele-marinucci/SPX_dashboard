@@ -62,12 +62,18 @@ HTTP_HEADERS = {
 HERE = os.path.dirname(os.path.abspath(__file__))
 DASHBOARD_JSON = os.path.join(os.path.dirname(HERE), "data", "dashboard.json")
 
-# Global set of trusted (priority) handles, lowercased, across all themes.
-PRIORITY_HANDLES = {
-    h.lower().lstrip("@")
-    for t in cfg.THEMES
-    for h in t.get("priority_handles", [])
-}
+# Curated "followed" accounts, lowercased: the per-theme priority handles plus
+# the global FOLLOWED_HANDLES list. Used for tiering and written into the feed
+# so the UI can seed its (browser-editable) followed set.
+FOLLOWED_HANDLES = sorted(
+    {h.lower().lstrip("@") for h in getattr(cfg, "FOLLOWED_HANDLES", [])}
+    | {
+        h.lower().lstrip("@")
+        for t in cfg.THEMES
+        for h in t.get("priority_handles", [])
+    }
+)
+PRIORITY_HANDLES = set(FOLLOWED_HANDLES)
 WATCHLIST = {t.upper() for t in cfg.WATCHLIST}
 
 
@@ -636,6 +642,8 @@ def build_feed(prior: Optional[dict], now: Optional[dt.datetime] = None) -> Opti
         "themes": [
             {"key": t["key"], "label": t.get("label", t["key"])} for t in cfg.THEMES
         ],
+        # Curated followed accounts that seed the UI's (browser-editable) set.
+        "followed_handles": FOLLOWED_HANDLES,
         "ideas": records,
     }
 
