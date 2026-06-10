@@ -30,23 +30,39 @@ async function rest(path: string, init: RequestInit = {}): Promise<Response> {
 // password gate like every other page.
 export async function diligenceDebug(): Promise<Record<string, string>> {
   let urlInfo = "NOT SET";
+  let restBase = "—";
   if (URL) {
     try {
-      urlInfo = `set (host: ${new globalThis.URL(URL).host})`;
+      const u = new globalThis.URL(URL);
+      urlInfo =
+        u.pathname && u.pathname !== "/"
+          ? `set but has an EXTRA PATH "${u.pathname}" — should be just https://<ref>.supabase.co`
+          : `set OK (host: ${u.host})`;
     } catch {
       urlInfo = "set but MALFORMED (not a valid URL)";
     }
+    restBase = `${URL}/rest/v1/diligence_links?...`;
   }
 
+  // Classify the key by prefix WITHOUT revealing the secret, so we can tell a
+  // legacy service_role JWT from the new-style keys or a wrong value pasted in.
   let keyInfo = "NOT SET";
   if (KEY) {
-    try {
-      const payload = JSON.parse(
-        Buffer.from(KEY.split(".")[1], "base64").toString("utf8"),
-      );
-      keyInfo = `set (role: ${payload.role ?? "unknown"})`;
-    } catch {
-      keyInfo = "set but not a JWT — wrong value pasted?";
+    if (KEY.startsWith("eyJ")) {
+      try {
+        const payload = JSON.parse(Buffer.from(KEY.split(".")[1], "base64").toString("utf8"));
+        keyInfo = `legacy JWT (role: ${payload.role ?? "unknown"})${
+          payload.role === "service_role" ? " ✓" : " ✗ wrong role — need service_role"
+        }`;
+      } catch {
+        keyInfo = "starts like a JWT but is corrupt/truncated";
+      }
+    } else if (KEY.startsWith("sb_secret_")) {
+      keyInfo = "new-format secret key (sb_secret_…) ✓";
+    } else if (KEY.startsWith("sb_publishable_")) {
+      keyInfo = "PUBLISHABLE key (sb_publishable_…) ✗ — need the SECRET key";
+    } else {
+      keyInfo = `unrecognized value (starts "${KEY.slice(0, 4)}…") ✗ — not a Supabase API key`;
     }
   }
 
@@ -62,7 +78,7 @@ export async function diligenceDebug(): Promise<Record<string, string>> {
     }
   }
 
-  return { supabase_url: urlInfo, service_role_key: keyInfo, probe };
+  return { supabase_url: urlInfo, rest_base: restBase, service_role_key: keyInfo, probe };
 }
 
 export async function dbGetDiligence(): Promise<DiligenceLink[]> {
