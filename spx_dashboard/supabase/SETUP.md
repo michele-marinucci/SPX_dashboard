@@ -1,0 +1,36 @@
+# Supabase setup for X Themes
+
+The app and pipeline work **without** Supabase (they fall back to `data/themes.json`
+and per-browser localStorage). Provision Supabase to get cross-device persistence
+of the followed list, a DB-backed feed, and run history/analytics.
+
+## 1. Create the project
+1. Go to https://supabase.com → New project. Pick a region close to you.
+2. When it's ready, open **SQL** → paste the contents of `supabase/schema.sql` → **Run**.
+
+## 2. Grab credentials (Settings → API)
+- **Project URL** — e.g. `https://abcd1234.supabase.co`
+- **service_role key** — the secret one (NOT `anon`). Treat it like a password.
+
+## 3. Wire it up
+**Vercel** (Project → Settings → Environment Variables), for Production + Preview:
+- `SUPABASE_URL` = your Project URL
+- `SUPABASE_SERVICE_ROLE_KEY` = the service_role key
+
+**GitHub** (repo → Settings → Secrets and variables → Actions → New secret):
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+(The workflow already passes these through when present.)
+
+## 4. Seed + first write
+- Redeploy on Vercel so the env vars take effect.
+- Run the **Refresh X Themes feed** workflow once. It seeds `followed_handles`
+  (from `themes_config.py`) and `themes` if empty, writes the current feed to
+  `ideas`, and appends a `runs` + `idea_snapshots` history snapshot.
+
+## Notes
+- The browser never receives a Supabase key — all DB access is server-side
+  (Next.js API routes) or from the Actions runner.
+- If the env vars are absent, everything keeps working off `themes.json` /
+  localStorage, so you can roll this out without downtime.
