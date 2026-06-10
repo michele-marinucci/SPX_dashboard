@@ -106,6 +106,39 @@ def _handle_from_url(url: str) -> Optional[str]:
     return None
 
 
+_STATUS_RE = re.compile(r"/status/(\d+)")
+
+
+def _status_id(url: str) -> Optional[str]:
+    """The numeric post id from a .../status/<id> URL, if present."""
+    m = _STATUS_RE.search(url or "")
+    return m.group(1) if m else None
+
+
+def _collect_citation_urls(response: Any) -> list[str]:
+    """Gather every URL the response actually consulted.
+
+    `response.citations` is the documented default (a sequence of URL strings),
+    but we also fold in `inline_citations` and tolerate citation objects, so the
+    grounding guard is robust to SDK shape changes.
+    """
+    urls: list[str] = []
+    for c in getattr(response, "citations", None) or []:
+        if isinstance(c, str):
+            urls.append(c)
+        else:
+            u = getattr(c, "url", None)
+            if isinstance(u, str) and u:
+                urls.append(u)
+    for ic in getattr(response, "inline_citations", None) or []:
+        for attr in ("url", "uri", "link"):
+            u = getattr(ic, attr, None)
+            if isinstance(u, str) and u:
+                urls.append(u)
+                break
+    return urls
+
+
 # --------------------------------------------------------------------------- #
 # Grok x_search
 # --------------------------------------------------------------------------- #
@@ -179,18 +212,23 @@ def search_theme(
                 to_date=dt.datetime.combine(to_date, dt.time.max),
             )
         ],
+        include=["inline_citations"],
         messages=[system(SYSTEM_PROMPT)],
     )
     chat.append(user(_user_prompt(theme)))
     response = chat.sample()
 
     # Response-level citations: the URLs the tools actually consulted. This is
-    # our ground truth for the grounding guard.
-    cited = {
-        _normalize_url(c)
-        for c in (getattr(response, "citations", None) or [])
-        if isinstance(c, str)
-    }
+    # our ground truth for the grounding guard. We match either the exact
+    # (normalized) URL or the post's /status/<id>, so harmless host/query drift
+    # between the model's echoed URL and the citation doesn't reject a real post.
+    citation_urls = _collect_citation_urls(response)
+    cited = {_normalize_url(u) for u in citation_urls}
+    cited_ids = {sid for u in citation_urls if (sid := _status_id(u))}
+    _log(
+        f"  [{theme['key']}] {len(citation_urls)} citations; "
+        f"sample={citation_urls[:3]}"
+    )
 
     raw_ideas = _parse_ideas(getattr(response, "content", "") or "")
 
@@ -201,11 +239,16 @@ def search_theme(
         if not ticker or not direction:
             continue
 
-        sources = _grounded_sources(idea.get("sources"), cited)
+        sources = _grounded_sources(idea.get("sources"), cited, cited_ids)
         if not sources:
+            claimed = [
+                s.get("url")
+                for s in (idea.get("sources") or [])
+                if isinstance(s, dict)
+            ]
             _log(
                 f"  QUARANTINE [{theme['key']}] {ticker}/{direction}: "
-                "no post URL corroborated by citations."
+                f"no cited post (claimed={claimed[:3]})"
             )
             continue
 
@@ -223,8 +266,14 @@ def search_theme(
     return grounded
 
 
-def _grounded_sources(sources: Any, cited: set[str]) -> list[dict]:
-    """Keep only sources whose URL is a real X post present in citations."""
+def _grounded_sources(
+    sources: Any, cited: set[str], cited_ids: set[str]
+) -> list[dict]:
+    """Keep only sources whose URL is a real X post present in citations.
+
+    A source is grounded when its URL is a concrete X post AND either its
+    normalized URL or its /status/<id> appears in the response citations.
+    """
     out: list[dict] = []
     seen: set[str] = set()
     if not isinstance(sources, list):
@@ -233,7 +282,10 @@ def _grounded_sources(sources: Any, cited: set[str]) -> list[dict]:
         if not isinstance(s, dict):
             continue
         url = (s.get("url") or "").strip()
-        if not _is_x_post(url) or _normalize_url(url) not in cited:
+        if not _is_x_post(url):
+            continue
+        sid = _status_id(url)
+        if _normalize_url(url) not in cited and (sid is None or sid not in cited_ids):
             continue
         handle = _handle_from_url(url) or (s.get("handle") or "").lower().lstrip("@")
         if not handle:

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 // A compact, dismissible explainer pinned at the top of every view. Once
 // dismissed it collapses to a small "How it works" pill that reopens it.
@@ -66,6 +67,7 @@ export function HowToBanner() {
   // SSR/client hydration mismatch.
   const [dismissed, setDismissed] = useState(false);
   const [ready, setReady] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     try {
@@ -92,6 +94,9 @@ export function HowToBanner() {
       /* ignore */
     }
   };
+
+  // SPX-specific helper: never show it on the X Themes feed.
+  if (pathname?.startsWith("/themes")) return null;
 
   // Before hydration we render the full banner (matches SSR markup).
   if (ready && dismissed) {

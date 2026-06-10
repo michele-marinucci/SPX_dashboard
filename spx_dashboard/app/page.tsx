@@ -1,169 +1,52 @@
-import { Column, DataTable, TableRow } from "@/components/DataTable";
-import { NtmPeTable } from "@/components/NtmPeTable";
-import { DashboardFrame } from "@/components/DashboardFrame";
-import { ViewHeading } from "@/components/ViewHeading";
-import {
-  getBloombergDateLabel,
-  getCompounderTables,
-  getDashboard,
-  GrowthTable,
-  ThreeDateTable,
-} from "@/lib/data";
+import Link from "next/link";
+import { LogoutButton } from "@/components/LogoutButton";
+import { getActiveIdeasCount, getGeneratedAtLabel } from "@/lib/themes";
 
-// --- column builders ------------------------------------------------------- //
-function threeDateColumns(t: ThreeDateTable, digits: number): Column[] {
-  return [
-    ...t.dates.map((d, i) => ({
-      key: `v${i}`,
-      label: d,
-      groupLabel: t.value_label,
-      format: "money" as const,
-      heat: "blue" as const,
-      digits,
-    })),
-    {
-      key: "da0",
-      label: "YTD",
-      groupLabel: "$ Δ",
-      format: "signedMoney" as const,
-      heat: "rg" as const,
-      digits,
-    },
-    {
-      key: "da1",
-      label: "QTD",
-      groupLabel: "$ Δ",
-      format: "signedMoney" as const,
-      heat: "rg" as const,
-      digits,
-    },
-    {
-      key: "dp0",
-      label: "YTD",
-      groupLabel: "% Δ",
-      format: "pct" as const,
-      heat: "rg" as const,
-    },
-    {
-      key: "dp1",
-      label: "QTD",
-      groupLabel: "% Δ",
-      format: "pct" as const,
-      heat: "rg" as const,
-    },
-  ];
-}
-
-function threeDateRows(t: ThreeDateTable): TableRow[] {
-  return t.rows.map((r) => ({
-    label: r.label,
-    isTotal: r.is_total,
-    cells: [...r.values, ...r.delta_abs, ...r.delta_pct],
-  }));
-}
-
-function growthColumns(t: GrowthTable): Column[] {
-  return [
-    ...t.years.map((y) => ({
-      key: `y${y}`,
-      label: y,
-      groupLabel: t.value_label,
-      format: "money" as const,
-      heat: "blue" as const,
-      digits: 1,
-    })),
-    ...t.delta_years.map((y) => ({
-      key: `da${y}`,
-      label: y,
-      groupLabel: "$ Δ YoY",
-      format: "signedMoney" as const,
-      heat: "rg" as const,
-      digits: 1,
-    })),
-    ...t.delta_years.map((y) => ({
-      key: `dp${y}`,
-      label: y,
-      groupLabel: "% Δ YoY",
-      format: "pct" as const,
-      heat: "rg" as const,
-    })),
-  ];
-}
-function growthRows(t: GrowthTable): TableRow[] {
-  return t.rows.map((r) => ({
-    label: r.label,
-    isTotal: r.is_total,
-    cells: [...r.values, ...r.delta_abs, ...r.delta_pct],
-  }));
-}
-
-function Section({
-  id,
-  title,
-  children,
-}: {
-  id: string;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section id={id} className="section">
-      <h2 className="section-title">{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-export default function DashboardPage() {
-  const d = getDashboard();
-  const t = d.tables;
-  const tc = getCompounderTables();
+// The post-login landing: choose which tool to open. SPX Monitor is the
+// existing S&P 500 dashboard; X Themes is the daily idea briefing from X.
+export default function HomePage() {
+  const ideas = getActiveIdeasCount();
+  const asOf = getGeneratedAtLabel();
 
   return (
-    <DashboardFrame
-      heading={
-        <ViewHeading
-          title="Aggregate SPX"
-          meta="AI beneficiary & software tracker"
-          trailing={`Bloomberg data as of ${getBloombergDateLabel()}`}
-        />
-      }
-    >
-      <Section id="performance" title="Stock Performance">
-        <DataTable
-          columns={threeDateColumns(t.stock_performance, 0)}
-          rows={threeDateRows(t.stock_performance)}
-          altRows={tc ? threeDateRows(tc.stock_performance) : undefined}
-        />
-      </Section>
+    <div className="landing">
+      <header className="landing-head">
+        <div className="landing-brand">
+          <span className="login-dot" aria-hidden="true" />
+          Mendo Monitor
+        </div>
+        <LogoutButton />
+      </header>
 
-      <Section id="growth" title="Earnings Growth">
-        <DataTable
-          columns={growthColumns(t.earnings_growth)}
-          rows={growthRows(t.earnings_growth)}
-          altRows={tc ? growthRows(tc.earnings_growth) : undefined}
-        />
-      </Section>
+      <p className="landing-tagline">
+        An AI-beneficiary &amp; software tracker within the S&amp;P 500, plus a
+        daily briefing of investment ideas surfaced from X.
+      </p>
 
-      <Section id="rev2026" title="Estimate Revisions 2026">
-        <DataTable
-          columns={threeDateColumns(t.est_rev_2026, 1)}
-          rows={threeDateRows(t.est_rev_2026)}
-          altRows={tc ? threeDateRows(tc.est_rev_2026) : undefined}
-        />
-      </Section>
+      <div className="landing-grid">
+        <Link href="/spx" className="landing-card">
+          <div className="landing-card-title">SPX Monitor</div>
+          <p className="landing-card-desc">
+            An AI-beneficiary &amp; software tracker within the S&amp;P 500.
+            Browse categories, sort any column, toggle Compounders only, and
+            export the underlying Excel.
+          </p>
+          <span className="landing-card-cta">Open SPX Monitor →</span>
+        </Link>
 
-      <Section id="rev2027" title="Estimate Revisions 2027">
-        <DataTable
-          columns={threeDateColumns(t.est_rev_2027, 1)}
-          rows={threeDateRows(t.est_rev_2027)}
-          altRows={tc ? threeDateRows(tc.est_rev_2027) : undefined}
-        />
-      </Section>
+        <Link href="/themes" className="landing-card">
+          <div className="landing-card-title">X Themes</div>
+          <p className="landing-card-desc">
+            A daily, curated briefing of investment ideas surfaced from X about
+            your themes — ranked by conviction and grounded in real posts.
+          </p>
+          <span className="landing-card-cta">
+            {ideas > 0 ? `Open X Themes · ${ideas} ideas →` : "Open X Themes →"}
+          </span>
+        </Link>
+      </div>
 
-      <Section id="pe" title="NTM P/E">
-        <NtmPeTable data={t.ntm_pe} altData={tc?.ntm_pe} />
-      </Section>
-    </DashboardFrame>
+      {asOf && <p className="landing-foot">X Themes as of {asOf}</p>}
+    </div>
   );
 }
