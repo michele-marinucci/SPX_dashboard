@@ -34,3 +34,7 @@ of the followed list, a DB-backed feed, and run history/analytics.
   (Next.js API routes) or from the Actions runner.
 - If the env vars are absent, everything keeps working off `themes.json` /
   localStorage, so you can roll this out without downtime.
+- The **Diligence Tracker** shares the same Supabase project (`diligence_links`
+  table in `schema.sql`). It seeds itself from `data/diligence.json` the first
+  time the page is opened, then becomes the shared source of truth — no
+  workflow or extra env vars needed beyond the two above.
