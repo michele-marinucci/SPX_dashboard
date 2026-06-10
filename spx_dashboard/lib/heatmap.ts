@@ -34,14 +34,15 @@ function divergingRG(v: number, scale: ColScale): CellStyle {
 }
 
 // Sequential blue. Intensity scales with (value - min) / (max - min).
+// Ledger: recolored to the Meritage brand indigo.
 function sequentialBlue(v: number, scale: ColScale): CellStyle {
   const range = scale.max - scale.min || 1;
   const t = Math.min(1, Math.max(0, (v - scale.min) / range));
   const alpha = 0.08 + 0.62 * t;
   const style: CellStyle = {
-    backgroundColor: `rgba(37, 99, 235, ${alpha.toFixed(3)})`,
+    backgroundColor: `rgba(55, 48, 230, ${alpha.toFixed(3)})`,
   };
-  if (alpha > 0.5) style.color = "#f8fafc";
+  if (alpha > 0.5) style.color = "#f4f4ff";
   return style;
 }
 

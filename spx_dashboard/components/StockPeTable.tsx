@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { CategoryStock } from "@/lib/data";
 import { cellStyle, computeScale } from "@/lib/heatmap";
 import { fmtMoney, fmtNum } from "@/lib/format";
-import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
+import { NO_SORT, nextSort, sortRows } from "@/lib/sort";
+import { SortGlyph } from "./SortGlyph";
 import { useCompounders } from "./CompoundersContext";
 import { Sparkline } from "./Sparkline";
 
@@ -36,7 +37,7 @@ export function StockPeTable({ stocks }: { stocks: CategoryStock[] }) {
       title="Sort by this column"
     >
       {label}
-      {sortGlyph(sort, key)}
+      <SortGlyph sort={sort} sortKey={key} />
     </th>
   );
 
@@ -50,7 +51,7 @@ export function StockPeTable({ stocks }: { stocks: CategoryStock[] }) {
               onClick={() => setSort((s) => nextSort(s, LABEL_KEY))}
               title="Sort by name"
             >
-              {sortGlyph(sort, LABEL_KEY)}
+              <SortGlyph sort={sort} sortKey={LABEL_KEY} />
             </th>
             {th("mkt_cap", "Mkt cap ($b)")}
             {th("ntm_ni", "NTM NI ($b)")}

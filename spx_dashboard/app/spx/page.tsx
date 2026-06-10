@@ -99,16 +99,24 @@ function growthRows(t: GrowthTable): TableRow[] {
 
 function Section({
   id,
+  num,
   title,
+  note,
   children,
 }: {
   id: string;
+  num: string;
   title: string;
+  note?: string;
   children: React.ReactNode;
 }) {
   return (
     <section id={id} className="section">
-      <h2 className="section-title">{title}</h2>
+      <div className="section-head">
+        <span className="section-num">{num}</span>
+        <h2 className="section-title">{title}</h2>
+        {note && <span className="section-note">{note}</span>}
+      </div>
       {children}
     </section>
   );
@@ -129,7 +137,12 @@ export default function SpxMonitorPage() {
         />
       }
     >
-      <Section id="performance" title="Stock Performance">
+      <Section
+        id="performance"
+        num="01"
+        title="Stock Performance"
+        note="Market cap ($b) · diverging Δ heatmaps"
+      >
         <DataTable
           columns={threeDateColumns(t.stock_performance, 0)}
           rows={threeDateRows(t.stock_performance)}
@@ -137,7 +150,12 @@ export default function SpxMonitorPage() {
         />
       </Section>
 
-      <Section id="growth" title="Earnings Growth">
+      <Section
+        id="growth"
+        num="02"
+        title="Earnings Growth"
+        note="Adjusted net income ($b)"
+      >
         <DataTable
           columns={growthColumns(t.earnings_growth)}
           rows={growthRows(t.earnings_growth)}
@@ -145,7 +163,12 @@ export default function SpxMonitorPage() {
         />
       </Section>
 
-      <Section id="rev2026" title="Estimate Revisions 2026">
+      <Section
+        id="rev2026"
+        num="03"
+        title="Estimate Revisions · 2026"
+        note="Consensus adj. NI ($b)"
+      >
         <DataTable
           columns={threeDateColumns(t.est_rev_2026, 1)}
           rows={threeDateRows(t.est_rev_2026)}
@@ -153,7 +176,12 @@ export default function SpxMonitorPage() {
         />
       </Section>
 
-      <Section id="rev2027" title="Estimate Revisions 2027">
+      <Section
+        id="rev2027"
+        num="04"
+        title="Estimate Revisions · 2027"
+        note="Consensus adj. NI ($b)"
+      >
         <DataTable
           columns={threeDateColumns(t.est_rev_2027, 1)}
           rows={threeDateRows(t.est_rev_2027)}
@@ -161,7 +189,12 @@ export default function SpxMonitorPage() {
         />
       </Section>
 
-      <Section id="pe" title="NTM P/E">
+      <Section
+        id="pe"
+        num="05"
+        title="NTM P/E"
+        note="Current vs historical averages · P/E history"
+      >
         <NtmPeTable data={t.ntm_pe} altData={tc?.ntm_pe} />
       </Section>
     </DashboardFrame>

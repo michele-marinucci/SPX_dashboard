@@ -2,7 +2,7 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
 import { Sidebar } from "@/components/Sidebar";
 import { HowToBanner } from "@/components/HowToBanner";
-import { getNavModel } from "@/lib/data";
+import { getBloombergDateLabel, getNavModel } from "@/lib/data";
 
 // The shared shell for every dashboard view: a left sidebar to switch views
 // and a content area with a per-view heading. The "data as of" date is shown
@@ -15,6 +15,7 @@ export function DashboardFrame({
   children: React.ReactNode;
 }) {
   const nav = getNavModel();
+  const asOf = getBloombergDateLabel();
 
   return (
     <div className="shell">
@@ -39,6 +40,10 @@ export function DashboardFrame({
         </header>
         <HowToBanner />
         {children}
+        <footer className="view-foot">
+          <span>Bloomberg data as of {asOf}</span>
+          <span>MERITAGE · INTERNAL</span>
+        </footer>
       </div>
     </div>
   );

@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { NtmPeRow, NtmPeTableData } from "@/lib/data";
 import { cellStyle, computeScale } from "@/lib/heatmap";
 import { cx, fmtMoney, fmtNum, fmtPct } from "@/lib/format";
-import { NO_SORT, nextSort, sortGlyph, sortRows } from "@/lib/sort";
+import { NO_SORT, nextSort, sortRows } from "@/lib/sort";
+import { SortGlyph } from "./SortGlyph";
 import { useCompounders } from "./CompoundersContext";
 import { Sparkline } from "./Sparkline";
 
@@ -53,14 +54,14 @@ export function NtmPeTable({
     return [...head, ...eff.rows.slice(splitAt)];
   }, [eff.rows, sort]);
 
-  const sortableTh = (key: string, label: React.ReactNode) => (
+  const sortableTh = (key: string, label: React.ReactNode, divider = false) => (
     <th
-      className="num-th sortable"
+      className={cx("num-th sortable", divider && "col-divider")}
       onClick={() => setSort((s) => nextSort(s, key))}
       title="Sort by this column"
     >
       {label}
-      {sortGlyph(sort, key)}
+      <SortGlyph sort={sort} sortKey={key} />
     </th>
   );
 
@@ -72,14 +73,14 @@ export function NtmPeTable({
             <th className="row-head" />
             <th className="group-th">Mkt cap</th>
             <th className="group-th">NTM NI</th>
-            <th className="group-th">NTM P/E</th>
-            <th className="group-th" colSpan={eff.avg_dates.length}>
+            <th className="group-th col-divider">NTM P/E</th>
+            <th className="group-th col-divider" colSpan={eff.avg_dates.length}>
               Avg P/E since
             </th>
-            <th className="group-th" colSpan={eff.avg_dates.length}>
+            <th className="group-th col-divider" colSpan={eff.avg_dates.length}>
               Current vs avg since
             </th>
-            <th className="group-th">History</th>
+            <th className="group-th col-divider">History</th>
           </tr>
           <tr>
             <th
@@ -87,14 +88,14 @@ export function NtmPeTable({
               onClick={() => setSort((s) => nextSort(s, LABEL_KEY))}
               title="Sort by name"
             >
-              {sortGlyph(sort, LABEL_KEY)}
+              <SortGlyph sort={sort} sortKey={LABEL_KEY} />
             </th>
             {sortableTh("mkt_cap", "$b")}
             {sortableTh("ntm_ni", "$b")}
-            {sortableTh("ntm_pe", eff.current_label.replace(/[()]/g, ""))}
-            {eff.avg_dates.map((d, i) => sortableTh(`avg${i}`, d))}
-            {eff.avg_dates.map((d, i) => sortableTh(`delta${i}`, d))}
-            <th className="num-th">since &apos;20</th>
+            {sortableTh("ntm_pe", eff.current_label.replace(/[()]/g, ""), true)}
+            {eff.avg_dates.map((d, i) => sortableTh(`avg${i}`, d, i === 0))}
+            {eff.avg_dates.map((d, i) => sortableTh(`delta${i}`, d, i === 0))}
+            <th className="num-th col-divider">since &apos;20</th>
           </tr>
         </thead>
         <tbody>
@@ -106,7 +107,7 @@ export function NtmPeTable({
               <td className="num-td">{fmtMoney(r.mkt_cap, 0)}</td>
               <td className="num-td">{fmtNum(r.ntm_ni, 1)}</td>
               <td
-                className="num-td"
+                className="num-td col-divider"
                 style={r.is_total ? {} : cellStyle(r.ntm_pe, "blue", peScale)}
               >
                 {fmtNum(r.ntm_pe, 1)}
@@ -114,7 +115,7 @@ export function NtmPeTable({
               {r.avg_since.map((v, i) => (
                 <td
                   key={`av-${i}`}
-                  className="num-td"
+                  className={cx("num-td", i === 0 && "col-divider")}
                   style={r.is_total ? {} : cellStyle(v, "blue", avgScales[i])}
                 >
                   {fmtNum(v, 1)}
@@ -123,13 +124,13 @@ export function NtmPeTable({
               {r.delta_vs_avg.map((v, i) => (
                 <td
                   key={`dv-${i}`}
-                  className="num-td"
+                  className={cx("num-td", i === 0 && "col-divider")}
                   style={r.is_total ? {} : cellStyle(v, "rg", deltaScales[i])}
                 >
                   {fmtPct(v, 1)}
                 </td>
               ))}
-              <td className="num-td spark-td">
+              <td className="num-td spark-td col-divider">
                 <Sparkline values={r.series} />
               </td>
             </tr>

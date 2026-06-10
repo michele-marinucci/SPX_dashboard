@@ -1,8 +1,8 @@
 // Tiny inline-SVG sparkline for the NTM P/E history. Server-rendered, no JS.
 export function Sparkline({
   values,
-  width = 120,
-  height = 26,
+  width = 116,
+  height = 24,
 }: {
   values: (number | null)[];
   width?: number;
@@ -46,7 +46,7 @@ export function Sparkline({
         points={coords}
         fill="none"
         stroke={stroke}
-        strokeWidth={1.25}
+        strokeWidth={1.4}
         strokeLinejoin="round"
         strokeLinecap="round"
       />
