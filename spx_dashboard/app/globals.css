@@ -1868,3 +1868,215 @@ thead .row-head {
     flex-basis: 100%;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Twitter Monitor
+--------------------------------------------------------------------------- */
+.tw-explain {
+  margin: 0 0 18px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--accent-soft);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.tw-explain summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+}
+.tw-explain p {
+  margin: 8px 0 2px;
+  line-height: 1.55;
+}
+
+.tw-headline {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 4px 0 14px;
+  line-height: 1.5;
+}
+
+.tw-daily {
+  display: grid;
+  gap: 12px;
+}
+.tw-daily-item {
+  border: 1px solid var(--line-2);
+  border-left: 3px solid var(--brand);
+  border-radius: 6px;
+  padding: 10px 14px;
+  background: #fff;
+}
+.tw-daily-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin-bottom: 4px;
+}
+.tw-daily-text {
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.tw-daily-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.tw-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  background: var(--line-soft);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.tw-chip-move {
+  font-weight: 700;
+}
+.tw-move-up { color: var(--green); }
+.tw-move-down { color: var(--red); }
+.tw-move-na { color: var(--faint); }
+
+.tw-jump,
+.tw-mention {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tw-jump:hover,
+.tw-mention:hover { text-decoration: underline; }
+.tw-mention { margin-right: 10px; }
+.tw-mention.tw-sent-positive { color: var(--green); }
+.tw-mention.tw-sent-negative { color: var(--red); }
+
+.tw-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.tw-table th {
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line-strong);
+  padding: 6px 10px;
+}
+.tw-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.tw-table .r { text-align: right; }
+.tw-table tr:hover td { background: var(--line-soft); }
+.tw-row-port td { background: var(--accent-soft); }
+
+.tw-ticker {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-weight: 700;
+  color: var(--brand);
+  text-decoration: none;
+}
+.tw-ticker:hover { text-decoration: underline; }
+.tw-name { color: var(--muted); }
+.tw-port-link {
+  color: var(--brand);
+  text-decoration: none;
+}
+.tw-port-link:hover { text-decoration: underline; }
+
+.tw-author a {
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tw-author a:hover { color: var(--brand); }
+.tw-sent-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-left: 6px;
+  background: var(--faint);
+  vertical-align: middle;
+}
+.tw-sent-dot.tw-sent-positive { background: var(--green); }
+.tw-sent-dot.tw-sent-negative { background: var(--red); }
+
+.tw-sum { max-width: 520px; line-height: 1.5; color: var(--ink-2); }
+.tw-media { cursor: help; }
+.tw-media-sum {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+.tw-tickers { white-space: nowrap; }
+.tw-tickers .tw-chip { margin: 0 4px 4px 0; }
+.tw-open {
+  font-weight: 700;
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.tw-recur-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.tw-recur-card {
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  padding: 10px 14px;
+  background: #fff;
+}
+.tw-recur-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.tw-recur-topic { font-weight: 700; color: var(--ink); font-size: 13.5px; }
+.tw-recur-days {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand);
+  background: var(--brand-050);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+.tw-recur-sum {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+@media (max-width: 760px) {
+  .tw-sum { max-width: none; }
+  .tw-tweets-table th:nth-child(4), .tw-tweets-table td:nth-child(4) { display: none; }
+}

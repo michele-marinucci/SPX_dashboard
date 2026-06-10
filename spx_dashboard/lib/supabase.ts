@@ -1,6 +1,12 @@
 // Server-only: imported solely by API route handlers; reads the service-role
 // key from server env and is never bundled into client code.
-import type { ThemeIdea, ThemeRef, ThemesData } from "@/lib/themes";
+import type {
+  DailySummary,
+  RecurringTopic,
+  ThemeRef,
+  Tweet,
+  TwitterData,
+} from "@/lib/tweets";
 
 // Server-only Supabase access via PostgREST using the service-role key. The key
 // never reaches the browser; all calls happen in API routes / server code.
@@ -69,48 +75,73 @@ export async function dbRemoveFollowed(handle: string): Promise<void> {
   if (!res.ok) throw new Error(`followed remove ${res.status}`);
 }
 
-// ---- Feed ----------------------------------------------------------------- //
+// ---- Twitter Monitor feed -------------------------------------------------- //
 // Returns the DB-backed feed, or null if Supabase isn't configured/empty so
-// callers can fall back to the committed themes.json.
-export async function dbGetFeed(): Promise<ThemesData | null> {
+// callers can fall back to the committed data/tweets.json.
+export async function dbGetTwitterFeed(): Promise<TwitterData | null> {
   if (!supabaseEnabled()) return null;
-  const [ideasRes, themesRes, runsRes] = await Promise.all([
-    rest("ideas?active=eq.true&select=*"),
+  const [tweetsRes, themesRes, dailyRes, recurRes] = await Promise.all([
+    rest("tweets?select=*&order=posted_at.desc.nullslast&limit=500"),
     rest("themes?select=key,label"),
-    rest("runs?select=generated_at&order=generated_at.desc&limit=1"),
+    rest("daily_summary?select=generated_at,summary&order=generated_at.desc&limit=1"),
+    rest("recurring_themes?select=generated_at,data&order=generated_at.desc&limit=1"),
   ]);
-  if (!ideasRes.ok || !themesRes.ok) return null;
+  if (!tweetsRes.ok || !themesRes.ok) return null;
 
-  const rows = (await ideasRes.json()) as Record<string, unknown>[];
+  const rows = (await tweetsRes.json()) as Record<string, unknown>[];
   if (!rows.length) return null; // not populated yet → use the JSON fallback
 
   const themes = (await themesRes.json()) as ThemeRef[];
-  const runs = runsRes.ok ? ((await runsRes.json()) as { generated_at: string }[]) : [];
+  const dailyRows = dailyRes.ok
+    ? ((await dailyRes.json()) as {
+        generated_at: string;
+        summary: DailySummary & {
+          ticker_moves?: Record<string, number | null>;
+          portfolio?: string[];
+        };
+      }[])
+    : [];
+  const recurRows = recurRes.ok
+    ? ((await recurRes.json()) as { data: RecurringTopic[] }[])
+    : [];
 
-  const ideas = rows.map(
-    (r): ThemeIdea => ({
-      ticker: r.ticker as string,
-      direction: r.direction as ThemeIdea["direction"],
-      thesis: (r.thesis as string) ?? "",
-      catalyst: (r.catalyst as string) ?? "",
-      sources: (r.sources as ThemeIdea["sources"]) ?? [],
-      theme_keys: (r.theme_keys as string[]) ?? [],
-      prices: (r.prices as ThemeIdea["prices"]) ?? null,
-      citations: (r.citations as string[]) ?? [],
-      first_seen: r.first_seen as string,
-      last_seen: r.last_seen as string,
+  const tweets = rows.map(
+    (r): Tweet => ({
+      id: r.id as string,
+      url: (r.url as string) ?? "",
+      handle: (r.handle as string) ?? "",
+      author_name: (r.author_name as string) ?? "",
+      posted_at: (r.posted_at as string) ?? "",
+      text: (r.text as string) ?? "",
+      summary: (r.summary as string) ?? "",
+      sentiment: (r.sentiment as Tweet["sentiment"]) ?? "neutral",
+      themes: (r.themes as string[]) ?? [],
+      tickers: (r.tickers as string[]) ?? [],
+      portfolio: (r.portfolio as string[]) ?? [],
+      views: (r.views as number | null) ?? null,
+      has_media: (r.has_media as boolean) ?? false,
+      media_summary: (r.media_summary as string) ?? "",
+      first_seen: (r.first_seen as string) ?? "",
+      last_seen: (r.last_seen as string) ?? "",
       seen_count: (r.seen_count as number) ?? 1,
-      tier: (r.tier as ThemeIdea["tier"]) ?? "discovery",
-      score: (r.score as number) ?? 0,
-      conviction: (r.conviction as ThemeIdea["conviction"]) ?? "low",
-      active: (r.active as boolean) ?? true,
-      on_watchlist: (r.on_watchlist as boolean) ?? false,
     }),
   );
 
+  const latest = dailyRows[0];
+  const { ticker_moves = {}, portfolio = [], ...daily } = latest?.summary ?? {
+    date: null,
+    headline: "",
+    items: [],
+  };
+
   return {
-    generated_at: runs[0]?.generated_at ?? null,
+    generated_at: latest?.generated_at ?? null,
     themes,
-    ideas,
+    followed_handles: [],
+    portfolio,
+    daily_summary: daily as DailySummary,
+    recurring: recurRows[0]?.data ?? [],
+    ticker_moves,
+    tweets,
   };
 }

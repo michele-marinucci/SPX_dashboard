@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { LogoutButton } from "@/components/LogoutButton";
 import { Sidebar } from "@/components/Sidebar";
 import { HowToBanner } from "@/components/HowToBanner";
 import { getBloombergDateLabel, getNavModel } from "@/lib/data";
@@ -24,9 +23,12 @@ export function DashboardFrame({
         <header className="content-header">
           {heading}
           <div className="header-actions">
-            <Link href="/" className="btn-back" title="Back to all views">
-              ← All views
-            </Link>
+            <span className="crumb">
+              <Link href="/" className="crumb-home">
+                Mendo Hub
+              </Link>
+              <span className="crumb-sep">|</span> SPX Monitor
+            </span>
             <a
               href="/SPX_inputs.xlsx"
               download="SPX_inputs.xlsx"
@@ -35,7 +37,6 @@ export function DashboardFrame({
             >
               <span aria-hidden="true">↓</span> Export Excel
             </a>
-            <LogoutButton />
           </div>
         </header>
         <HowToBanner />

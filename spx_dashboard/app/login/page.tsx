@@ -40,7 +40,7 @@ function LoginForm() {
       <div className="login-card">
         <div className="login-brand">
           <span className="login-dot" aria-hidden="true" />
-          Mendo Monitor
+          Mendo Hub
         </div>
         <p className="login-tagline">Private dashboard — authorized access only.</p>
 

@@ -1,11 +1,15 @@
-name: Refresh Twitter Monitor
+name: Backfill Twitter Monitor (manual, one-time)
 
+# Manual-only: populates the tweet store with the trailing month so
+# recurring-theme detection has history from day one. Costs ~4-5x a normal
+# run in xAI credits — trigger deliberately, not on a schedule.
 on:
-  schedule:
-    # Mon/Wed/Fri at 10:00 UTC (6am EDT). GitHub cron is UTC, so this drifts to
-    # 5am local for the EST half of the year (no DST handling on the runner).
-    - cron: "0 10 * * 1,3,5"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "How many days back to backfill"
+        required: false
+        default: "30"
 
 concurrency:
   group: refresh-themes
@@ -15,7 +19,7 @@ permissions:
   contents: write
 
 jobs:
-  refresh:
+  backfill:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,23 +33,23 @@ jobs:
       - name: Install dependencies
         run: pip install -r spx_dashboard/pipeline/requirements.txt
 
-      - name: Scrape followed accounts and refresh the tweet store
+      - name: Backfill the tweet store
         env:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-          # Optional: when set, the store + digests are mirrored into Supabase
-          # and the UI-editable (shared) followed list drives the scrape.
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: python spx_dashboard/pipeline/run_twitter.py
+        run: >
+          python spx_dashboard/pipeline/backfill_tweets.py
+          --days "${{ inputs.days || '30' }}"
 
-      - name: Commit refreshed store (triggers Vercel redeploy)
+      - name: Commit the backfilled store (triggers Vercel redeploy)
         run: |
           if [ -n "$(git status --porcelain spx_dashboard/data/tweets.json)" ]; then
             git config user.name "spx-dashboard-bot"
             git config user.email "actions@github.com"
             git add spx_dashboard/data/tweets.json
-            git commit -m "data: refresh Twitter Monitor store"
+            git commit -m "data: backfill Twitter Monitor store"
             git push
           else
-            echo "No feed changes; nothing to deploy."
+            echo "No changes; nothing to commit."
           fi

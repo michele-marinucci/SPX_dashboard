@@ -101,68 +101,88 @@ def _upsert_themes(themes: list[dict]) -> None:
     ).raise_for_status()
 
 
-def _replace_ideas(ideas: list[dict]) -> None:
-    # Replace the whole current feed so the table mirrors themes.json exactly.
+def _upsert_tweets(tweets: list[dict], retention_cutoff: str) -> None:
+    """Upsert the tweet store (PK = id) and prune rows past retention.
+
+    The store ACCUMULATES across runs — this never deletes inside the
+    retention window, only upserts current rows and trims the old tail.
+    """
+    rows = [
+        {
+            "id": t["id"],
+            "url": t.get("url"),
+            "handle": t.get("handle"),
+            "author_name": t.get("author_name"),
+            "posted_at": t.get("posted_at") or None,
+            "text": t.get("text"),
+            "summary": t.get("summary"),
+            "sentiment": t.get("sentiment"),
+            "themes": t.get("themes", []),
+            "tickers": t.get("tickers", []),
+            "portfolio": t.get("portfolio", []),
+            "views": t.get("views"),
+            "has_media": bool(t.get("has_media")),
+            "media_summary": t.get("media_summary"),
+            "first_seen": t.get("first_seen"),
+            "last_seen": t.get("last_seen"),
+            "seen_count": t.get("seen_count", 1),
+        }
+        for t in tweets
+        if t.get("id")
+    ]
+    if rows:
+        requests.post(
+            f"{URL}/rest/v1/tweets",
+            headers=_headers({"Prefer": "resolution=merge-duplicates,return=minimal"}),
+            json=rows,
+            timeout=TIMEOUT,
+        ).raise_for_status()
     requests.delete(
-        f"{URL}/rest/v1/ideas?ticker=not.is.null",
+        f"{URL}/rest/v1/tweets?first_seen=lt.{retention_cutoff}",
         headers=_headers({"Prefer": "return=minimal"}),
         timeout=TIMEOUT,
     ).raise_for_status()
-    if ideas:
-        requests.post(
-            f"{URL}/rest/v1/ideas",
-            headers=_headers({"Prefer": "return=minimal"}),
-            json=ideas,
-            timeout=TIMEOUT,
-        ).raise_for_status()
 
 
-def _record_history(feed: dict) -> None:
-    ideas = feed.get("ideas", [])
-    active = sum(1 for i in ideas if i.get("active"))
-    r = requests.post(
-        f"{URL}/rest/v1/runs",
-        headers=_headers({"Prefer": "return=representation"}),
-        json={
-            "generated_at": feed.get("generated_at"),
-            "idea_count": len(ideas),
-            "active_count": active,
-        },
-        timeout=TIMEOUT,
-    )
-    r.raise_for_status()
-    run_id = r.json()[0]["id"]
-    snaps = [
-        {
-            "run_id": run_id,
-            "ticker": i["ticker"],
-            "direction": i["direction"],
-            "tier": i.get("tier"),
-            "score": i.get("score"),
-            "conviction": i.get("conviction"),
-            "seen_count": i.get("seen_count"),
-            "active": i.get("active"),
-            "data": i,
-        }
-        for i in ideas
-    ]
-    if snaps:
-        requests.post(
-            f"{URL}/rest/v1/idea_snapshots",
-            headers=_headers({"Prefer": "return=minimal"}),
-            json=snaps,
-            timeout=TIMEOUT,
-        ).raise_for_status()
+def publish_twitter(payload: dict) -> None:
+    """Mirror a freshly built Twitter Monitor payload into Supabase.
 
-
-def publish(feed: dict) -> None:
-    """Mirror the freshly built feed into Supabase and append a history snapshot."""
+    daily_summary.summary carries the full digest context (headline, items,
+    ticker_moves, portfolio, followed) so the web app can serve the latest
+    state from the DB alone.
+    """
     if not enabled():
         return
+    import datetime as dt
+
     try:
-        _upsert_themes(feed.get("themes", []))
-        _replace_ideas(feed.get("ideas", []))
-        _record_history(feed)
-        _log("db: published feed + history snapshot")
+        _upsert_themes(payload.get("themes", []))
+        cutoff = (
+            dt.date.today() - dt.timedelta(days=45)  # retention + slack
+        ).isoformat()
+        _upsert_tweets(payload.get("tweets", []), cutoff)
+        requests.post(
+            f"{URL}/rest/v1/daily_summary",
+            headers=_headers({"Prefer": "return=minimal"}),
+            json={
+                "generated_at": payload.get("generated_at"),
+                "summary": {
+                    **(payload.get("daily_summary") or {}),
+                    "ticker_moves": payload.get("ticker_moves", {}),
+                    "portfolio": payload.get("portfolio", []),
+                },
+            },
+            timeout=TIMEOUT,
+        ).raise_for_status()
+        requests.post(
+            f"{URL}/rest/v1/recurring_themes",
+            headers=_headers({"Prefer": "return=minimal"}),
+            json={
+                "generated_at": payload.get("generated_at"),
+                "data": payload.get("recurring", []),
+            },
+            timeout=TIMEOUT,
+        ).raise_for_status()
+        _log("db: published tweets + daily summary + recurring topics")
     except (requests.RequestException, ValueError, KeyError, IndexError) as e:
-        _log(f"db.publish failed: {e}")
+        _log(f"db.publish_twitter failed: {e}")
