@@ -12,13 +12,7 @@ import { useSidebarState } from "./SidebarStateContext";
 // then (in SPX Monitor mode) the aggregate/compounders toggle and each
 // category's per-stock breakdown. Highlights whichever route is active.
 // Collapsible — collapsed by default on mobile, expanded on the desktop site.
-export function Sidebar({
-  nav,
-  themesCount = 0,
-}: {
-  nav: NavGroup[];
-  themesCount?: number;
-}) {
+export function Sidebar({ nav }: { nav: NavGroup[] }) {
   const pathname = usePathname();
   const { on: compoundersOnly, set: setCompounders } = useCompounders();
   const { collapsed, setCollapsed, toggle: toggleSidebar } = useSidebarState();
@@ -104,34 +98,6 @@ export function Sidebar({
         <span className="sidebar-hint" aria-hidden="true">
           Click to filter
         </span>
-      </div>
-
-      {/* Top-level view switch: the existing SPX Monitor vs. the X Themes feed.
-          Same segmented-button styling as the filter toggle below. */}
-      <div className="view-switch">
-        <Link
-          href="/spx"
-          onClick={handleSelect}
-          className={cx("seg-btn", !isThemes && "seg-btn-on")}
-          title="The S&P 500 AI-beneficiary dashboard"
-        >
-          <span className="seg-label">SPX Monitor</span>
-          <span className="seg-count">{totalStocks}</span>
-        </Link>
-        <Link
-          href="/themes"
-          onClick={() => {
-            // The themes feed has no compounders filter; reset it so the tag
-            // never bleeds across from the SPX views.
-            setCompounders(false);
-            handleSelect();
-          }}
-          className={cx("seg-btn", isThemes && "seg-btn-on")}
-          title="Daily curated investment ideas surfaced from X"
-        >
-          <span className="seg-label">X Themes</span>
-          <span className="seg-count">{themesCount}</span>
-        </Link>
       </div>
 
       {/* SPX-specific controls: hidden on the themes feed. */}
