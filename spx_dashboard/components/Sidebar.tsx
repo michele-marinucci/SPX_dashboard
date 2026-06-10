@@ -90,9 +90,17 @@ export function Sidebar({
         >
           <span className="hamburger" aria-hidden="true" />
         </button>
-        <span className="sidebar-brand">
+        <Link
+          href="/"
+          className="sidebar-brand"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSelect();
+          }}
+          title="Back to all views"
+        >
           <span className="sidebar-brand-text">Mendo Monitor</span>
-        </span>
+        </Link>
         <span className="sidebar-hint" aria-hidden="true">
           Click to filter
         </span>
@@ -102,7 +110,7 @@ export function Sidebar({
           Same segmented-button styling as the filter toggle below. */}
       <div className="view-switch">
         <Link
-          href="/"
+          href="/spx"
           onClick={handleSelect}
           className={cx("seg-btn", !isThemes && "seg-btn-on")}
           title="The S&P 500 AI-beneficiary dashboard"
@@ -132,7 +140,7 @@ export function Sidebar({
           {/* Two mutually-exclusive blue toggles: show every SPX stock, or only
               the compounders. Both reflect the same global filter. */}
           <Link
-            href="/"
+            href="/spx"
             onClick={() => {
               setCompounders(false);
               handleSelect();

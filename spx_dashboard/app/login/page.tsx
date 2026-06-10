@@ -42,22 +42,7 @@ function LoginForm() {
           <span className="login-dot" aria-hidden="true" />
           Mendo Monitor
         </div>
-        <p className="login-tagline">
-          An AI-beneficiary &amp; software tracker within the S&amp;P 500.
-        </p>
-        <ul className="login-points">
-          <li>
-            <b>Browse</b> categories in the sidebar — Aggregate SPX, each group,
-            and Other.
-          </li>
-          <li>
-            <b>Sort</b> any column with a click, and toggle{" "}
-            <b>Compounders only</b> to focus the whole view.
-          </li>
-          <li>
-            <b>Export</b> the underlying Excel file at any time.
-          </li>
-        </ul>
+        <p className="login-tagline">Private dashboard — authorized access only.</p>
 
         <form className="login-form" onSubmit={onSubmit}>
           <input
