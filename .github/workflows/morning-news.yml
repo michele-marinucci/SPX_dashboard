@@ -1,0 +1,54 @@
+name: Generate morning news summary
+
+on:
+  schedule:
+    # 9:00 AM ET = 13:00 UTC (EST) / 14:00 UTC (EDT).
+    # Run at both so it fires at 9am regardless of DST.
+    - cron: "0 13 * 11,12,1,2,3 *"   # Nov–Mar (EST, UTC-5)
+    - cron: "0 14 * 4,5,6,7,8,9,10 *" # Apr–Oct (EDT, UTC-4)
+  workflow_dispatch: {}
+
+concurrency:
+  group: morning-news
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r spx_dashboard/pipeline/requirements.txt
+
+      - name: Fetch newsletters and generate summary
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NEWS_SENDER_FILTER: ${{ secrets.NEWS_SENDER_FILTER }}
+          NEWS_LOOKBACK_HOURS: "24"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MORNING_NEWS_RECIPIENTS: ${{ secrets.MORNING_NEWS_RECIPIENTS }}
+          MORNING_NEWS_FROM: ${{ secrets.GMAIL_ADDRESS }}
+        run: python spx_dashboard/pipeline/run_news.py
+
+      - name: Commit updated morning news data (triggers Vercel redeploy)
+        run: |
+          if [ -n "$(git status --porcelain spx_dashboard/data/morning_news.json)" ]; then
+            git config user.name "spx-dashboard-bot"
+            git config user.email "actions@github.com"
+            git add spx_dashboard/data/morning_news.json
+            git commit -m "data: morning news summary $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "No changes to morning_news.json; nothing to deploy."
+          fi

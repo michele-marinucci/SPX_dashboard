@@ -1,6 +1,26 @@
-import { WorkInProgress } from "@/components/WorkInProgress";
+import { MorningNewsClient } from "./MorningNewsClient";
+import morningNewsRaw from "@/data/morning_news.json";
 
-// Morning News Summary — announced on the landing page, not built yet.
+export interface NewsTheme {
+  headline: string;
+  detail: string;
+  sources: string[];
+}
+
+export interface NewsPosition {
+  ticker: string;
+  name?: string;
+  notes: string;
+}
+
+export interface MorningNote {
+  date: string; // YYYY-MM-DD
+  top_themes: NewsTheme[];
+  positions: NewsPosition[];
+  one_liner: string;
+}
+
 export default function MorningNewsPage() {
-  return <WorkInProgress title="Morning News Summary" />;
+  const notes = morningNewsRaw as MorningNote[];
+  return <MorningNewsClient notes={notes} />;
 }
