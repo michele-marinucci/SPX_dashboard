@@ -147,9 +147,24 @@ export default function HomePage() {
         <div className="prev">Preview →</div>
       </Link>
 
+      <Link href="/insider" className="hub-row wip">
+        <div className="hub-idx">06</div>
+        <div>
+          <div className="rname">Insider Selling</div>
+          <p className="rdesc">
+            Track insider sell transactions across the universe — who&apos;s
+            selling, how much, and when.
+          </p>
+        </div>
+        <div>
+          <span className="wiptag">Work in progress</span>
+        </div>
+        <div className="prev">Preview →</div>
+      </Link>
+
       <div className="hub-foot">
         <span>{asOf ? `X THEMES AS OF ${asOf}` : "X THEMES"}</span>
-        <span>5 MODULES · 2 LIVE</span>
+        <span>6 MODULES · 2 LIVE</span>
       </div>
     </div>
   );
