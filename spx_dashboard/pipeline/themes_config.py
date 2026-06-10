@@ -1,67 +1,69 @@
 """
-Shared, in-code configuration for the "X Themes" briefing.
+Shared, in-code configuration for the Twitter Monitor pipeline.
 
-This is the *only* place to edit what the daily scout looks for. There is no
-database and nothing per-user: one curated config drives the whole feed.
+The monitor scrapes the tweets of FOLLOWED_HANDLES on a Mon/Wed/Fri cadence,
+summarizes them by theme, flags portfolio mentions, and tracks topics that
+recur across the trailing RETENTION_DAYS window.
 
-  - THEMES          the investment themes to scout each day. Each has a free-
-                    text intent prompt (handed to Grok) and a set of
-                    `priority_handles` — accounts you trust most. NOTE: the
-                    handles do NOT restrict the search; the scout searches all
-                    of X openly and only uses these to *bucket* ideas into the
-                    "priority" tier afterwards.
-  - WATCHLIST       tickers you care about. Passed to the model as a hint and
-                    flagged on the card; it is not a hard filter (any validated
-                    US ticker can surface).
-  - SOURCE_WEIGHTS  per-tier weights feeding the derived conviction/score.
+  - FOLLOWED_HANDLES  default followed accounts; seeds the shared (UI-editable)
+                      Supabase list on first run. The DB list wins afterwards.
+  - PORTFOLIO         current holdings, matched against each day's tweets.
+  - THEMES            the theme taxonomy used to organize the daily summary.
+  - WATCHLIST         tickers passed to the model as a tagging hint.
 
 Edit freely — the pipeline imports these names directly.
 """
 
 from __future__ import annotations
 
-# xAI model used for scouting. The x_search agent tool requires a tool-capable
-# Grok. Bump this as xAI ships newer models.
-MODEL = "grok-4.3"
+# xAI models. Retrieval needs a tool-capable Grok (x_search); FAST_MODEL is
+# the knob for routing summaries/sentiment/clustering to a cheaper model.
+# NOTE: the grok-4-1-fast-* family was deprecated 2026-05-15 (requests now
+# redirect to grok-4.3 at 4.3 pricing), so both point at grok-4.3 until xAI
+# ships a new discounted tier. The pipeline falls back to MODEL automatically
+# if FAST_MODEL is ever invalid.
+MODEL = "grok-4.3"       # retrieval (x_search) + vision
+FAST_MODEL = "grok-4.3"  # summaries, sentiment, theme clustering
 
-# How many days back x_search should look each run. A daily briefing wants
-# recent chatter, but trusted accounts post intermittently — a ~1-week window
-# captures them (and survives a missed/slow run) without drowning the feed.
-LOOKBACK_DAYS = 7
+# How many days back each scheduled run looks. The cron fires Mon/Wed/Fri, so
+# a 3-day window always covers the gap since the previous run (Fri→Mon).
+LOOKBACK_DAYS = 3
 
-# Feed shaping (consumed by the merge/aging logic, not the frontend).
-#   AGE_OUT_DAYS  an idea drops out of the *main view* this many days after it
-#                 was last seen — but it stays in themes.json for recurrence
-#                 math (so its seen_count keeps counting if it returns).
-#   PRUNE_DAYS    hard-delete a record from themes.json once it has been silent
-#                 this long, to keep the file bounded.
-#   MAX_FEED      safety cap on how many active ideas the file carries forward.
-AGE_OUT_DAYS = 5
-PRUNE_DAYS = 120
-MAX_FEED = 60
+# Tweet store shaping.
+#   RETENTION_DAYS    tweets older than this are pruned from the store; this is
+#                     the memory window recurring-theme detection sees.
+#   RECUR_MIN_DAYS    a topic must appear on at least this many distinct days
+#                     to count as "recurring".
+#   MAX_VISION_CALLS  per-run cap on chart/image description calls (cost bound).
+RETENTION_DAYS = 30
+RECUR_MIN_DAYS = 3
+MAX_VISION_CALLS = 12
 
-# Per-tier source weight feeding the derived conviction (see fetch_themes.py).
-# Priority handles are trusted most; discovery (unvetted) least.
-SOURCE_WEIGHTS = {
-    "priority": 1.0,
-    "credible": 0.6,
-    "discovery": 0.25,
-}
-
-# Curated "Followed accounts": the handles you trust. An idea is shown under
-# "Followed accounts" (vs "Discovery") when any of its source posts is from one
-# of these. Seeds the X Themes UI, which lets you add/remove handles in-browser.
-# Handles are case-insensitive and stored without the leading '@'.
+# Curated "Followed accounts": the handles you trust. Seeds the Twitter Monitor
+# UI on first run; thereafter the list is editable in-app and SHARED across all
+# users (one Supabase `followed_handles` table, not per-user). Handles are
+# case-insensitive and stored without the leading '@'.
 FOLLOWED_HANDLES = [
-    # AI labs
-    "sama", "demishassabis", "DarioAmodei",
-    # Prominent investors
-    "GavinSBaker", "bgurley", "BillAckman", "altcap", "modestproposal1",
-    # Podcasters / research
-    "patrick_oshag", "dwarkesh_sp",
-    # Sector specialists
-    "dnystedt", "dylan522p", "Beth_Kindig", "p_ferragu",
-    "DataCenterHawk", "hhhypergrowth", "rihardjarc", "StockMarketNerd",
+    "EdZitron", "Wccftech", "Firstadopter", "SouthernValue95", "ChatGPTapp",
+    "Kimmonismus", "Jukan05", "PrismML", "ClaudeAI", "Austinsemis",
+    "Apoorv03", "JulienBek", "Citrini", "KobeissiLetter", "Atelicinvest",
+    "Nicbstme", "Inflectionecon", "Coatuemgmt", "Wisemancap", "Bgurley",
+    "Vikramskr", "Contrariancurse", "Insane_analyst", "Alexeheath", "Dnystedt",
+    "Mooremorrissemi", "The_ai_investor", "Thehumanoidlab", "Similarweb",
+    "Rihardjarc", "Kevinweil", "Tmtmoats", "Macroedgeres", "Fundaai",
+    "Altcap", "Elerianm", "Satyanadella", "Dharmesh", "Sama", "Dylan522p",
+    "Techfundies", "Modestproposal1", "Benthompson", "Deepseek_ai",
+    "Artificialanlys", "Gavinsbaker",
+]
+
+# Current portfolio holdings, surfaced in the Twitter Monitor "Portfolio
+# mentions" table when a name comes up in the day's tweets. Some are non-US
+# (Bloomberg-style suffixes kept for display); price lookups for those will be
+# placeholder until a non-US-capable finance source is wired. The Equities
+# Dashboard tool will become the authoritative source for this list.
+PORTFOLIO = [
+    "MSFT", "AMZN", "TRU", "COF", "AON", "WDAY", "SPGI", "LSEG LN",
+    "CSGP", "DSV DC", "MSCI", "META", "SAP GY", "TOST", "EFX", "VSAT",
 ]
 
 # Tickers you actively track. Used only as a prompt hint + an `on_watchlist`
