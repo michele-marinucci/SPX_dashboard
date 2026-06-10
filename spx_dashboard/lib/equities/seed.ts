@@ -47,6 +47,7 @@ function toCompany(c: SeedCompany, grp: string, grpOrder: number, rowOrder: numb
     model: { ...emptyModel(), ...(c.model as Partial<EquityModel>) },
     is_index: false,
     best_pe: null,
+    removed: false,
   };
 }
 
@@ -84,6 +85,7 @@ export function seedCompanies(): Company[] {
       model: { ...emptyModel() },
       is_index: true,
       best_pe: ix.best_pe,
+      removed: false,
     });
   });
   return out;

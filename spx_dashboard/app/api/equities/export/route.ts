@@ -79,6 +79,7 @@ export async function GET() {
 
   const meta = xlMeta();
   for (const c of companies) {
+    if (c.removed) continue; // keep the template row's last values as-is
     const m = meta.get(c.ticker);
     if (!m) continue; // added on the site — no template row to patch
 

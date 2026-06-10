@@ -56,6 +56,9 @@ export interface Company {
   model: EquityModel;
   is_index: boolean;
   best_pe: YearMap | null; // index rows only (BEst P/E by year)
+  // Soft delete: removed names stay in the database (model, history and edit
+  // log intact) and can be restored from the "Removed names" modal.
+  removed: boolean;
 }
 
 export interface Quote {

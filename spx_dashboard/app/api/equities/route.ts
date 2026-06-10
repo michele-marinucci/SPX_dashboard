@@ -12,7 +12,7 @@ import {
   dbGetEdits,
   dbInsertCompany,
   dbInsertEdit,
-  dbRemoveCompany,
+  dbSetRemoved,
   dbUpdateCompany,
   equitiesEnabled,
 } from "@/lib/equitiesDb";
@@ -159,7 +159,15 @@ export async function POST(req: NextRequest) {
 
     if (action === "add") {
       const companies = await dbGetCompanies();
-      if (companies.some((x) => x.ticker === ticker)) {
+      const existing = companies.find((x) => x.ticker === ticker);
+      if (existing?.removed) {
+        // Re-adding a removed name restores it with its old model intact.
+        await dbSetRemoved(ticker, false, analyst);
+        await dbInsertEdit(ticker, analyst, [{ field: "__restored__", old: null, new: ticker }]);
+        existing.removed = false;
+        return NextResponse.json({ ok: true, company: existing, restored: true });
+      }
+      if (existing) {
         return NextResponse.json({ error: "Ticker already exists." }, { status: 409 });
       }
       const grp = String(body.grp ?? "").trim() || "Other sectors";
@@ -189,15 +197,21 @@ export async function POST(req: NextRequest) {
         model: emptyModel(),
         is_index: false,
         best_pe: null,
+        removed: false,
       };
       await dbInsertCompany(row);
       await dbInsertEdit(ticker, analyst, [{ field: "__added__", old: null, new: ticker }]);
       return NextResponse.json({ ok: true, company: row });
     }
 
-    if (action === "remove") {
-      await dbInsertEdit(ticker, analyst, [{ field: "__removed__", old: ticker, new: null }]);
-      await dbRemoveCompany(ticker);
+    if (action === "remove" || action === "restore") {
+      const removed = action === "remove";
+      await dbSetRemoved(ticker, removed, analyst);
+      await dbInsertEdit(ticker, analyst, [
+        removed
+          ? { field: "__removed__", old: ticker, new: null }
+          : { field: "__restored__", old: null, new: ticker },
+      ]);
       return NextResponse.json({ ok: true });
     }
 

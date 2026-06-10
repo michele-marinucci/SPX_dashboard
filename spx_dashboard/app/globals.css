@@ -2287,3 +2287,30 @@ thead .row-head {
 .eq-stale {
   color: var(--amber);
 }
+.eq-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.eq-sortable:hover {
+  color: var(--brand-700);
+}
+.eq-removed {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.eq-removed li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  background: var(--surface-2);
+}
+.eq-removed-name {
+  flex: 1;
+}

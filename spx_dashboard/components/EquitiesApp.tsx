@@ -7,9 +7,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { compute, Derived, displayYears } from "@/lib/equities/calc";
+import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { ANALYSTS } from "@/lib/equities/config";
 import { Company, EditRecord, Quote } from "@/lib/equities/types";
+import { NO_SORT, nextSort, SortState, sortRows } from "@/lib/sort";
+import { SortGlyph } from "@/components/SortGlyph";
 
 const ANALYST_KEY = "equities:analyst";
 
@@ -68,7 +70,9 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
   const [editTicker, setEditTicker] = useState<string | null>(null);
   const [logTicker, setLogTicker] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [removedOpen, setRemovedOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [sort, setSort] = useState<SortState>(NO_SORT);
 
   const today = useMemo(() => new Date(), []);
   const years = useMemo(() => displayYears(today), [today]);
@@ -112,7 +116,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
     const order: string[] = [];
     const by: Record<string, Company[]> = {};
     for (const c of companies) {
-      if (c.is_index) continue;
+      if (c.is_index || c.removed) continue;
       if (!by[c.grp]) {
         by[c.grp] = [];
         order.push(c.grp);
@@ -122,8 +126,18 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
     return order.map((g) => [g, by[g]] as const);
   }, [companies]);
 
-  const indexRows = useMemo(() => companies.filter((c) => c.is_index), [companies]);
-  const stocks = useMemo(() => companies.filter((c) => !c.is_index), [companies]);
+  const indexRows = useMemo(
+    () => companies.filter((c) => c.is_index && !c.removed),
+    [companies],
+  );
+  const stocks = useMemo(
+    () => companies.filter((c) => !c.is_index && !c.removed),
+    [companies],
+  );
+  const removedNames = useMemo(
+    () => companies.filter((c) => c.removed && !c.is_index),
+    [companies],
+  );
 
   // Column-wide color scales, computed across all (non-index) names.
   const peStats = useMemo(
@@ -141,19 +155,128 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
   const heatPerf = (v: number | null) =>
     v == null ? undefined : scale3(v, -0.3, 0, 0.3, [RED, WHITE, GREEN]);
 
+  // Click-to-sort across every column (lib/sort: desc → asc → unsorted).
+  // While a sort is active the sector grouping is flattened so names compare
+  // across the whole book; clearing the sort restores the grouped layout.
+  const sortValue = useCallback(
+    (c: Company, key: string): number | string | null => {
+      const d = derived.get(c.ticker);
+      const [head, arg] = key.split(":");
+      switch (head) {
+        case "ticker":
+          return c.ticker;
+        case "px":
+          return d?.price ?? null;
+        case "evgp":
+          return d?.evGp[Number(arg)] ?? null;
+        case "pe":
+          return d?.mendoPe[Number(arg)] ?? null;
+        case "mult":
+          return c.model.target_mult[arg] ?? null;
+        case "irr":
+          return d?.irr[Number(arg)] ?? null;
+        case "mom":
+          return d?.mom[Number(arg)] ?? null;
+        case "perf":
+          return perfOf(c)[arg as "m1" | "m3" | "m6"];
+        case "dec":
+          return d?.decomp[arg as keyof Decomp] ?? null;
+        case "gpcagr":
+          return d?.gpCagr ?? null;
+        case "mepscagr":
+          return d?.mepsCagr ?? null;
+      }
+      return null;
+    },
+    [derived, perfOf],
+  );
+  const sortedStocks = useMemo(
+    () => (sort.key ? sortRows(stocks, sort, sortValue) : null),
+    [stocks, sort, sortValue],
+  );
+
+  const sortTh = (key: string, label: React.ReactNode, extra = "") => (
+    <th
+      key={key}
+      className={`eq-num eq-sortable${extra}`}
+      onClick={() => setSort((s) => nextSort(s, key))}
+      title="Click to sort"
+    >
+      {label}
+      <SortGlyph sort={sort} sortKey={key} />
+    </th>
+  );
+
+  const valRow = (c: Company) => {
+    const d = derived.get(c.ticker)!;
+    const pf = perfOf(c);
+    return (
+      <tr key={c.ticker} className="eq-row">
+        {tickCell(c)}
+        {num(fpx(d.price, c.currency), undefined, "px")}
+        {[y0, y1].map((y, i) => num(fx(d.evGp[y]), undefined, `g${i}`))}
+        {years.map((y, i) =>
+          num(fx(d.mendoPe[y]), y === y1 ? heatPe(d.mendoPe[y]) : undefined, `p${i}`),
+        )}
+        {[y1, y2, y3].map((y, i) =>
+          num(fx(c.model.target_mult[String(y)] ?? null), undefined, `t${i}`),
+        )}
+        {[y1, y2, y3].map((y, i) =>
+          num(fp(d.irr[y]), y === y2 ? heatIrr(d.irr[y]) : undefined, `i${i}`),
+        )}
+        {[y0, y1, y2, y3].map((y, i) => num(fx(d.mom[y]), undefined, `m${i}`))}
+        {num(fp(pf.m1), heatPerf(pf.m1), "p1")}
+        {num(fp(pf.m3), heatPerf(pf.m3), "p3")}
+        {num(fp(pf.m6), heatPerf(pf.m6), "p6")}
+      </tr>
+    );
+  };
+
+  const decompRow = (c: Company) => {
+    const d = derived.get(c.ticker)!;
+    const dc = d.decomp;
+    return (
+      <tr key={c.ticker} className="eq-row">
+        {tickCell(c)}
+        {num(fpx(d.price, c.currency), undefined, "px")}
+        {num(<span className="eq-blue">{fp(dc.revs)}</span>, undefined, "r")}
+        {num(fp(dc.margin), undefined, "m")}
+        {num(<span className="eq-blue">{fp(dc.ni)}</span>, undefined, "n")}
+        {num(fp(dc.yld), undefined, "y")}
+        {num(<span className="eq-blue">{fp(dc.epsDivs)}</span>, undefined, "e")}
+        {num(fp(dc.multiple), undefined, "x")}
+        {num(fp(dc.ret), undefined, "t")}
+        {num(fp(d.gpCagr), undefined, "cg")}
+        {num(fp(d.mepsCagr), undefined, "ce")}
+      </tr>
+    );
+  };
+
   const editing = editTicker ? companies.find((c) => c.ticker === editTicker) ?? null : null;
 
   const onSaved = useCallback((c: Company) => {
     setCompanies((prev) => prev.map((x) => (x.ticker === c.ticker ? c : x)));
   }, []);
   const onAdded = useCallback((c: Company) => {
-    setCompanies((prev) => [...prev, c]);
+    setCompanies((prev) =>
+      prev.some((x) => x.ticker === c.ticker)
+        ? prev.map((x) => (x.ticker === c.ticker ? c : x)) // re-added → restored
+        : [...prev, c],
+    );
     setAddOpen(false);
     setEditTicker(c.ticker); // jump straight into filling the model
   }, []);
   const onRemoved = useCallback((ticker: string) => {
-    setCompanies((prev) => prev.filter((x) => x.ticker !== ticker));
+    // Soft delete: the name moves to the "Removed names" list, model intact.
+    setCompanies((prev) =>
+      prev.map((x) => (x.ticker === ticker ? { ...x, removed: true } : x)),
+    );
     setEditTicker(null);
+  }, []);
+  const onRestored = useCallback((ticker: string) => {
+    setCompanies((prev) =>
+      prev.map((x) => (x.ticker === ticker ? { ...x, removed: false } : x)),
+    );
   }, []);
 
   const refreshPrices = useCallback(async () => {
@@ -225,6 +348,9 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           <button type="button" className="eq-act" onClick={() => setAddOpen(true)}>
             + Add company
           </button>
+          <button type="button" className="eq-act" onClick={() => setRemovedOpen(true)}>
+            Removed names{removedNames.length ? ` (${removedNames.length})` : ""}
+          </button>
           <a className="eq-act eq-act-primary" href="/api/equities/export">
             ⬇ Download Excel
           </a>
@@ -236,14 +362,20 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           <button
             type="button"
             className={view === "val" ? "on" : ""}
-            onClick={() => setView("val")}
+            onClick={() => {
+              setView("val");
+              setSort(NO_SORT);
+            }}
           >
             Valuation
           </button>
           <button
             type="button"
             className={view === "decomp" ? "on" : ""}
-            onClick={() => setView("decomp")}
+            onClick={() => {
+              setView("decomp");
+              setSort(NO_SORT);
+            }}
           >
             NTM – YE{String(y2).slice(2)} IRR Decomp
           </button>
@@ -289,71 +421,37 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
                 </th>
               </tr>
               <tr className="eq-h2">
-                <th className="eq-tick">Company</th>
-                <th className="eq-num">Px</th>
-                {[y0, y1].map((y, i) => (
-                  <th key={`g${y}`} className={`eq-num${i === 0 ? " eq-sep" : ""}`}>
-                    {y}
-                  </th>
-                ))}
-                {years.map((y, i) => (
-                  <th key={`p${y}`} className={`eq-num${i === 0 ? " eq-sep" : ""}`}>
-                    {y}
-                  </th>
-                ))}
-                {[y1, y2, y3].map((y, i) => (
-                  <th key={`t${y}`} className={`eq-num${i === 0 ? " eq-sep" : ""}`}>
-                    {y}
-                  </th>
-                ))}
-                {[y1, y2, y3].map((y, i) => (
-                  <th key={`i${y}`} className={`eq-num${i === 0 ? " eq-sep" : ""}`}>
-                    {y}
-                  </th>
-                ))}
-                {[y0, y1, y2, y3].map((y, i) => (
-                  <th key={`m${y}`} className={`eq-num${i === 0 ? " eq-sep" : ""}`}>
-                    {y}
-                  </th>
-                ))}
-                {["1M", "3M", "6M"].map((l, i) => (
-                  <th key={l} className={`eq-num${i === 0 ? " eq-sep" : ""}`}>
-                    {l}
-                  </th>
-                ))}
+                <th
+                  className="eq-tick eq-sortable"
+                  onClick={() => setSort((s) => nextSort(s, "ticker"))}
+                  title="Click to sort"
+                >
+                  Company
+                  <SortGlyph sort={sort} sortKey="ticker" />
+                </th>
+                {sortTh("px", "Px")}
+                {[y0, y1].map((y, i) => sortTh(`evgp:${y}`, y, i === 0 ? " eq-sep" : ""))}
+                {years.map((y, i) => sortTh(`pe:${y}`, y, i === 0 ? " eq-sep" : ""))}
+                {[y1, y2, y3].map((y, i) => sortTh(`mult:${y}`, y, i === 0 ? " eq-sep" : ""))}
+                {[y1, y2, y3].map((y, i) => sortTh(`irr:${y}`, y, i === 0 ? " eq-sep" : ""))}
+                {[y0, y1, y2, y3].map((y, i) => sortTh(`mom:${y}`, y, i === 0 ? " eq-sep" : ""))}
+                {(["m1", "m3", "m6"] as const).map((k, i) =>
+                  sortTh(`perf:${k}`, k.slice(1) + "M", i === 0 ? " eq-sep" : ""),
+                )}
               </tr>
             </thead>
             <tbody>
-              {groups.map(([grp, rows]) => (
-                <GroupRows key={grp} label={grp} span={21}>
-                  {rows.map((c) => {
-                    const d = derived.get(c.ticker)!;
-                    const pf = perfOf(c);
-                    return (
-                      <tr key={c.ticker} className="eq-row">
-                        {tickCell(c)}
-                        {num(fpx(d.price, c.currency), undefined, "px")}
-                        {[y0, y1].map((y, i) =>
-                          num(fx(d.evGp[y]), undefined, `g${i}`),
-                        )}
-                        {years.map((y, i) =>
-                          num(fx(d.mendoPe[y]), y === y1 ? heatPe(d.mendoPe[y]) : undefined, `p${i}`),
-                        )}
-                        {[y1, y2, y3].map((y, i) =>
-                          num(fx(c.model.target_mult[String(y)] ?? null), undefined, `t${i}`),
-                        )}
-                        {[y1, y2, y3].map((y, i) =>
-                          num(fp(d.irr[y]), y === y2 ? heatIrr(d.irr[y]) : undefined, `i${i}`),
-                        )}
-                        {[y0, y1, y2, y3].map((y, i) => num(fx(d.mom[y]), undefined, `m${i}`))}
-                        {num(fp(pf.m1), heatPerf(pf.m1), "p1")}
-                        {num(fp(pf.m3), heatPerf(pf.m3), "p3")}
-                        {num(fp(pf.m6), heatPerf(pf.m6), "p6")}
-                      </tr>
-                    );
-                  })}
+              {sortedStocks ? (
+                <GroupRows label="All names (sorted)" span={21}>
+                  {sortedStocks.map(valRow)}
                 </GroupRows>
-              ))}
+              ) : (
+                groups.map(([grp, rows]) => (
+                  <GroupRows key={grp} label={grp} span={21}>
+                    {rows.map(valRow)}
+                  </GroupRows>
+                ))
+              )}
               {indexRows.length > 0 && (
                 <GroupRows label="Index" span={21}>
                   {indexRows.map((c) => {
@@ -397,43 +495,42 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
                 </th>
               </tr>
               <tr className="eq-h2">
-                <th className="eq-tick">Company</th>
-                <th className="eq-num">Px</th>
-                {["Revs", "Margin", "Mendo NI", "Yield", "EPS + Divs", "Multiple", "Return"].map(
-                  (l, i) => (
-                    <th key={l} className={`eq-num${i === 0 ? " eq-sep" : ""}`}>
-                      {l}
-                    </th>
-                  ),
-                )}
-                <th className="eq-num eq-sep">GP</th>
-                <th className="eq-num">mEPS</th>
+                <th
+                  className="eq-tick eq-sortable"
+                  onClick={() => setSort((s) => nextSort(s, "ticker"))}
+                  title="Click to sort"
+                >
+                  Company
+                  <SortGlyph sort={sort} sortKey="ticker" />
+                </th>
+                {sortTh("px", "Px")}
+                {(
+                  [
+                    ["revs", "Revs"],
+                    ["margin", "Margin"],
+                    ["ni", "Mendo NI"],
+                    ["yld", "Yield"],
+                    ["epsDivs", "EPS + Divs"],
+                    ["multiple", "Multiple"],
+                    ["ret", "Return"],
+                  ] as const
+                ).map(([k, l], i) => sortTh(`dec:${k}`, l, i === 0 ? " eq-sep" : ""))}
+                {sortTh("gpcagr", "GP", " eq-sep")}
+                {sortTh("mepscagr", "mEPS")}
               </tr>
             </thead>
             <tbody>
-              {groups.map(([grp, rows]) => (
-                <GroupRows key={grp} label={grp} span={11}>
-                  {rows.map((c) => {
-                    const d = derived.get(c.ticker)!;
-                    const dc = d.decomp;
-                    return (
-                      <tr key={c.ticker} className="eq-row">
-                        {tickCell(c)}
-                        {num(fpx(d.price, c.currency), undefined, "px")}
-                        {num(<span className="eq-blue">{fp(dc.revs)}</span>, undefined, "r")}
-                        {num(fp(dc.margin), undefined, "m")}
-                        {num(<span className="eq-blue">{fp(dc.ni)}</span>, undefined, "n")}
-                        {num(fp(dc.yld), undefined, "y")}
-                        {num(<span className="eq-blue">{fp(dc.epsDivs)}</span>, undefined, "e")}
-                        {num(fp(dc.multiple), undefined, "x")}
-                        {num(fp(dc.ret), undefined, "t")}
-                        {num(fp(d.gpCagr), undefined, "cg")}
-                        {num(fp(d.mepsCagr), undefined, "ce")}
-                      </tr>
-                    );
-                  })}
+              {sortedStocks ? (
+                <GroupRows label="All names (sorted)" span={11}>
+                  {sortedStocks.map(decompRow)}
                 </GroupRows>
-              ))}
+              ) : (
+                groups.map(([grp, rows]) => (
+                  <GroupRows key={grp} label={grp} span={11}>
+                    {rows.map(decompRow)}
+                  </GroupRows>
+                ))
+              )}
             </tbody>
           </table>
         )}
@@ -466,6 +563,13 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         />
       )}
       {logTicker && <LogModal ticker={logTicker} onClose={() => setLogTicker(null)} />}
+      {removedOpen && (
+        <RemovedModal
+          companies={removedNames}
+          onClose={() => setRemovedOpen(false)}
+          onRestored={onRestored}
+        />
+      )}
       {addOpen && (
         <AddModal
           groups={groups.map(([g]) => g)}
@@ -813,6 +917,7 @@ function EditModal({
 function fieldLabel(field: string): string {
   if (field === "__added__") return "Added to dashboard";
   if (field === "__removed__") return "Removed from dashboard";
+  if (field === "__restored__") return "Restored to dashboard";
   const [head, year] = field.split(".");
   const labels: Record<string, string> = {
     revs: "Revenue",
@@ -902,6 +1007,91 @@ function LogModal({ ticker, onClose }: { ticker: string; onClose: () => void }) 
             ))}
           </ul>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ---- removed-names modal ---------------------------------------------------------- //
+
+function RemovedModal({
+  companies,
+  onClose,
+  onRestored,
+}: {
+  companies: Company[];
+  onClose: () => void;
+  onRestored: (ticker: string) => void;
+}) {
+  const [analyst, setAnalyst] = useAnalyst();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const restore = async (ticker: string) => {
+    setError("");
+    if (!analyst) return setError("Pick your name first — restores are logged too.");
+    setBusy(true);
+    try {
+      const res = await fetch("/api/equities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "restore", ticker, analyst }),
+      });
+      const d = await res.json();
+      if (!res.ok || !d?.ok) setError(d?.error || "Could not restore.");
+      else onRestored(ticker);
+    } catch {
+      setError("Network error.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="eq-overlay" onClick={onClose}>
+      <div className="eq-modal eq-modal-log" onClick={(e) => e.stopPropagation()}>
+        <div className="eq-modal-head">
+          <h2>Removed names</h2>
+          <button type="button" className="eq-x" onClick={onClose} aria-label="Close">
+            ×
+          </button>
+        </div>
+        {companies.length === 0 ? (
+          <p className="eq-note">
+            Nothing here — names removed from the dashboard are kept in the database and
+            will show up in this list, ready to be restored.
+          </p>
+        ) : (
+          <>
+            <AnalystSelect value={analyst} onChange={setAnalyst} />
+            <ul className="eq-removed">
+              {companies.map((c) => (
+                <li key={c.ticker}>
+                  <span className="eq-removed-name">
+                    <strong>{c.ticker}</strong>
+                    <span className="eq-note"> · {c.grp}</span>
+                  </span>
+                  <span className="eq-note">
+                    removed {c.update_date ?? "—"}
+                    {c.update_by ? ` by ${c.update_by}` : ""}
+                  </span>
+                  <button
+                    type="button"
+                    className="eq-act"
+                    onClick={() => restore(c.ticker)}
+                    disabled={busy}
+                  >
+                    ↩ Restore
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <p className="eq-note">
+              Restored names come back with their full model and edit history.
+            </p>
+          </>
+        )}
+        {error && <p className="eq-error">{error}</p>}
       </div>
     </div>
   );

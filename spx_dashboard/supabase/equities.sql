@@ -33,8 +33,13 @@ create table if not exists eq_companies (
   perf            jsonb not null default '{}'::jsonb, -- seed-time 1M/3M/6M fallback
   model           jsonb not null default '{}'::jsonb, -- the editable model inputs
   is_index        boolean not null default false,
-  best_pe         jsonb                    -- index rows: BEst P/E by year
+  best_pe         jsonb,                   -- index rows: BEst P/E by year
+  removed         boolean not null default false -- soft delete; restorable in the UI
 );
+
+-- Upgrade-in-place for tables created before soft-delete existed (re-running
+-- this whole file is always safe).
+alter table eq_companies add column if not exists removed boolean not null default false;
 
 -- ---------------------------------------------------------------------------
 -- Append-only log of model changes ("Edits log" in the UI).

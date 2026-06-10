@@ -23,15 +23,24 @@ async function rest(path: string, init: RequestInit = {}): Promise<Response> {
   });
 }
 
-const COMPANY_COLS =
+const BASE_COLS =
   "ticker,bbg,yahoo,currency,px_scale,grp,grp_order,row_order,port,update_date," +
   "update_by,variant,cash_in_target,div_yield_mode,decomp,yield_input,adv_3m," +
   "perf,model,is_index,best_pe";
+const COMPANY_COLS = `${BASE_COLS},removed`;
 
 export async function dbGetCompanies(): Promise<Company[]> {
-  const res = await rest(
+  let res = await rest(
     `eq_companies?select=${COMPANY_COLS}&order=grp_order.asc,row_order.asc`,
   );
+  if (res.status === 400) {
+    // Table created before soft-delete existed (no `removed` column yet) —
+    // stay functional read-wise; the equities.sql upgrade adds the column.
+    res = await rest(`eq_companies?select=${BASE_COLS}&order=grp_order.asc,row_order.asc`);
+    if (!res.ok) throw new Error(`equities read ${res.status}`);
+    const rows = (await res.json()) as Omit<Company, "removed">[];
+    return rows.map((r) => ({ ...r, removed: false }));
+  }
   if (!res.ok) throw new Error(`equities read ${res.status}`);
   return (await res.json()) as Company[];
 }
@@ -68,12 +77,18 @@ export async function dbInsertCompany(row: Company): Promise<void> {
   if (!res.ok) throw new Error(`equities insert ${res.status}: ${await res.text()}`);
 }
 
-export async function dbRemoveCompany(ticker: string): Promise<void> {
-  const res = await rest(`eq_companies?ticker=eq.${encodeURIComponent(ticker)}`, {
-    method: "DELETE",
-    headers: { Prefer: "return=minimal" },
+// Soft delete / restore: rows are never dropped, so a removed name keeps its
+// model and edit history and can be brought back from the "Removed names" UI.
+export async function dbSetRemoved(
+  ticker: string,
+  removed: boolean,
+  analyst: string,
+): Promise<void> {
+  await dbUpdateCompany(ticker, {
+    removed,
+    update_date: new Date().toISOString().slice(0, 10),
+    update_by: analyst,
   });
-  if (!res.ok) throw new Error(`equities remove ${res.status}`);
 }
 
 // ---- Edits log (append-only) ---------------------------------------------- //
