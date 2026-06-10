@@ -10,7 +10,14 @@ import type {
 
 // Server-only Supabase access via PostgREST using the service-role key. The key
 // never reaches the browser; all calls happen in API routes / server code.
-const URL = process.env.SUPABASE_URL;
+// Tolerate the common paste mistakes: trailing slashes and a "/rest/v1" suffix
+// (the URL should be the bare project origin; rest() appends the path itself).
+const URL =
+  (process.env.SUPABASE_URL ?? "")
+    .trim()
+    .replace(/\/+$/, "")
+    .replace(/\/rest\/v1$/i, "")
+    .replace(/\/+$/, "") || undefined;
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export function supabaseEnabled(): boolean {

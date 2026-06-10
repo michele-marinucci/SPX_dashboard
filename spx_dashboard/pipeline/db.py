@@ -17,7 +17,17 @@ from typing import Any, Optional
 
 import requests
 
-URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
+def _norm_url(raw: str) -> str:
+    """Tolerate the common paste mistakes: trailing slashes and a "/rest/v1"
+    suffix (the env var should be the bare project origin; callers append
+    /rest/v1/... themselves)."""
+    url = raw.strip().rstrip("/")
+    if url.lower().endswith("/rest/v1"):
+        url = url[: -len("/rest/v1")].rstrip("/")
+    return url
+
+
+URL = _norm_url(os.environ.get("SUPABASE_URL", ""))
 KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 TIMEOUT = 30
 
