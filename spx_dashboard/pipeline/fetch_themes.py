@@ -15,8 +15,9 @@ Flow per run:
      fluent thesis from training data when the index is empty; we reject those.
   3. Bucket each idea into a tier by source: priority (your handles) > credible
      (execs / well-known managers, soft/inferred) > discovery (unvetted).
-  4. Validate the ticker via Stooq (which also gives us the YTD price series);
-     drop invented/unresolved tickers.
+  4. Validate the ticker against a reference universe (watchlist + the tracked
+     S&P 500), drop invented/unresolved tickers, and attach a best-effort YTD
+     price series (Stooq, then Yahoo) — prices never gate storage.
   5. Merge with the prior themes.json keyed on (ticker, direction) so recurrence
      (first_seen / last_seen / seen_count in DAYS) survives across runs.
   6. Derive conviction + score from source weight, distinct trusted handles, and
@@ -45,6 +46,9 @@ import requests
 import themes_config as cfg
 
 STOOQ_URL = "https://stooq.com/q/d/l/?s={sym}.us&i=d"
+YAHOO_URL = (
+    "https://query1.finance.yahoo.com/v8/finance/chart/{sym}?range=ytd&interval=1d"
+)
 HTTP_TIMEOUT = 20
 # Stooq returns "no data" to requests without a browser-like User-Agent — a
 # common reason it appears to fail from server/datacenter IPs.
@@ -416,47 +420,71 @@ def _clean_direction(raw: Any) -> Optional[str]:
 
 
 # --------------------------------------------------------------------------- #
-# Stooq prices (free, no key) — best-effort, NOT used for ticker validation
+# Prices (free, no key) — best-effort, NOT used for ticker validation.
+# Stooq is primary; Yahoo is a fallback because Stooq frequently blocks
+# datacenter IPs (e.g. GitHub Actions runners).
 # --------------------------------------------------------------------------- #
 def fetch_prices(ticker: str, cache: dict[str, Optional[dict]]) -> Optional[dict]:
-    """Fetch YTD daily closes from Stooq; None if unavailable.
+    """Fetch YTD daily closes (newest-first), or None if unavailable.
 
-    Returns {"currency","as_of","series"} with `series` newest-first to match
-    Sparkline.tsx's expectation. None means Stooq had no data (or is blocking
-    this IP) — a best-effort miss that must NOT drop the idea; the card simply
-    renders without a sparkline.
+    Tries Stooq, then Yahoo. None is a best-effort miss that must NOT drop the
+    idea — the card simply renders without a sparkline.
     """
     if ticker in cache:
         return cache[ticker]
-
-    result: Optional[dict] = None
-    sym = ticker.lower().replace(".", "-")
-    for attempt in range(2):
-        try:
-            resp = requests.get(
-                STOOQ_URL.format(sym=sym),
-                timeout=HTTP_TIMEOUT,
-                headers=HTTP_HEADERS,
-            )
-            rows = _parse_stooq_csv(resp.text)
-            if rows:
-                year = dt.date.today().year
-                ytd = [(d, c) for (d, c) in rows if d.year == year]
-                ytd = ytd or rows[-60:]  # early January: last ~3 months
-                if ytd:
-                    result = {
-                        "currency": "USD",
-                        "as_of": ytd[-1][0].isoformat(),
-                        # Stooq is oldest-first; store newest-first for Sparkline.
-                        "series": [round(c, 2) for (_, c) in reversed(ytd)],
-                    }
-            break
-        except requests.RequestException as e:
-            if attempt == 1:
-                _log(f"  Stooq fetch failed for {ticker}: {e}")
-
+    result = _stooq_prices(ticker) or _yahoo_prices(ticker)
     cache[ticker] = result
     return result
+
+
+def _ytd_result(pairs: list[tuple[dt.date, float]]) -> Optional[dict]:
+    """Slice (date, close) pairs to YTD and shape them newest-first."""
+    if not pairs:
+        return None
+    pairs.sort(key=lambda r: r[0])
+    year = dt.date.today().year
+    ytd = [(d, c) for (d, c) in pairs if d.year == year]
+    ytd = ytd or pairs[-60:]  # early January: fall back to last ~3 months
+    if not ytd:
+        return None
+    return {
+        "currency": "USD",
+        "as_of": ytd[-1][0].isoformat(),
+        "series": [round(c, 2) for (_, c) in reversed(ytd)],
+    }
+
+
+def _stooq_prices(ticker: str) -> Optional[dict]:
+    sym = ticker.lower().replace(".", "-")
+    try:
+        resp = requests.get(
+            STOOQ_URL.format(sym=sym), timeout=HTTP_TIMEOUT, headers=HTTP_HEADERS
+        )
+        return _ytd_result(_parse_stooq_csv(resp.text))
+    except requests.RequestException as e:
+        _log(f"  Stooq fetch failed for {ticker}: {e}")
+        return None
+
+
+def _yahoo_prices(ticker: str) -> Optional[dict]:
+    sym = ticker.upper().replace(".", "-")
+    try:
+        resp = requests.get(
+            YAHOO_URL.format(sym=sym), timeout=HTTP_TIMEOUT, headers=HTTP_HEADERS
+        )
+        data = resp.json()
+        res = data["chart"]["result"][0]
+        stamps = res["timestamp"]
+        closes = res["indicators"]["quote"][0]["close"]
+    except (requests.RequestException, ValueError, KeyError, IndexError, TypeError) as e:
+        _log(f"  Yahoo fetch failed for {ticker}: {e}")
+        return None
+    pairs = [
+        (dt.datetime.utcfromtimestamp(t).date(), float(c))
+        for t, c in zip(stamps, closes)
+        if t is not None and c is not None
+    ]
+    return _ytd_result(pairs)
 
 
 def _parse_stooq_csv(text: str) -> list[tuple[dt.date, float]]:

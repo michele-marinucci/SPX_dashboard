@@ -24,10 +24,10 @@ from __future__ import annotations
 # Grok. Bump this as xAI ships newer models.
 MODEL = "grok-4.3"
 
-# How many days back x_search should look each run. A daily briefing wants the
-# most recent chatter; 2 days gives a little overlap so nothing slips through a
-# missed/slow run without drowning the feed in stale posts.
-LOOKBACK_DAYS = 2
+# How many days back x_search should look each run. A daily briefing wants
+# recent chatter, but trusted accounts post intermittently — a ~1-week window
+# captures them (and survives a missed/slow run) without drowning the feed.
+LOOKBACK_DAYS = 7
 
 # Feed shaping (consumed by the merge/aging logic, not the frontend).
 #   AGE_OUT_DAYS  an idea drops out of the *main view* this many days after it
