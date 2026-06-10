@@ -4,6 +4,7 @@ import {
   dbRemoveDiligence,
   dbSeedDiligence,
   dbUpsertDiligence,
+  diligenceDebug,
   diligenceEnabled,
 } from "@/lib/diligenceDb";
 import { getDiligenceLinks, normTicker } from "@/lib/diligence";
@@ -14,7 +15,11 @@ export const dynamic = "force-dynamic";
 // GET: the diligence links from the DB. On first use (empty table) it seeds from
 // the committed data/diligence.json. Returns { enabled:false } when Supabase
 // isn't configured so the client falls back to its localStorage overlay.
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // ?debug=1 → connection diagnostics instead of data (behind the password gate).
+  if (req.nextUrl.searchParams.get("debug") === "1") {
+    return NextResponse.json(await diligenceDebug());
+  }
   if (!diligenceEnabled()) return NextResponse.json({ enabled: false });
   try {
     let links = await dbGetDiligence();
