@@ -3,7 +3,14 @@
 // Mirrors lib/supabase.ts; kept separate so the two features never share a file.
 import { DiligenceLink, normTicker } from "@/lib/diligence";
 
-const URL = (process.env.SUPABASE_URL ?? "").trim().replace(/\/+$/, "") || undefined;
+// Tolerate the common paste mistakes: trailing slashes and a "/rest/v1" suffix
+// (the URL should be the bare project origin; rest() appends the path itself).
+const URL =
+  (process.env.SUPABASE_URL ?? "")
+    .trim()
+    .replace(/\/+$/, "")
+    .replace(/\/rest\/v1$/i, "")
+    .replace(/\/+$/, "") || undefined;
 const KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim() || undefined;
 
 export function diligenceEnabled(): boolean {
