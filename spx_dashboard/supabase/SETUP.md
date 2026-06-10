@@ -38,3 +38,19 @@ of the followed list, a DB-backed feed, and run history/analytics.
   table in `schema.sql`). It seeds itself from `data/diligence.json` the first
   time the page is opened, then becomes the shared source of truth — no
   workflow or extra env vars needed beyond the two above.
+
+---
+
+# Equities Dashboard tables
+
+The Equities Dashboard (`/dashboard`) uses the **same** Supabase project and the
+same two env vars as above — no extra credentials needed. To enable shared
+analyst edits and the per-company edits log:
+
+1. Open **SQL** in Supabase → paste the contents of `supabase/equities.sql` → **Run**.
+2. That's it. On the next page load the app seeds `eq_companies` from the
+   committed workbook parse (`data/equities_seed.json`), and starts caching
+   Yahoo prices in `eq_market` (refreshed automatically when older than 4h).
+
+Without these tables the page still works read-only from the committed snapshot
+(live prices, but no shared edits).

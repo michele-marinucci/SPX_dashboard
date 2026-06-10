@@ -102,19 +102,34 @@ export default function HomePage() {
         </div>
       </Link>
 
-      <Link href="/dashboard" className="hub-row wip">
+      <Link href="/dashboard" className="hub-row live">
         <div className="hub-idx">03</div>
         <div>
-          <div className="rname">Equities Dashboard</div>
+          <div className="rname">
+            <span className="livedot" aria-hidden="true" />
+            Equities Dashboard
+          </div>
           <p className="rdesc">
-            A consolidated view of the equities book — positions, exposures, and
-            performance in one place.
+            The detailed dashboard, live — valuation, IRRs, and the IRR decomp
+            across the book, with shared analyst model updates.
           </p>
         </div>
-        <div>
-          <span className="wiptag">Work in progress</span>
+        <div className="stats">
+          <div className="stat">
+            <span className="k">STATUS</span>
+            <span className="v on">LIVE</span>
+          </div>
+          <div className="stat">
+            <span className="k">PRICES</span>
+            <span className="v">INTRADAY</span>
+          </div>
         </div>
-        <div className="prev">Preview →</div>
+        <div className="cta">
+          Open
+          <span className="arr" aria-hidden="true">
+            →
+          </span>
+        </div>
       </Link>
 
       <Link href="/diligence" className="hub-row wip">
