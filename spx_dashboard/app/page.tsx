@@ -13,19 +13,15 @@ export default function HomePage() {
       <div className="hub-top">
         <div className="hub-brand">
           <span className="hub-brand-dot" aria-hidden="true" />
-          <span className="sys">MENDO&nbsp;MONITOR</span>
+          <span className="sys">MENDO&nbsp;HUB</span>
         </div>
         <div className="hub-right">
-          {asOf && <span className="hub-clock">X THEMES · {asOf}</span>}
+          {asOf && <span className="hub-clock">TWITTER · {asOf}</span>}
           <LogoutButton />
         </div>
       </div>
 
-      <h1>Mendo Monitor</h1>
-      <p className="hub-tagline">
-        An AI-beneficiary &amp; software tracker within the S&amp;P 500, plus a
-        daily briefing of investment ideas surfaced from X.
-      </p>
+      <h1>Mendo Hub</h1>
 
       <div className="colhead">
         <span>#</span>
@@ -73,11 +69,11 @@ export default function HomePage() {
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
-            X Themes
+            Twitter Monitor
           </div>
           <p className="rdesc">
-            A daily, curated briefing of investment ideas surfaced from X about
-            your themes — ranked by conviction and grounded in real posts.
+            A summary of the day&apos;s tweets from your followed accounts —
+            organized by theme, with portfolio mentions and recurring topics.
           </p>
         </div>
         <div className="stats">
@@ -178,7 +174,7 @@ export default function HomePage() {
       </Link>
 
       <div className="hub-foot">
-        <span>{asOf ? `X THEMES AS OF ${asOf}` : "X THEMES"}</span>
+        <span>{asOf ? `TWITTER MONITOR AS OF ${asOf}` : "TWITTER MONITOR"}</span>
         <span>7 MODULES · 2 LIVE</span>
       </div>
     </div>

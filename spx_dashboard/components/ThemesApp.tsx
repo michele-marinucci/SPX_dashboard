@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { LogoutButton } from "@/components/LogoutButton";
 import { Sparkline } from "@/components/Sparkline";
 import { cx } from "@/lib/format";
 import { Direction, IdeaSource, ThemeIdea, ThemeRef } from "@/lib/themes";
@@ -180,7 +179,6 @@ export function ThemesApp({
 
   const active = ideas.filter((i) => i.active);
   const followedIdeas = active.filter(isFollowed).sort(byRecency);
-  const discoveryIdeas = active.filter((i) => !isFollowed(i)).sort(byRecency);
   const followedList = Array.from(followed).sort();
 
   const themeRollup = useMemo(() => {
@@ -206,7 +204,7 @@ export function ThemesApp({
             <span className="sidebar-brand-text">Mendo Monitor</span>
           </Link>
           <span className="sidebar-sys" aria-hidden="true">
-            X THEMES
+            TWITTER
           </span>
         </div>
         <Link href="/" className="rail-back">
@@ -285,17 +283,22 @@ export function ThemesApp({
       <div className="content">
         <header className="content-header">
           <div>
-            <h1>X Themes</h1>
+            <h1>Twitter Monitor</h1>
             <p className="subtitle">
-              Daily idea briefing from X ·{" "}
+              Daily summary of your followed accounts ·{" "}
               <span className="mono">
                 {asOf ? `as of ${asOf}` : "awaiting first run"}
               </span>{" "}
-              · {active.length} {active.length === 1 ? "idea" : "ideas"}
+              · {active.length} {active.length === 1 ? "tweet" : "tweets"}
             </p>
           </div>
           <div className="header-actions">
-            <LogoutButton />
+            <span className="crumb">
+              <Link href="/" className="crumb-home">
+                Mendo Hub
+              </Link>
+              <span className="crumb-sep">|</span> Twitter Monitor
+            </span>
           </div>
         </header>
 
@@ -343,14 +346,6 @@ export function ThemesApp({
               title="Followed accounts"
               blurb="From handles you follow."
               ideas={followedIdeas}
-              names={names}
-              labelOf={labelOf}
-              followed={followed}
-            />
-            <IdeaSectionView
-              title="Discovery"
-              blurb="Unvetted — surfaced from the wider firehose."
-              ideas={discoveryIdeas}
               names={names}
               labelOf={labelOf}
               followed={followed}

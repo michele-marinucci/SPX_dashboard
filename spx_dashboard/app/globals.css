@@ -506,6 +506,28 @@ body {
   flex-shrink: 0;
 }
 
+/* Breadcrumb shown top-right on sub-pages (replaces per-page Sign out). */
+.crumb {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.crumb-home {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.14s;
+}
+.crumb-home:hover {
+  color: var(--brand);
+}
+.crumb-sep {
+  color: var(--faint);
+  margin: 0 5px;
+}
+
 /* Buttons */
 .btn-export,
 .logout-btn {

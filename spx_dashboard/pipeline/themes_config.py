@@ -48,20 +48,31 @@ SOURCE_WEIGHTS = {
     "discovery": 0.25,
 }
 
-# Curated "Followed accounts": the handles you trust. An idea is shown under
-# "Followed accounts" (vs "Discovery") when any of its source posts is from one
-# of these. Seeds the X Themes UI, which lets you add/remove handles in-browser.
-# Handles are case-insensitive and stored without the leading '@'.
+# Curated "Followed accounts": the handles you trust. Seeds the Twitter Monitor
+# UI on first run; thereafter the list is editable in-app and SHARED across all
+# users (one Supabase `followed_handles` table, not per-user). Handles are
+# case-insensitive and stored without the leading '@'.
 FOLLOWED_HANDLES = [
-    # AI labs
-    "sama", "demishassabis", "DarioAmodei",
-    # Prominent investors
-    "GavinSBaker", "bgurley", "BillAckman", "altcap", "modestproposal1",
-    # Podcasters / research
-    "patrick_oshag", "dwarkesh_sp",
-    # Sector specialists
-    "dnystedt", "dylan522p", "Beth_Kindig", "p_ferragu",
-    "DataCenterHawk", "hhhypergrowth", "rihardjarc", "StockMarketNerd",
+    "EdZitron", "Wccftech", "Firstadopter", "SouthernValue95", "ChatGPTapp",
+    "Kimmonismus", "Jukan05", "PrismML", "ClaudeAI", "Austinsemis",
+    "Apoorv03", "JulienBek", "Citrini", "KobeissiLetter", "Atelicinvest",
+    "Nicbstme", "Inflectionecon", "Coatuemgmt", "Wisemancap", "Bgurley",
+    "Vikramskr", "Contrariancurse", "Insane_analyst", "Alexeheath", "Dnystedt",
+    "Mooremorrissemi", "The_ai_investor", "Thehumanoidlab", "Similarweb",
+    "Rihardjarc", "Kevinweil", "Tmtmoats", "Macroedgeres", "Fundaai",
+    "Altcap", "Elerianm", "Satyanadella", "Dharmesh", "Sama", "Dylan522p",
+    "Techfundies", "Modestproposal1", "Benthompson", "Deepseek_ai",
+    "Artificialanlys", "Gavinsbaker",
+]
+
+# Current portfolio holdings, surfaced in the Twitter Monitor "Portfolio
+# mentions" table when a name comes up in the day's tweets. Some are non-US
+# (Bloomberg-style suffixes kept for display); price lookups for those will be
+# placeholder until a non-US-capable finance source is wired. The Equities
+# Dashboard tool will become the authoritative source for this list.
+PORTFOLIO = [
+    "MSFT", "AMZN", "TRU", "COF", "AON", "WDAY", "SPGI", "LSEG LN",
+    "CSGP", "DSV DC", "MSCI", "META", "SAP GY", "TOST", "EFX", "VSAT",
 ]
 
 # Tickers you actively track. Used only as a prompt hint + an `on_watchlist`
