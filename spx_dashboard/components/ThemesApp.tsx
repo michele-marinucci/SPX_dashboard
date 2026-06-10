@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
 import { Sparkline } from "@/components/Sparkline";
@@ -9,17 +9,24 @@ import { Direction, IdeaSource, ThemeIdea, ThemeRef } from "@/lib/themes";
 
 const ADD_KEY = "xthemes:followed:add";
 const REMOVE_KEY = "xthemes:followed:remove";
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const norm = (h: string) => h.trim().toLowerCase().replace(/^@/, "");
 
 function loadList(key: string): string[] {
   try {
-    const raw = window.localStorage.getItem(key);
-    const arr = raw ? JSON.parse(raw) : [];
+    const arr = JSON.parse(window.localStorage.getItem(key) || "[]");
     return Array.isArray(arr) ? arr.map(norm).filter(Boolean) : [];
   } catch {
     return [];
   }
+}
+
+function fmtAsOf(iso: string | null): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
 
 function byRecency(a: ThemeIdea, b: ThemeIdea): number {
@@ -31,11 +38,11 @@ function byRecency(a: ThemeIdea, b: ThemeIdea): number {
 }
 
 export function ThemesApp({
-  ideas,
+  ideas: initialIdeas,
   canonicalFollowed,
   names,
-  themes,
-  asOf,
+  themes: initialThemes,
+  asOf: initialAsOf,
 }: {
   ideas: ThemeIdea[];
   canonicalFollowed: string[];
@@ -43,13 +50,39 @@ export function ThemesApp({
   themes: ThemeRef[];
   asOf: string | null;
 }) {
+  const [ideas, setIdeas] = useState(initialIdeas);
+  const [themes, setThemes] = useState(initialThemes);
+  const [asOf, setAsOf] = useState(initialAsOf);
+
+  // DB mode: when the API reports Supabase is configured, dbFollowed is the
+  // authoritative followed set. Otherwise we use the localStorage overlay.
+  const [dbFollowed, setDbFollowed] = useState<string[] | null>(null);
   const [added, setAdded] = useState<string[]>([]);
   const [removed, setRemoved] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     setAdded(loadList(ADD_KEY));
     setRemoved(loadList(REMOVE_KEY));
+
+    fetch("/api/feed")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.enabled && Array.isArray(d.ideas)) {
+          setIdeas(d.ideas);
+          if (Array.isArray(d.themes)) setThemes(d.themes);
+          setAsOf(fmtAsOf(d.generated_at ?? null));
+        }
+      })
+      .catch(() => {});
+
+    fetch("/api/followed")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.enabled && Array.isArray(d.handles)) setDbFollowed(d.handles.map(norm));
+      })
+      .catch(() => {});
   }, []);
 
   const persist = (key: string, list: string[]) => {
@@ -60,18 +93,16 @@ export function ThemesApp({
     }
   };
 
-  const canonical = useMemo(
-    () => new Set(canonicalFollowed.map(norm)),
-    [canonicalFollowed],
-  );
+  const canonical = useMemo(() => new Set(canonicalFollowed.map(norm)), [canonicalFollowed]);
 
-  // Effective followed set = (canonical ∪ added) − removed.
+  // Effective followed set: DB when enabled, else (canonical ∪ added) − removed.
   const followed = useMemo(() => {
+    if (dbFollowed !== null) return new Set(dbFollowed);
     const s = new Set(canonical);
     added.forEach((h) => s.add(h));
     removed.forEach((h) => s.delete(h));
     return s;
-  }, [canonical, added, removed]);
+  }, [dbFollowed, canonical, added, removed]);
 
   const labelOf = useMemo(() => {
     const m: Record<string, string> = {};
@@ -79,33 +110,70 @@ export function ThemesApp({
     return (k: string) => m[k] ?? k;
   }, [themes]);
 
-  function addHandle(raw: string) {
-    const h = norm(raw);
-    if (!h) return;
-    setDraft("");
-    if (removed.includes(h)) {
-      const next = removed.filter((x) => x !== h);
-      setRemoved(next);
-      persist(REMOVE_KEY, next);
-    }
-    if (!canonical.has(h) && !added.includes(h)) {
-      const next = [...added, h];
-      setAdded(next);
-      persist(ADD_KEY, next);
-    }
-  }
+  const addHandle = useCallback(
+    async (raw: string) => {
+      const h = norm(raw);
+      if (!h) return;
+      setDraft("");
+      if (dbFollowed !== null) {
+        setBusy(true);
+        try {
+          const res = await fetch("/api/followed", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "add", handle: h }),
+          });
+          const d = await res.json();
+          if (d?.handles) setDbFollowed(d.handles.map(norm));
+        } finally {
+          setBusy(false);
+        }
+        return;
+      }
+      // localStorage fallback
+      if (removed.includes(h)) {
+        const next = removed.filter((x) => x !== h);
+        setRemoved(next);
+        persist(REMOVE_KEY, next);
+      }
+      if (!canonical.has(h) && !added.includes(h)) {
+        const next = [...added, h];
+        setAdded(next);
+        persist(ADD_KEY, next);
+      }
+    },
+    [dbFollowed, removed, canonical, added],
+  );
 
-  function removeHandle(h: string) {
-    if (added.includes(h)) {
-      const next = added.filter((x) => x !== h);
-      setAdded(next);
-      persist(ADD_KEY, next);
-    } else {
-      const next = Array.from(new Set([...removed, h]));
-      setRemoved(next);
-      persist(REMOVE_KEY, next);
-    }
-  }
+  const removeHandle = useCallback(
+    async (h: string) => {
+      if (dbFollowed !== null) {
+        setBusy(true);
+        try {
+          const res = await fetch("/api/followed", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "remove", handle: h }),
+          });
+          const d = await res.json();
+          if (d?.handles) setDbFollowed(d.handles.map(norm));
+        } finally {
+          setBusy(false);
+        }
+        return;
+      }
+      if (added.includes(h)) {
+        const next = added.filter((x) => x !== h);
+        setAdded(next);
+        persist(ADD_KEY, next);
+      } else {
+        const next = Array.from(new Set([...removed, h]));
+        setRemoved(next);
+        persist(REMOVE_KEY, next);
+      }
+    },
+    [dbFollowed, added, removed],
+  );
 
   const isFollowed = (idea: ThemeIdea) =>
     idea.sources.some((s) => followed.has(norm(s.handle)));
@@ -115,7 +183,6 @@ export function ThemesApp({
   const discoveryIdeas = active.filter((i) => !isFollowed(i)).sort(byRecency);
   const followedList = Array.from(followed).sort();
 
-  // Key-themes rollup across today's ideas.
   const themeRollup = useMemo(() => {
     const m = new Map<string, { long: Set<string>; short: Set<string>; n: number }>();
     for (const i of active) {
@@ -128,7 +195,8 @@ export function ThemesApp({
       }
     }
     return [...m.entries()].sort((a, b) => b[1].n - a[1].n);
-  }, [active]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ideas]);
 
   return (
     <div className="shell">
@@ -172,7 +240,7 @@ export function ThemesApp({
               placeholder="add @handle"
               aria-label="Add a handle"
             />
-            <button type="submit" disabled={!draft.trim()}>
+            <button type="submit" disabled={busy || !draft.trim()}>
               Add
             </button>
           </form>
@@ -191,6 +259,7 @@ export function ThemesApp({
                   type="button"
                   className="handle-x"
                   onClick={() => removeHandle(h)}
+                  disabled={busy}
                   aria-label={`Remove @${h}`}
                   title="Remove"
                 >
@@ -199,7 +268,9 @@ export function ThemesApp({
               </li>
             ))}
           </ul>
-          <p className="handles-note">Saved in this browser.</p>
+          <p className="handles-note">
+            {dbFollowed !== null ? "Synced to your database." : "Saved in this browser."}
+          </p>
         </div>
       </aside>
 
@@ -208,8 +279,7 @@ export function ThemesApp({
           <div>
             <h1>X Themes</h1>
             <p className="subtitle">
-              Daily idea briefing from X ·{" "}
-              {asOf ? `as of ${asOf}` : "awaiting first run"}
+              Daily idea briefing from X · {asOf ? `as of ${asOf}` : "awaiting first run"}
             </p>
           </div>
           <div className="header-actions">

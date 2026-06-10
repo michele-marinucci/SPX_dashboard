@@ -32,6 +32,10 @@ jobs:
       - name: Scout X and refresh themes feed
         env:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          # Optional: when set, the feed + history are mirrored into Supabase
+          # and the UI-editable followed list drives tiering.
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: python spx_dashboard/pipeline/run_themes.py
 
       - name: Commit refreshed feed (triggers Vercel redeploy)

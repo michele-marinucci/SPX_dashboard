@@ -578,12 +578,17 @@ def _rank(idea: dict) -> int:
     return max((order.get(s["tier"], 0) for s in idea["sources"]), default=0)
 
 
-def build_feed(prior: Optional[dict], now: Optional[dt.datetime] = None) -> Optional[dict]:
+def build_feed(
+    prior: Optional[dict],
+    now: Optional[dt.datetime] = None,
+    followed: Optional[list[str]] = None,
+) -> Optional[dict]:
     """Produce the new themes.json dict, or None to keep the last good file.
 
     `prior` is the previously committed themes.json (or None on first run).
-    Returns None when no new grounded ideas surfaced AND there is a prior feed
-    to preserve (empty-day guard).
+    `followed`, when given (e.g. read from the DB), overrides the configured
+    followed-handle set so UI edits drive tiering. Returns None when no new
+    grounded ideas surfaced AND there is a prior feed (empty-day guard).
     """
     from xai_sdk import Client
 
@@ -591,6 +596,15 @@ def build_feed(prior: Optional[dict], now: Optional[dt.datetime] = None) -> Opti
     today = now.date()
     to_date = today
     from_date = today - dt.timedelta(days=cfg.LOOKBACK_DAYS)
+
+    # Effective followed set: DB-provided list wins over the in-code default.
+    effective_followed = (
+        sorted({h.lower().lstrip("@") for h in followed if h})
+        if followed
+        else FOLLOWED_HANDLES
+    )
+    PRIORITY_HANDLES.clear()
+    PRIORITY_HANDLES.update(effective_followed)
 
     client = Client()  # reads XAI_API_KEY from the environment; never logged
 
@@ -643,7 +657,7 @@ def build_feed(prior: Optional[dict], now: Optional[dt.datetime] = None) -> Opti
             {"key": t["key"], "label": t.get("label", t["key"])} for t in cfg.THEMES
         ],
         # Curated followed accounts that seed the UI's (browser-editable) set.
-        "followed_handles": FOLLOWED_HANDLES,
+        "followed_handles": effective_followed,
         "ideas": records,
     }
 

@@ -27,6 +27,8 @@ DATA_DIR = os.path.join(REPO, "data")
 THEMES_JSON = os.path.join(DATA_DIR, "themes.json")
 
 sys.path.insert(0, HERE)
+import db  # noqa: E402
+import themes_config as cfg  # noqa: E402
 from fetch_themes import build_feed  # noqa: E402
 
 
@@ -42,7 +44,15 @@ def main() -> int:
     os.makedirs(DATA_DIR, exist_ok=True)
 
     prior = _load_prior()
-    feed = build_feed(prior)
+
+    # When Supabase is configured, seed the followed set on first use and let
+    # the DB's (UI-editable) followed list drive tiering.
+    followed = None
+    if db.enabled():
+        db.ensure_seeded(getattr(cfg, "FOLLOWED_HANDLES", []))
+        followed = db.fetch_followed()
+
+    feed = build_feed(prior, followed=followed)
 
     if feed is None:
         print("UNCHANGED: no new grounded ideas; kept last good themes.json.")
@@ -50,6 +60,9 @@ def main() -> int:
 
     with open(THEMES_JSON, "w") as f:
         json.dump(feed, f, indent=2, default=str)
+
+    # Mirror into Supabase (feed + history). No-op when not configured.
+    db.publish(feed)
 
     active = sum(1 for i in feed["ideas"] if i.get("active"))
     print(
