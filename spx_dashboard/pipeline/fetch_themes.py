@@ -34,6 +34,7 @@ import csv
 import datetime as dt
 import io
 import json
+import os
 import re
 import sys
 from typing import Any, Iterable, Optional
@@ -45,6 +46,17 @@ import themes_config as cfg
 
 STOOQ_URL = "https://stooq.com/q/d/l/?s={sym}.us&i=d"
 HTTP_TIMEOUT = 20
+# Stooq returns "no data" to requests without a browser-like User-Agent — a
+# common reason it appears to fail from server/datacenter IPs.
+HTTP_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/121.0 Safari/537.36"
+    )
+}
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DASHBOARD_JSON = os.path.join(os.path.dirname(HERE), "data", "dashboard.json")
 
 # Global set of trusted (priority) handles, lowercased, across all themes.
 PRIORITY_HANDLES = {
@@ -58,6 +70,33 @@ WATCHLIST = {t.upper() for t in cfg.WATCHLIST}
 def _log(msg: str) -> None:
     """Diagnostics go to stderr so they never pollute committed output."""
     print(msg, file=sys.stderr)
+
+
+def _load_reference_tickers() -> set[str]:
+    """The known-valid ticker universe for validation, with no network call.
+
+    Combines the configured watchlist with every S&P 500 symbol already tracked
+    in dashboard.json (stored Bloomberg-style, e.g. "NVDA US Equity"). This is
+    the spec's "membership check against watchlist + a reference symbol list",
+    deliberately decoupled from price fetching so a flaky/blocked Stooq can
+    never empty the feed on its own.
+    """
+    refs = set(WATCHLIST)
+    try:
+        with open(DASHBOARD_JSON) as f:
+            d = json.load(f)
+        for g in d["tables"]["categories"]["groups"]:
+            for c in g["categories"]:
+                for s in c.get("stocks", []):
+                    sym = (s.get("ticker") or "").split()[0].upper()
+                    if sym:
+                        refs.add(sym)
+    except (OSError, KeyError, json.JSONDecodeError) as e:
+        _log(f"reference ticker load failed ({e}); using watchlist only")
+    return refs
+
+
+VALID_TICKERS = _load_reference_tickers()
 
 
 # --------------------------------------------------------------------------- #
@@ -287,7 +326,13 @@ def _grounded_sources(
         sid = _status_id(url)
         if _normalize_url(url) not in cited and (sid is None or sid not in cited_ids):
             continue
-        handle = _handle_from_url(url) or (s.get("handle") or "").lower().lstrip("@")
+        # Prefer the handle from the post URL, but X's canonical link form
+        # (x.com/i/status/<id>) hides it as "i" — fall back to the model's
+        # stated handle so priority/credible tiering still works.
+        derived = _handle_from_url(url)
+        if derived == "i":
+            derived = None
+        handle = derived or (s.get("handle") or "").lower().lstrip("@")
         if not handle:
             continue
         tier = _tier_for(handle, bool(s.get("credible")))
@@ -371,43 +416,52 @@ def _clean_direction(raw: Any) -> Optional[str]:
 
 
 # --------------------------------------------------------------------------- #
-# Stooq prices (free, no key) — doubles as ticker validation
+# Stooq prices (free, no key) — best-effort, NOT used for ticker validation
 # --------------------------------------------------------------------------- #
 def fetch_prices(ticker: str, cache: dict[str, Optional[dict]]) -> Optional[dict]:
-    """Fetch YTD daily closes from Stooq; None if the symbol is unknown.
+    """Fetch YTD daily closes from Stooq; None if unavailable.
 
     Returns {"currency","as_of","series"} with `series` newest-first to match
-    Sparkline.tsx's expectation. A None result means Stooq has no data for the
-    symbol, which we treat as failed ticker validation (invented/unresolved).
+    Sparkline.tsx's expectation. None means Stooq had no data (or is blocking
+    this IP) — a best-effort miss that must NOT drop the idea; the card simply
+    renders without a sparkline.
     """
     if ticker in cache:
         return cache[ticker]
 
     result: Optional[dict] = None
-    try:
-        sym = ticker.lower().replace(".", "-")
-        resp = requests.get(STOOQ_URL.format(sym=sym), timeout=HTTP_TIMEOUT)
-        rows = _parse_stooq_csv(resp.text)
-        if rows:
-            year = dt.date.today().year
-            ytd = [(d, c) for (d, c) in rows if d.year == year]
-            ytd = ytd or rows[-60:]  # early January: fall back to last ~3 months
-            if ytd:
-                result = {
-                    "currency": "USD",
-                    "as_of": ytd[-1][0].isoformat(),
-                    # Stooq is oldest-first; store newest-first for Sparkline.
-                    "series": [round(c, 2) for (_, c) in reversed(ytd)],
-                }
-    except requests.RequestException as e:
-        _log(f"  Stooq fetch failed for {ticker}: {e}")
+    sym = ticker.lower().replace(".", "-")
+    for attempt in range(2):
+        try:
+            resp = requests.get(
+                STOOQ_URL.format(sym=sym),
+                timeout=HTTP_TIMEOUT,
+                headers=HTTP_HEADERS,
+            )
+            rows = _parse_stooq_csv(resp.text)
+            if rows:
+                year = dt.date.today().year
+                ytd = [(d, c) for (d, c) in rows if d.year == year]
+                ytd = ytd or rows[-60:]  # early January: last ~3 months
+                if ytd:
+                    result = {
+                        "currency": "USD",
+                        "as_of": ytd[-1][0].isoformat(),
+                        # Stooq is oldest-first; store newest-first for Sparkline.
+                        "series": [round(c, 2) for (_, c) in reversed(ytd)],
+                    }
+            break
+        except requests.RequestException as e:
+            if attempt == 1:
+                _log(f"  Stooq fetch failed for {ticker}: {e}")
 
     cache[ticker] = result
     return result
 
 
 def _parse_stooq_csv(text: str) -> list[tuple[dt.date, float]]:
-    if not text or text.lstrip().lower().startswith("no data"):
+    head = (text or "").lstrip().lower()
+    if not head or head.startswith("no data") or head.startswith("exceeded"):
         return []
     out: list[tuple[dt.date, float]] = []
     reader = csv.DictReader(io.StringIO(text))
@@ -516,13 +570,16 @@ def build_feed(prior: Optional[dict], now: Optional[dt.datetime] = None) -> Opti
 
     aggregated = _aggregate_today(todays_ideas)
 
-    # Ticker validation via Stooq (also yields the YTD series). Drop unknowns.
+    # Ticker validation (no network): the symbol must be in our reference
+    # universe (watchlist + the tracked S&P 500), OR resolvable on Stooq when
+    # it's reachable. Prices are fetched best-effort and never gate storage.
     price_cache: dict[str, Optional[dict]] = {}
     validated: dict[str, dict] = {}
     for k, idea in aggregated.items():
-        prices = fetch_prices(idea["ticker"], price_cache)
-        if prices is None:
-            _log(f"  DROP {idea['ticker']}: ticker not resolved on Stooq.")
+        ticker = idea["ticker"]
+        prices = fetch_prices(ticker, price_cache)  # best-effort; may be None
+        if ticker not in VALID_TICKERS and prices is None:
+            _log(f"  DROP {ticker}: not in reference universe and unresolved on Stooq.")
             continue
         idea["prices"] = prices
         validated[k] = idea
