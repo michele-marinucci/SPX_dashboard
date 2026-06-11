@@ -5,8 +5,8 @@ import { TodayDate } from "@/components/TodayDate";
 import { getTweetCount } from "@/lib/tweets";
 
 // The post-login launcher (Ledger "hub"): one ledger row per tool. Five are
-// live (SPX Monitor, Twitter Themes, Diligence Tracker, Morning Notes, Equities
-// Dashboard); the rest are WIP. Order + naming follow the redesign spec.
+// live; the rest are WIP. Order is Equities-first per the team's preference;
+// naming follows the redesign spec (Twitter Themes, Morning Notes).
 export default function HomePage() {
   const tweets = getTweetCount();
 
@@ -37,8 +37,38 @@ export default function HomePage() {
         <span className="r">OPEN</span>
       </div>
 
-      <Link href="/spx" className="hub-row live">
+      <Link href="/dashboard" className="hub-row live">
         <div className="hub-idx">01</div>
+        <div>
+          <div className="rname">
+            <span className="livedot" aria-hidden="true" />
+            Equities Dashboard
+          </div>
+          <p className="rdesc">
+            The detailed dashboard, live. Valuation, IRRs, and the IRR
+            decomposition across the book, with shared model updates.
+          </p>
+        </div>
+        <div className="stats">
+          <div className="stat">
+            <span className="k">STATUS</span>
+            <span className="v on">LIVE</span>
+          </div>
+          <div className="stat">
+            <span className="k">PRICES</span>
+            <span className="v">PRIOR CLOSE</span>
+          </div>
+        </div>
+        <div className="cta">
+          Open
+          <span className="arr" aria-hidden="true">
+            →
+          </span>
+        </div>
+      </Link>
+
+      <Link href="/spx" className="hub-row live">
+        <div className="hub-idx">02</div>
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
@@ -59,6 +89,40 @@ export default function HomePage() {
             <span className="v">S&amp;P 500</span>
           </div>
           <div className="stat">
+            <span className="k">PRICES</span>
+            <span className="v">PRIOR CLOSE</span>
+          </div>
+        </div>
+        <div className="cta">
+          Open
+          <span className="arr" aria-hidden="true">
+            →
+          </span>
+        </div>
+      </Link>
+
+      <Link href="/morning-news" className="hub-row live">
+        <div className="hub-idx">03</div>
+        <div>
+          <div className="rname">
+            <span className="livedot" aria-hidden="true" />
+            Morning Notes
+          </div>
+          <p className="rdesc">
+            A pre-market digest of overnight headlines and the news that moves
+            your names. Summarized fresh each morning.
+          </p>
+        </div>
+        <div className="stats">
+          <div className="stat">
+            <span className="k">STATUS</span>
+            <span className="v on">LIVE</span>
+          </div>
+          <div className="stat">
+            <span className="k">CADENCE</span>
+            <span className="v">PRE-MKT</span>
+          </div>
+          <div className="stat">
             <span className="k">UPDATED</span>
             <span className="v">DAILY</span>
           </div>
@@ -72,7 +136,7 @@ export default function HomePage() {
       </Link>
 
       <Link href="/themes" className="hub-row live">
-        <div className="hub-idx">02</div>
+        <div className="hub-idx">04</div>
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
@@ -106,7 +170,7 @@ export default function HomePage() {
       </Link>
 
       <Link href="/diligence" className="hub-row live">
-        <div className="hub-idx">03</div>
+        <div className="hub-idx">05</div>
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
@@ -129,70 +193,6 @@ export default function HomePage() {
           <div className="stat">
             <span className="k">ACCESS</span>
             <span className="v">SHARED</span>
-          </div>
-        </div>
-        <div className="cta">
-          Open
-          <span className="arr" aria-hidden="true">
-            →
-          </span>
-        </div>
-      </Link>
-
-      <Link href="/morning-news" className="hub-row live">
-        <div className="hub-idx">04</div>
-        <div>
-          <div className="rname">
-            <span className="livedot" aria-hidden="true" />
-            Morning Notes
-          </div>
-          <p className="rdesc">
-            A pre-market digest of overnight headlines and the news that moves
-            your names. Summarized fresh each morning.
-          </p>
-        </div>
-        <div className="stats">
-          <div className="stat">
-            <span className="k">STATUS</span>
-            <span className="v on">LIVE</span>
-          </div>
-          <div className="stat">
-            <span className="k">CADENCE</span>
-            <span className="v">PRE-MKT</span>
-          </div>
-          <div className="stat">
-            <span className="k">UPDATED</span>
-            <span className="v">DAILY</span>
-          </div>
-        </div>
-        <div className="cta">
-          Open
-          <span className="arr" aria-hidden="true">
-            →
-          </span>
-        </div>
-      </Link>
-
-      <Link href="/dashboard" className="hub-row live">
-        <div className="hub-idx">05</div>
-        <div>
-          <div className="rname">
-            <span className="livedot" aria-hidden="true" />
-            Equities Dashboard
-          </div>
-          <p className="rdesc">
-            The detailed dashboard, live. Valuation, IRRs, and the IRR
-            decomposition across the book, with shared model updates.
-          </p>
-        </div>
-        <div className="stats">
-          <div className="stat">
-            <span className="k">STATUS</span>
-            <span className="v on">LIVE</span>
-          </div>
-          <div className="stat">
-            <span className="k">PRICES</span>
-            <span className="v">PRIOR CLOSE</span>
           </div>
         </div>
         <div className="cta">

@@ -11,11 +11,11 @@ import { useSidebarState } from "./SidebarStateContext";
 // The five live tools, in the redesign's locked order/naming. This list is the
 // global navigation rail shown on every view + the homepage.
 export const TOOLS: { href: string; name: string; match: (p: string) => boolean }[] = [
+  { href: "/dashboard", name: "Equities Dashboard", match: (p) => p.startsWith("/dashboard") },
   { href: "/spx", name: "SPX Monitor", match: (p) => p.startsWith("/spx") || p.startsWith("/category") },
+  { href: "/morning-news", name: "Morning Notes", match: (p) => p.startsWith("/morning-news") },
   { href: "/themes", name: "Twitter Themes", match: (p) => p.startsWith("/themes") },
   { href: "/diligence", name: "Diligence Tracker", match: (p) => p.startsWith("/diligence") },
-  { href: "/morning-news", name: "Morning Notes", match: (p) => p.startsWith("/morning-news") },
-  { href: "/dashboard", name: "Equities Dashboard", match: (p) => p.startsWith("/dashboard") },
 ];
 
 // Global navigation rail, shown on every tool. Brand lockup at the top, then
