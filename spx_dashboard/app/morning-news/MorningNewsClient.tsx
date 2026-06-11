@@ -3,16 +3,29 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
-import { logoUrl, normTicker } from "@/lib/diligence";
+import { logoUrl } from "@/lib/diligence";
 import type { MorningNote, ThemeChart } from "./page";
+
+// Non-US listings keep their full Bloomberg ticker (exchange suffix and all —
+// downstream Bloomberg formulas depend on it). Parqet's symbol CDN doesn't
+// resolve those, so map the few exchange-listed names straight to a logo
+// domain. Plain US tickers fall through to the shared parqet lookup.
+const LOGO_DOMAIN: Record<string, string> = {
+  "LSEG LN": "lseg.com",
+  "SAP GY": "sap.com",
+  "DSV DC": "dsv.com",
+};
 
 function TickerLogo({ ticker }: { ticker: string }) {
   const [failed, setFailed] = useState(false);
 
+  const domain = LOGO_DOMAIN[ticker.trim().toUpperCase()];
+  const src = domain ? `https://logo.clearbit.com/${domain}` : logoUrl(ticker);
+
   if (failed) {
     return (
       <span className="news-position-logo news-position-logo-ph" aria-hidden>
-        {normTicker(ticker).charAt(0)}
+        {ticker.trim().charAt(0)}
       </span>
     );
   }
@@ -20,7 +33,7 @@ function TickerLogo({ ticker }: { ticker: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={logoUrl(ticker)}
+      src={src}
       alt=""
       width={20}
       height={20}
