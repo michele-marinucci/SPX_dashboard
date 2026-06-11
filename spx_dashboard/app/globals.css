@@ -2190,6 +2190,10 @@ thead .row-head {
   padding: 5px 8px;
   white-space: nowrap;
 }
+.eq-grid-emph {
+  color: var(--brand);
+  font-weight: 700;
+}
 /* Excel-style header band over the year columns. */
 .eq-grid thead th {
   text-align: center;
@@ -2336,6 +2340,15 @@ thead .row-head {
 }
 .eq-log-head span {
   color: var(--muted);
+}
+.eq-log-tk {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand);
+  background: var(--brand-050, #eeeefb);
+  border-radius: 4px;
+  padding: 1px 6px;
 }
 .eq-log ul {
   list-style: none;
@@ -3677,13 +3690,37 @@ thead .row-head {
 }
 .eq-spark {
   display: flex;
+  align-items: stretch;
+  gap: 5px;
+  height: 30px;
+}
+/* Each bar is a column split by the x-axis: positives fill the top half
+   (anchored to the axis), negatives the bottom half (also from the axis). */
+.eq-sparkcol {
+  display: flex;
+  flex-direction: column;
+  width: 7px;
+}
+.eq-sparkcol-top {
+  flex: 1;
+  display: flex;
   align-items: flex-end;
-  gap: 3px;
-  height: 22px;
+  justify-content: center;
+}
+.eq-sparkcol-bot {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  border-top: 1px solid var(--line-2);
 }
 .eq-sparkbar {
-  width: 6px;
+  width: 7px;
   border-radius: 2px;
+}
+.eq-sparkbar-na {
+  height: 2px;
+  background: var(--line-2);
 }
 .eq-bullet-key {
   position: relative;
@@ -3830,6 +3867,12 @@ thead .row-head {
   font-size: 13px;
   font-weight: 700;
 }
+.eq-focus-logo {
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 4px;
+}
 .eq-focus-name-row {
   display: flex;
   align-items: center;
@@ -3940,6 +3983,26 @@ thead .row-head {
   display: block;
   height: 100%;
   border-radius: 4px;
+}
+/* Diverging variant: fills are anchored to a centre axis so a component can
+   contribute negatively (red, growing left) as well as positively. */
+.eq-decomp-track-div {
+  position: relative;
+  overflow: visible;
+}
+.eq-decomp-axis {
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--line-2);
+}
+.eq-decomp-fill-div {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
 }
 .eq-decomp-val {
   width: 46px;

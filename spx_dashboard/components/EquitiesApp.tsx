@@ -12,6 +12,8 @@ import { ModelGrid } from "@/components/ModelGrid";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { ANALYSTS } from "@/lib/equities/config";
 import { Company, EditRecord, Quote } from "@/lib/equities/types";
+import { fieldLabel, fmtEditValue } from "@/lib/equities/editLog";
+import { logoUrl } from "@/lib/diligence";
 import { NO_SORT, nextSort, SortState, sortRows } from "@/lib/sort";
 import { SortGlyph } from "@/components/SortGlyph";
 
@@ -75,7 +77,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
   const [logTicker, setLogTicker] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [removedOpen, setRemovedOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [allLogOpen, setAllLogOpen] = useState(false);
   const [sort, setSort] = useState<SortState>(NO_SORT);
 
   const today = useMemo(() => new Date(), []);
@@ -291,15 +293,6 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
     );
   }, []);
 
-  const refreshPrices = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await load(true);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [load]);
-
   const tickCell = (c: Company) => (
     <th
       scope="row"
@@ -425,18 +418,39 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         </td>
         {num(fx(d.mom[y2]), undefined, "mom")}
         <td className="eq-sep">
+          {/* Diverging sparkbars: positive (green) grow up from the x-axis,
+              negative (red) grow down below it, so direction reads at a glance. */}
           <div className="eq-spark">
-            {bars.map((v, i) => (
-              <span
-                key={i}
-                className="eq-sparkbar"
-                style={{
-                  height: `${(v == null ? 0 : Math.abs(v) / perfMax) * 17 + 3}px`,
-                  background: v == null ? "var(--line-2)" : v < 0 ? "var(--red)" : "var(--green)",
-                }}
-                title={`${["1M", "3M", "6M"][i]}: ${v == null ? "n/a" : (v * 100).toFixed(0) + "%"}`}
-              />
-            ))}
+            {bars.map((v, i) => {
+              const h = v == null ? 0 : Math.min(14, (Math.abs(v) / perfMax) * 13 + 2);
+              const up = v != null && v >= 0;
+              const down = v != null && v < 0;
+              return (
+                <span
+                  key={i}
+                  className="eq-sparkcol"
+                  title={`${["1M", "3M", "6M"][i]}: ${v == null ? "n/a" : (v * 100).toFixed(0) + "%"}`}
+                >
+                  <span className="eq-sparkcol-top">
+                    {up && (
+                      <span
+                        className="eq-sparkbar"
+                        style={{ height: `${h}px`, background: "var(--green)" }}
+                      />
+                    )}
+                    {v == null && <span className="eq-sparkbar eq-sparkbar-na" />}
+                  </span>
+                  <span className="eq-sparkcol-bot">
+                    {down && (
+                      <span
+                        className="eq-sparkbar"
+                        style={{ height: `${h}px`, background: "var(--red)" }}
+                      />
+                    )}
+                  </span>
+                </span>
+              );
+            })}
           </div>
         </td>
       </tr>
@@ -496,23 +510,21 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           </li>
           <li>
             <b>Prices</b> — prior-day closes from a Bloomberg terminal push
-            and/or Yahoo. <b>Refresh</b> re-fetches; <b>Export Excel</b> exports
-            the live workbook.
+            and/or Yahoo, refreshed automatically once a new close is
+            available. <b>Export Excel</b> downloads a clean snapshot: a
+            formatted Summary tab plus a tab logging every edit.
+          </li>
+          <li>
+            <b>Activity log</b> — the <span className="mono">⌃</span> Activity
+            button lists every change across the whole book, newest first.
           </li>
         </ul>
       </HowItWorks>
-      <button
-        type="button"
-        className="btn"
-        onClick={refreshPrices}
-        disabled={refreshing}
-        title="Re-fetch the latest prior-day closes"
-      >
-        <span className="glyph" aria-hidden="true">⟳</span>{" "}
-        {refreshing ? "Refreshing…" : "Refresh"}
-      </button>
       <button type="button" className="btn" onClick={() => setAddOpen(true)}>
         <span className="glyph" aria-hidden="true">＋</span> Add
+      </button>
+      <button type="button" className="btn" onClick={() => setAllLogOpen(true)}>
+        <span className="glyph" aria-hidden="true">↻</span> Activity log
       </button>
       <button type="button" className="btn" onClick={() => setRemovedOpen(true)}>
         Removed{removedNames.length ? ` (${removedNames.length})` : ""}
@@ -835,6 +847,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         />
       )}
       {logTicker && <LogModal ticker={logTicker} onClose={() => setLogTicker(null)} />}
+      {allLogOpen && <AllLogModal onClose={() => setAllLogOpen(false)} />}
       {removedOpen && (
         <RemovedModal
           companies={removedNames}
@@ -865,6 +878,31 @@ function monoColor(ticker: string): string {
 }
 const fFx = (v: number | null | undefined) => (v == null ? "n/a" : `${v.toFixed(1)}x`);
 const fFp = (v: number | null | undefined) => (v == null ? "n/a" : `${(v * 100).toFixed(0)}%`);
+
+// The Focus header logo: the real company mark (same CDN as the Diligence
+// Tracker) with a graceful monogram fallback when the CDN can't resolve the
+// ticker, so a blocked/missing image never leaves a broken icon.
+function FocusLogo({ ticker }: { ticker: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) {
+    return (
+      <span className="monotile eq-focus-tile" style={{ background: monoColor(ticker) }}>
+        {ticker.slice(0, 2)}
+      </span>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      className="eq-focus-tile eq-focus-logo"
+      src={logoUrl(ticker)}
+      alt={`${ticker} logo`}
+      width={44}
+      height={44}
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 function FocusLayout({
   stocks,
@@ -950,12 +988,7 @@ function FocusLayout({
           <>
             <div className="eq-focus-detail-head">
               <div className="eq-focus-id">
-                <span
-                  className="monotile eq-focus-tile"
-                  style={{ background: monoColor(selected.ticker) }}
-                >
-                  {selected.ticker.slice(0, 2)}
-                </span>
+                <FocusLogo ticker={selected.ticker} />
                 <div>
                   <div className="eq-focus-name-row">
                     <span className="eq-focus-name">{selected.ticker}</span>
@@ -1020,27 +1053,49 @@ function FocusLayout({
                 <span className="eq-decomp-title">IRR decomposition</span>
                 <span className="eq-note mono">NTM → YE+{String(y2).slice(2)} · approximate</span>
               </div>
-              {decompItems.map(([label, v, color]) => (
-                <div className="eq-decomp-bar-row" key={label}>
-                  <span className="eq-decomp-label">{label}</span>
-                  <span className="eq-decomp-track">
+              {decompItems.map(([label, v, color]) => {
+                const neg = v != null && v < 0;
+                // Diverging track: components can pull IRR up (right, in their
+                // colour) or down (left, red) from the zero axis.
+                const fillStyle: React.CSSProperties = {
+                  width: `${(v == null ? 0 : Math.abs(v) / decompMax) * 50}%`,
+                  background: neg ? "var(--red)" : color,
+                };
+                if (neg) fillStyle.right = "50%";
+                else fillStyle.left = "50%";
+                return (
+                  <div className="eq-decomp-bar-row" key={label}>
+                    <span className="eq-decomp-label">{label}</span>
+                    <span className="eq-decomp-track eq-decomp-track-div">
+                      <span className="eq-decomp-axis" />
+                      {v != null && <span className="eq-decomp-fill-div" style={fillStyle} />}
+                    </span>
                     <span
-                      className="eq-decomp-fill"
-                      style={{
-                        width: `${(v == null ? 0 : Math.abs(v) / decompMax) * 100}%`,
-                        background: color,
-                      }}
-                    />
-                  </span>
-                  <span className="eq-decomp-val">{fFp(v)}</span>
-                </div>
-              ))}
+                      className="eq-decomp-val"
+                      style={neg ? { color: "var(--red)" } : undefined}
+                    >
+                      {fFp(v)}
+                    </span>
+                  </div>
+                );
+              })}
               <div className="eq-decomp-bar-row eq-decomp-total">
                 <span className="eq-decomp-label">Total IRR</span>
                 <span className="eq-decomp-track eq-decomp-track-total">
-                  <span className="eq-decomp-fill" style={{ width: "100%", background: "var(--brand)" }} />
+                  <span
+                    className="eq-decomp-fill"
+                    style={{
+                      width: "100%",
+                      background: (dc?.ret ?? 0) < 0 ? "var(--red)" : "var(--brand)",
+                    }}
+                  />
                 </span>
-                <span className="eq-decomp-val">{fFp(dc?.ret)}</span>
+                <span
+                  className="eq-decomp-val"
+                  style={(dc?.ret ?? 0) < 0 ? { color: "var(--red)" } : undefined}
+                >
+                  {fFp(dc?.ret)}
+                </span>
               </div>
             </div>
           </>
@@ -1338,7 +1393,14 @@ function EditModal({
             <ModelGrid
               columns={years}
               rows={SERIES_FIELDS.map((f) => ({
-                label: f.label,
+                // Target multiples drive every target price/IRR, so flag the
+                // row so analysts spot it's editable here too.
+                label:
+                  f.key === "target_mult" ? (
+                    <span className="eq-grid-emph">{f.label}</span>
+                  ) : (
+                    f.label
+                  ),
                 keys: years.map((y) => `${f.key}.${y}`),
               }))}
               values={draft}
@@ -1413,40 +1475,6 @@ function EditModal({
 
 // ---- edits log modal ---------------------------------------------------------- //
 
-function fieldLabel(field: string): string {
-  if (field === "__added__") return "Added to dashboard";
-  if (field === "__removed__") return "Removed from dashboard";
-  if (field === "__restored__") return "Restored to dashboard";
-  const [head, year] = field.split(".");
-  const labels: Record<string, string> = {
-    revs: "Revenue",
-    gm: "GM %",
-    adj_eps: "Adj EPS",
-    mendo_eps: "Mendo EPS",
-    dps: "DPS",
-    target_mult: "Target mult",
-    ncps: "Net cash/sh",
-    wadso: "WADSO",
-    net_debt: "Net debt",
-    best_pe: "BEst P/E",
-    shares: "Shares",
-    cash: "Cash",
-    debt: "Debt",
-    min_int: "Min interest",
-    port: "Portfolio flag",
-    grp: "Sector group",
-    yield_input: "Yield input",
-  };
-  return `${labels[head] ?? head}${year ? ` ${year}` : ""}`;
-}
-
-function fmtOld(v: number | string | null, field: string): string {
-  if (v == null) return "—";
-  if (typeof v === "string") return v;
-  if (field.startsWith("gm.")) return `${(v * 100).toFixed(2)}%`;
-  return v.toLocaleString("en-US", { maximumFractionDigits: 4 });
-}
-
 function LogModal({ ticker, onClose }: { ticker: string; onClose: () => void }) {
   const [edits, setEdits] = useState<EditRecord[] | null>(null);
   const [error, setError] = useState("");
@@ -1496,9 +1524,91 @@ function LogModal({ ticker, onClose }: { ticker: string; onClose: () => void }) 
                   {e.changes.map((ch, i) => (
                     <li key={i}>
                       {fieldLabel(ch.field)}:{" "}
-                      <span className="eq-old">{fmtOld(ch.old, ch.field)}</span>
+                      <span className="eq-old">{fmtEditValue(ch.old, ch.field)}</span>
                       {" → "}
-                      <span className="eq-new">{fmtOld(ch.new, ch.field)}</span>
+                      <span className="eq-new">{fmtEditValue(ch.new, ch.field)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---- aggregate activity-log modal -------------------------------------------- //
+
+// Every change across the whole dashboard, newest first — a book-wide
+// companion to the per-company LogModal, opened from the toolbar.
+function AllLogModal({ onClose }: { onClose: () => void }) {
+  const [edits, setEdits] = useState<EditRecord[] | null>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/equities", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "logAll" }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!active) return;
+        if (Array.isArray(d?.edits)) setEdits(d.edits);
+        else setError(d?.error || "Could not load the activity log.");
+      })
+      .catch(() => active && setError("Network error."));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return (
+    <div className="eq-overlay" onClick={onClose}>
+      <div className="eq-modal eq-modal-log" onClick={(e) => e.stopPropagation()}>
+        <div className="eq-modal-head">
+          <h2>
+            Activity log
+            <span className="eq-modal-sub"> · all changes, most recent first</span>
+          </h2>
+          <button type="button" className="eq-x" onClick={onClose} aria-label="Close">
+            ×
+          </button>
+        </div>
+        {error && <p className="eq-error">{error}</p>}
+        {!error && edits === null && <p className="eq-note">Loading…</p>}
+        {edits !== null && edits.length === 0 && (
+          <p className="eq-note">No logged changes yet.</p>
+        )}
+        {edits !== null && edits.length > 0 && (
+          <ul className="eq-log">
+            {edits.map((e) => (
+              <li key={e.id}>
+                <div className="eq-log-head">
+                  <span>
+                    <span className="eq-log-tk">{e.ticker}</span>
+                    <strong> {e.analyst}</strong>
+                  </span>
+                  <span>{new Date(e.created_at).toLocaleString()}</span>
+                </div>
+                <ul>
+                  {e.changes.map((ch, i) => (
+                    <li key={i}>
+                      {fieldLabel(ch.field)}:{" "}
+                      <span className="eq-old">{fmtEditValue(ch.old, ch.field)}</span>
+                      {" → "}
+                      <span className="eq-new">{fmtEditValue(ch.new, ch.field)}</span>
                     </li>
                   ))}
                 </ul>

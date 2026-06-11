@@ -1,69 +1,209 @@
-// "Download Excel" for the Equities Dashboard.
+// "Export Excel" for the Equities Dashboard.
 //
-// Returns the team's ORIGINAL workbook (committed as
-// data/detailed_dashboard_template.xlsx) with only the analyst model-input
-// cells overwritten by the current shared values — every Bloomberg formula,
-// derived formula, format, and the other tabs survive untouched, so the file
-// recalculates normally the next time it's opened on a terminal.
-//
-// Two kinds of patches, driven by the xl_row/xl_patch metadata the parser
-// recorded for each row:
-//   1. literal input cells (revs, GM%, EPS, DPS, multiples, …) → new <v>,
-//      plus the Port flag (E), update date (F) and analyst (G);
-//   2. Bloomberg price/performance cells (H, EB–ED) keep their <f> formula
-//      but get the current Yahoo value written into the cached <v>, so the
-//      file shows live-ish numbers even when opened off-terminal.
-// Companies added on the site (no template row) can't be patched in;
-// removed companies keep their last template values.
-import { promises as fs } from "fs";
-import path from "path";
+// Builds a clean, self-contained workbook of exactly what the site shows right
+// now — every analyst edit included, recomputed against the latest prices —
+// with just two tabs:
+//   1. "Summary"  — the Summary-view table, sector-grouped and number-formatted
+//                   ($, %, multiples, thousands separators).
+//   2. "Edit Log" — every change ever made, newest first, one row per field.
+// No Bloomberg formulas, no helper columns, no other tabs: it's a snapshot for
+// sharing, not the live model. (The live model still lives in the team's
+// original workbook.)
 import { NextResponse } from "next/server";
-import JSZip from "jszip";
-import seedJson from "@/data/equities_seed.json";
-import { latestAsOf, loadCompanies, loadQuotes } from "@/lib/equities/load";
-import { Company } from "@/lib/equities/types";
-import { dateSerial, numCell, setCachedValue, setCell, strCell } from "@/lib/equities/xlsxPatch";
+import { compute, displayYears } from "@/lib/equities/calc";
+import { fieldLabel, fmtEditValue } from "@/lib/equities/editLog";
+import { latestAsOf, latestDataDate, loadCompanies, loadQuotes } from "@/lib/equities/load";
+import { Company, EditRecord } from "@/lib/equities/types";
+import {
+  buildWorkbook,
+  currencyStyle,
+  excelDateTime,
+  Row,
+  S,
+  sheetXml,
+} from "@/lib/equities/xlsxBuild";
+import { dbGetAllEdits, equitiesEnabled } from "@/lib/equitiesDb";
 
 export const dynamic = "force-dynamic";
 
-const SHEET_PATH = "xl/worksheets/sheet1.xml"; // "Summary" in the template
+// Columns A..V, mirroring the on-screen Summary view.
+const N_COLS = 22;
+const LAST = "V";
 
-interface XlMeta {
-  row: number;
-  patch: Record<string, string>; // column letter → dotted model path
-  isIndex: boolean;
-}
+function summarySheet(
+  companies: Company[],
+  quotes: Awaited<ReturnType<typeof loadQuotes>>,
+  today: Date,
+  asOfNote: string,
+): string {
+  const years = displayYears(today);
+  const [y0, y1, y2, y3, y4] = years;
+  const yr = (y: number) => String(y).slice(2); // "27"
+  const rows: string[] = [];
+  const merges: string[] = [`A1:${LAST}1`, `A2:${LAST}2`];
 
-function xlMeta(): Map<string, XlMeta> {
-  const map = new Map<string, XlMeta>();
-  for (const g of seedJson.groups as {
-    companies: { ticker: string; xl_row: number; xl_patch: Record<string, string> }[];
-  }[]) {
-    for (const c of g.companies) {
-      map.set(c.ticker, { row: c.xl_row, patch: c.xl_patch, isIndex: false });
+  // Title + subtitle band.
+  rows.push(new Row(1).str("Equities Dashboard — Summary", S.TITLE).xml());
+  rows.push(new Row(2).str(asOfNote, S.SUBTITLE).xml());
+  rows.push(new Row(3).xml()); // spacer
+
+  // Group header (row 4) + column header (row 5).
+  const gh = new Row(4)
+    .str("Company", S.GROUP_HEAD)
+    .str("Price", S.GROUP_HEAD)
+    .str("EV / GP", S.GROUP_HEAD).skip(1)
+    .str("Mendo P/E", S.GROUP_HEAD).skip(4)
+    .str("Target Mult", S.GROUP_HEAD).skip(2)
+    .str("IRR", S.GROUP_HEAD).skip(2)
+    .str("MoM", S.GROUP_HEAD).skip(3)
+    .str("Recent Perf", S.GROUP_HEAD).skip(2);
+  rows.push(gh.xml());
+  merges.push(
+    "A4:A5", "B4:B5", "C4:D4", "E4:I4", "J4:L4", "M4:O4", "P4:S4", "T4:V4",
+  );
+
+  const ch = new Row(5)
+    .skip(2) // A/B covered by the merged group header
+    .str(`'${yr(y0)}`, S.COL_HEAD).str(`'${yr(y1)}`, S.COL_HEAD) // EV/GP
+    .str(`'${yr(y0)}`, S.COL_HEAD).str(`'${yr(y1)}`, S.COL_HEAD).str(`'${yr(y2)}`, S.COL_HEAD)
+    .str(`'${yr(y3)}`, S.COL_HEAD).str(`'${yr(y4)}`, S.COL_HEAD) // Mendo P/E
+    .str(`'${yr(y1)}`, S.COL_HEAD).str(`'${yr(y2)}`, S.COL_HEAD).str(`'${yr(y3)}`, S.COL_HEAD) // Target
+    .str(`'${yr(y1)}`, S.COL_HEAD).str(`'${yr(y2)}`, S.COL_HEAD).str(`'${yr(y3)}`, S.COL_HEAD) // IRR
+    .str(`'${yr(y0)}`, S.COL_HEAD).str(`'${yr(y1)}`, S.COL_HEAD).str(`'${yr(y2)}`, S.COL_HEAD)
+    .str(`'${yr(y3)}`, S.COL_HEAD) // MoM
+    .str("1M", S.COL_HEAD).str("3M", S.COL_HEAD).str("6M", S.COL_HEAD);
+  rows.push(ch.xml());
+
+  let r = 6;
+  const sectorBand = (label: string) => {
+    rows.push(new Row(r).str(label, S.SECTOR).xml());
+    // Fill the band across the row so the sector fill carries the full width.
+    merges.push(`A${r}:${LAST}${r}`);
+    r++;
+  };
+
+  const perfOf = (c: Company) => {
+    const q = c.yahoo ? quotes[c.yahoo] : undefined;
+    return { m1: q?.m1 ?? c.perf.m1, m3: q?.m3 ?? c.perf.m3, m6: q?.m6 ?? c.perf.m6 };
+  };
+
+  const companyRow = (c: Company) => {
+    const q = c.yahoo ? quotes[c.yahoo] : undefined;
+    const d = compute(c, q?.price ?? null, today);
+    const pf = perfOf(c);
+    const row = new Row(r)
+      .str(c.ticker + (c.port === 1 ? " ◆" : ""), S.TICKER)
+      .num(d.price, currencyStyle(c.currency))
+      .num(d.evGp[y0], S.MULTIPLE).num(d.evGp[y1], S.MULTIPLE)
+      .num(d.mendoPe[y0], S.MULTIPLE).num(d.mendoPe[y1], S.MULTIPLE)
+      .num(d.mendoPe[y2], S.MULTIPLE).num(d.mendoPe[y3], S.MULTIPLE).num(d.mendoPe[y4], S.MULTIPLE)
+      .num(c.model.target_mult[String(y1)] ?? null, S.MULTIPLE)
+      .num(c.model.target_mult[String(y2)] ?? null, S.MULTIPLE)
+      .num(c.model.target_mult[String(y3)] ?? null, S.MULTIPLE)
+      .num(d.irr[y1], S.PERCENT).num(d.irr[y2], S.PERCENT).num(d.irr[y3], S.PERCENT)
+      .num(d.mom[y0], S.MULTIPLE).num(d.mom[y1], S.MULTIPLE)
+      .num(d.mom[y2], S.MULTIPLE).num(d.mom[y3], S.MULTIPLE)
+      .num(pf.m1, S.PERCENT).num(pf.m3, S.PERCENT).num(pf.m6, S.PERCENT);
+    rows.push(row.xml());
+    r++;
+  };
+
+  // Sector groups (same ordering the API returns: grp_order, row_order).
+  const seen = new Set<string>();
+  const order: string[] = [];
+  for (const c of companies) {
+    if (c.is_index || c.removed) continue;
+    if (!seen.has(c.grp)) {
+      seen.add(c.grp);
+      order.push(c.grp);
     }
   }
-  for (const ix of seedJson.indexes as { ticker: string; xl_row: number }[]) {
-    map.set(ix.ticker, { row: ix.xl_row, patch: {}, isIndex: true });
+  for (const grp of order) {
+    sectorBand(grp);
+    for (const c of companies) {
+      if (!c.is_index && !c.removed && c.grp === grp) companyRow(c);
+    }
   }
-  return map;
+
+  // Index rows (Px + P/E only).
+  const indexRows = companies.filter((c) => c.is_index && !c.removed);
+  if (indexRows.length) {
+    sectorBand("Index");
+    for (const c of indexRows) {
+      const q = c.yahoo ? quotes[c.yahoo] : undefined;
+      const d = compute(c, q?.price ?? null, today);
+      const pf = perfOf(c);
+      const row = new Row(r)
+        .str(c.ticker, S.TICKER)
+        .num(d.price, currencyStyle(c.currency))
+        .skip(2); // no EV/GP
+      for (const y of years) row.num(c.best_pe?.[String(y)] ?? null, S.MULTIPLE);
+      row.skip(10); // no target / IRR / MoM
+      row.num(pf.m1, S.PERCENT).num(pf.m3, S.PERCENT).num(pf.m6, S.PERCENT);
+      rows.push(row.xml());
+      r++;
+    }
+  }
+
+  const cols = [
+    { min: 1, max: 1, width: 16 },
+    { min: 2, max: 2, width: 11 },
+    { min: 3, max: N_COLS, width: 8.5 },
+  ];
+  return sheetXml(rows, { cols, merges, freezeRows: 5, freezeCols: 1 });
 }
 
-// Resolve a dotted path ("revs.2027", "gp.2028", "shares") against the model.
-function resolve(c: Company, pathStr: string): number | null {
-  const [head, year] = pathStr.split(".");
-  if (!year) {
-    const v = c.model[head as "shares" | "cash" | "debt" | "min_int"];
-    return typeof v === "number" ? v : null;
+function editLogSheet(edits: EditRecord[]): string {
+  const rows: string[] = [];
+  const merges = ["A1:F1", "A2:F2"];
+  rows.push(new Row(1).str("Equities Dashboard — Edit Log", S.TITLE).xml());
+  rows.push(
+    new Row(2)
+      .str("Every change, most recent first. Times are UTC.", S.SUBTITLE)
+      .xml(),
+  );
+  rows.push(new Row(3).xml());
+
+  rows.push(
+    new Row(4)
+      .str("When", S.COL_HEAD)
+      .str("Ticker", S.COL_HEAD)
+      .str("Analyst", S.COL_HEAD)
+      .str("Field", S.COL_HEAD)
+      .str("Old", S.COL_HEAD)
+      .str("New", S.COL_HEAD)
+      .xml(),
+  );
+
+  let r = 5;
+  for (const e of edits) {
+    const when = excelDateTime(e.created_at);
+    for (const ch of e.changes) {
+      rows.push(
+        new Row(r)
+          .num(when, S.DATETIME)
+          .str(e.ticker, S.TEXT)
+          .str(e.analyst, S.TEXT)
+          .str(fieldLabel(ch.field), S.TEXT)
+          .str(fmtEditValue(ch.old, ch.field), S.TEXT)
+          .str(fmtEditValue(ch.new, ch.field), S.TEXT)
+          .xml(),
+      );
+      r++;
+    }
   }
-  if (head === "gp") {
-    const gm = c.model.gm[year];
-    const revs = c.model.revs[year];
-    return gm != null && revs != null ? gm * revs : null;
+  if (r === 5) {
+    rows.push(new Row(5).str("No changes logged yet.", S.TEXT).xml());
   }
-  const series = c.model[head as "revs"] as Record<string, number> | undefined;
-  const v = series?.[year];
-  return typeof v === "number" ? v : null;
+
+  const cols = [
+    { min: 1, max: 1, width: 17 },
+    { min: 2, max: 2, width: 10 },
+    { min: 3, max: 3, width: 12 },
+    { min: 4, max: 4, width: 18 },
+    { min: 5, max: 6, width: 16 },
+  ];
+  return sheetXml(rows, { cols, merges, freezeRows: 4 });
 }
 
 export async function GET() {
@@ -71,55 +211,40 @@ export async function GET() {
   const quotes = await loadQuotes(companies, enabled, false);
   const today = new Date();
 
-  const template = await fs.readFile(
-    path.join(process.cwd(), "data", "detailed_dashboard_template.xlsx"),
-  );
-  const zip = await JSZip.loadAsync(template);
-  let xml = await zip.file(SHEET_PATH)!.async("string");
-
-  const meta = xlMeta();
-  for (const c of companies) {
-    if (c.removed) continue; // keep the template row's last values as-is
-    const m = meta.get(c.ticker);
-    if (!m) continue; // added on the site — no template row to patch
-
-    if (!m.isIndex) {
-      for (const [col, pathStr] of Object.entries(m.patch)) {
-        xml = setCell(xml, `${col}${m.row}`, numCell(`${col}${m.row}`, resolve(c, pathStr)));
-      }
-      xml = setCell(xml, `E${m.row}`, numCell(`E${m.row}`, c.port));
-      xml = setCell(
-        xml,
-        `F${m.row}`,
-        numCell(`F${m.row}`, c.update_date ? dateSerial(c.update_date) : null),
-      );
-      xml = setCell(xml, `G${m.row}`, strCell(`G${m.row}`, c.update_by));
-    }
-
-    // Refresh the cached values of the Bloomberg price/perf cells so the
-    // file is current even before a terminal recalculates it.
-    const q = c.yahoo ? quotes[c.yahoo] : undefined;
-    if (q) {
-      xml = setCachedValue(xml, `H${m.row}`, q.price != null ? q.price * c.px_scale : null);
-      xml = setCachedValue(xml, `EB${m.row}`, q.m1);
-      xml = setCachedValue(xml, `EC${m.row}`, q.m3);
-      xml = setCachedValue(xml, `ED${m.row}`, q.m6);
+  let edits: EditRecord[] = [];
+  if (equitiesEnabled()) {
+    try {
+      edits = await dbGetAllEdits();
+    } catch {
+      /* log read is best-effort — still export the Summary */
     }
   }
 
-  zip.file(SHEET_PATH, xml);
-  const buf = await zip.generateAsync({
-    type: "nodebuffer",
-    compression: "DEFLATE",
-    compressionOptions: { level: 6 },
-  });
+  const dataDate = latestDataDate(quotes);
+  const stocks = companies.filter((c) => !c.is_index && !c.removed);
+  const asOfNote =
+    `${stocks.length} names · prices as of ` +
+    (dataDate
+      ? `${new Date(`${dataDate}T12:00:00`).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })} (prior close)`
+      : "n/a") +
+    ` · exported ${today.toISOString().slice(0, 10)}`;
+
+  const buf = await buildWorkbook([
+    { name: "Summary", xml: summarySheet(companies, quotes, today, asOfNote) },
+    { name: "Edit Log", xml: editLogSheet(edits) },
+  ]);
 
   const stamp = today.toISOString().slice(0, 10).replace(/-/g, "");
   const asOf = latestAsOf(quotes);
   return new NextResponse(new Uint8Array(buf), {
     headers: {
-      "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": `attachment; filename="${stamp}_Detailed_Dashboard.xlsx"`,
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Disposition": `attachment; filename="${stamp}_Equities_Dashboard.xlsx"`,
       "X-Prices-As-Of": asOf ?? "none",
     },
   });
