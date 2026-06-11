@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
+import { PrintAllButton } from "@/components/PrintAllButton";
+import { TodayDate } from "@/components/TodayDate";
 import { getGeneratedAtLabel, getTweetCount } from "@/lib/tweets";
 
 // The post-login launcher (Ledger "hub"): one ledger row per tool. Four are
@@ -12,17 +14,17 @@ export default function HomePage() {
   return (
     <div className="hub">
       <div className="hub-top">
-        <div className="hub-brand">
-          <span className="hub-brand-dot" aria-hidden="true" />
-          <span className="sys">MENDO&nbsp;HUB</span>
-        </div>
+        <img src="/meritage-logo.png" alt="Meritage" className="hub-logo" />
         <div className="hub-right">
-          {asOf && <span className="hub-clock">TWITTER · {asOf}</span>}
+          <PrintAllButton />
           <LogoutButton />
         </div>
       </div>
 
-      <h1>Mendo Hub</h1>
+      <div className="hub-head">
+        <h1>Mendo Hub</h1>
+        <TodayDate />
+      </div>
 
       <div className="colhead">
         <span>#</span>
@@ -39,8 +41,8 @@ export default function HomePage() {
             SPX Monitor
           </div>
           <p className="rdesc">
-            AI-beneficiary &amp; software tracker within the S&amp;P 500 — sort
-            any column, toggle Compounders, export the underlying data.
+            Track AI beneficiaries and software names in the S&amp;P 500. Sort
+            any column, toggle Compounders, and export the underlying data.
           </p>
         </div>
         <div className="stats">
@@ -73,8 +75,8 @@ export default function HomePage() {
             Twitter Monitor
           </div>
           <p className="rdesc">
-            A summary of the day&apos;s tweets from your followed accounts —
-            organized by theme, with portfolio mentions and recurring topics.
+            A daily summary of tweets from your followed accounts, organized by
+            theme with portfolio mentions and recurring topics.
           </p>
         </div>
         <div className="stats">
@@ -107,8 +109,8 @@ export default function HomePage() {
             Diligence Tracker
           </div>
           <p className="rdesc">
-            Every position&apos;s Microsoft List in one place — click through to a
-            name&apos;s tracker, add or remove links, shared across the team.
+            Every position&apos;s Microsoft List in one place. Open a name&apos;s
+            tracker, add or remove links, and share across the team.
           </p>
         </div>
         <div className="stats">
@@ -142,7 +144,7 @@ export default function HomePage() {
           </div>
           <p className="rdesc">
             A pre-market digest of overnight headlines and the news that moves
-            your names, summarized each morning.
+            your names. Summarized fresh each morning.
           </p>
         </div>
         <div className="stats">
@@ -172,7 +174,7 @@ export default function HomePage() {
         <div>
           <div className="rname">Equities Dashboard</div>
           <p className="rdesc">
-            A consolidated view of the equities book — positions, exposures, and
+            A consolidated view of the equities book. Positions, exposures, and
             performance in one place.
           </p>
         </div>
@@ -202,7 +204,7 @@ export default function HomePage() {
         <div>
           <div className="rname">Insider Selling</div>
           <p className="rdesc">
-            Track insider sell transactions across the universe — who&apos;s
+            Track insider sell transactions across the universe. See who is
             selling, how much, and when.
           </p>
         </div>
