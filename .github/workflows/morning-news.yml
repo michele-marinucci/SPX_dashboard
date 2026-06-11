@@ -34,7 +34,6 @@ jobs:
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          NEWS_SENDER_FILTER: ${{ secrets.NEWS_SENDER_FILTER }}
           NEWS_LOOKBACK_HOURS: "24"
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           MORNING_NEWS_RECIPIENTS: ${{ secrets.MORNING_NEWS_RECIPIENTS }}
