@@ -2,11 +2,10 @@ name: Generate morning news summary
 
 on:
   schedule:
-    # 9:00 AM ET. EST is UTC-5 (9am = 14:00 UTC); EDT is UTC-4 (9am = 13:00 UTC).
-    # Two crons so it lands at 9am ET regardless of DST — only the active one
-    # fires in any given month.
-    - cron: "0 14 * 11,12,1,2,3 *"   # Nov–Mar (EST, UTC-5): 9am ET = 14:00 UTC
-    - cron: "0 13 * 4,5,6,7,8,9,10 *" # Apr–Oct (EDT, UTC-4): 9am ET = 13:00 UTC
+    # 9:00 AM ET = 13:00 UTC (EST) / 14:00 UTC (EDT).
+    # Run at both so it fires at 9am regardless of DST.
+    - cron: "0 13 * 11,12,1,2,3 *"   # Nov–Mar (EST, UTC-5)
+    - cron: "0 14 * 4,5,6,7,8,9,10 *" # Apr–Oct (EDT, UTC-4)
   workflow_dispatch:
     inputs:
       lookback_hours:
@@ -44,6 +43,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           MORNING_NEWS_RECIPIENTS: ${{ secrets.MORNING_NEWS_RECIPIENTS }}
           MORNING_NEWS_FROM: ${{ secrets.GMAIL_ADDRESS }}
+          PORTFOLIO_API_URL: ${{ secrets.PORTFOLIO_API_URL }}
         run: python spx_dashboard/pipeline/run_news.py
 
       - name: Commit updated morning news data (triggers Vercel redeploy)
