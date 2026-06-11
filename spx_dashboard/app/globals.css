@@ -2124,12 +2124,23 @@ thead .row-head {
 }
 
 .news-position-ticker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 700;
   color: var(--brand);
   font-family: var(--font-mono, monospace);
   min-width: 56px;
   padding-top: 1px;
+}
+
+.news-position-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .news-position-notes {

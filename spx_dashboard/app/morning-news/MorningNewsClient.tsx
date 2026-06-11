@@ -1,9 +1,45 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
 import type { MorningNote } from "./page";
+
+// Map ticker → Clearbit logo domain
+const TICKER_DOMAIN: Record<string, string> = {
+  MSFT: "microsoft.com",
+  AMZN: "amazon.com",
+  TRU: "transunion.com",
+  COF: "capitalone.com",
+  AON: "aon.com",
+  WDAY: "workday.com",
+  SPGI: "spglobal.com",
+  "LSEG LN": "lseg.com",
+  CSGP: "costargroup.com",
+  "DSV DC": "dsv.com",
+  MSCI: "msci.com",
+  META: "meta.com",
+  "SAP GY": "sap.com",
+  TOST: "toasttab.com",
+  EFX: "equifax.com",
+  VSAT: "viasat.com",
+};
+
+function TickerLogo({ ticker }: { ticker: string }) {
+  const domain = TICKER_DOMAIN[ticker];
+  if (!domain) return null;
+  return (
+    <Image
+      src={`https://logo.clearbit.com/${domain}`}
+      alt={ticker}
+      width={20}
+      height={20}
+      className="news-position-logo"
+      unoptimized
+    />
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Calendar popup
@@ -188,6 +224,23 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
             <p className="news-one-liner">{selected.one_liner}</p>
           )}
 
+          {selected.positions.length > 0 && (
+            <>
+              <p className="news-section-title">Portfolio Mentions</p>
+              <div className="news-positions">
+                {selected.positions.map((p, i) => (
+                  <div key={i} className="news-position-row">
+                    <span className="news-position-ticker">
+                      <TickerLogo ticker={p.ticker} />
+                      {p.ticker}
+                    </span>
+                    <span className="news-position-notes">{p.notes}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
           {selected.top_themes.length > 0 && (
             <>
               <p className="news-section-title">Top Themes</p>
@@ -205,20 +258,6 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
                         ))}
                       </div>
                     )}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {selected.positions.length > 0 && (
-            <>
-              <p className="news-section-title">Portfolio Mentions</p>
-              <div className="news-positions">
-                {selected.positions.map((p, i) => (
-                  <div key={i} className="news-position-row">
-                    <span className="news-position-ticker">{p.ticker}</span>
-                    <span className="news-position-notes">{p.notes}</span>
                   </div>
                 ))}
               </div>
