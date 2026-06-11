@@ -1616,7 +1616,7 @@ thead .row-head {
 /* ============================================================================
    RESPONSIVE
    ========================================================================== */
-@media (max-width: 720px) {
+@media (max-width: 768px) {
   .shell {
     flex-direction: column;
   }
@@ -1810,6 +1810,37 @@ thead .row-head {
 }
 .dil-row:not(:last-child) {
   border-bottom: 1px solid var(--line-soft);
+}
+.dil-row-dragging {
+  opacity: 0.5;
+  background: var(--surface-2);
+}
+.dil-grip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 32px;
+  margin-left: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--faint);
+  cursor: grab;
+  border-radius: var(--radius-sm);
+  transition: color 0.12s, background 0.12s;
+  touch-action: none;
+}
+.dil-grip:hover {
+  color: var(--muted);
+  background: var(--surface-2);
+}
+.dil-grip:active {
+  cursor: grabbing;
+}
+.dil-grip-icon {
+  fill: currentColor;
 }
 .dil-link {
   flex: 1;
@@ -2874,6 +2905,30 @@ thead .row-head {
   line-height: 1.55;
   color: var(--ink-2);
 }
+/* Numbered takeaways (1, 2, 3) with lettered sub-bullets (a, b, c) — mirrors
+   the Morning Notes briefing format. */
+.tw-daily-points {
+  margin: 0 0 8px;
+  padding-left: 20px;
+  list-style: decimal;
+}
+.tw-daily-point {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 0 0 5px;
+}
+.tw-daily-subs {
+  margin: 4px 0 6px;
+  padding-left: 18px;
+  list-style: lower-alpha;
+}
+.tw-daily-subs li {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 2px 0;
+}
 .tw-daily-meta {
   display: flex;
   flex-wrap: wrap;
@@ -2998,6 +3053,20 @@ thead .row-head {
   text-decoration: none;
 }
 .tw-port-link:hover { text-decoration: underline; }
+
+/* "Go to portfolio positions" button — sits at the right of the section head. */
+.tw-port-btn {
+  margin-left: auto;
+  align-self: center;
+}
+
+/* Narrow leading column holding the X-post link in the Latest tweets table. */
+.tw-link-col {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+}
+th.tw-link-col { text-align: center; }
 
 .tw-author a {
   font-weight: 600;

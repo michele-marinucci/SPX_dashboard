@@ -502,13 +502,32 @@ def merge_store(
 # Stage 6 — daily summary + recurring topics (FAST_MODEL)
 # --------------------------------------------------------------------------- #
 DAILY_SYSTEM = (
-    "You write the morning briefing for an investment team from today's "
-    "tweets. Group the substance by the provided theme taxonomy; put "
-    "substantive content that fits no theme under key \"other\". For each "
-    "theme with content write 2-3 information-dense sentences (keep concrete "
-    "numbers). Also write one headline sentence capturing the day.\n\n"
+    "You write the morning briefing for a small team of professional investors "
+    "at a long-only equity fund, distilled from today's tweets. Group the "
+    "substance by the provided theme taxonomy; put substantive content that "
+    "fits no theme under key \"other\".\n\n"
+    "AUDIENCE & TONE:\n"
+    "- They are investors. NEVER explain basic finance concepts (what an IPO, a "
+    "buyback, or a P/E ratio is). No definitions of common terms.\n"
+    "- Assume deep familiarity with markets and the names involved.\n"
+    "- Be concise. Short, simple sentences — one idea each. Avoid long or "
+    "complex sentences.\n"
+    "- Ordinary financial terms are fine and expected; skip buzzwords and hype.\n"
+    "- Be factual and specific. Keep concrete numbers and names. No filler.\n\n"
+    "FORMAT (built to be skimmed):\n"
+    "- For each theme with content, every key takeaway is its own numbered "
+    "bullet (an entry in `points`; rendered 1, 2, 3 …).\n"
+    "- Supporting detail goes in lettered sub-bullets (`details`; rendered a, "
+    "b, c …) under the relevant takeaway. Omit `details` or use [] when the "
+    "takeaway stands alone.\n"
+    "- A busy reader should get the whole gist from the numbered bullets "
+    "alone.\n"
+    "- 2-4 points per theme. Also write one headline sentence capturing the "
+    "day.\n\n"
     'Return ONLY JSON: {"headline": "...", "items": [{"theme": "key", '
-    '"label": "Label", "summary": "...", "tickers": [], "tweet_ids": []}]}'
+    '"label": "Label", "points": [{"text": "the key takeaway, one concise '
+    'sentence", "details": ["a short supporting detail", "..."]}], '
+    '"tickers": [], "tweet_ids": []}]}'
 )
 
 RECUR_SYSTEM = (
@@ -550,14 +569,37 @@ def build_daily_summary(
     valid_ids = {t["id"] for t in todays}
     items = []
     for it in obj.get("items") or []:
-        if not isinstance(it, dict) or not (it.get("summary") or "").strip():
+        if not isinstance(it, dict):
             continue
+        # New shape: numbered takeaways (`points`) each with lettered
+        # sub-details. Older runs returned a single `summary` paragraph.
+        points: list[dict] = []
+        for p in it.get("points") or []:
+            if not isinstance(p, dict):
+                continue
+            text = (p.get("text") or "").strip()
+            if not text:
+                continue
+            details = [
+                d.strip()
+                for d in (p.get("details") or [])
+                if isinstance(d, str) and d.strip()
+            ]
+            points.append({"text": text, "details": details})
+        summary = (it.get("summary") or "").strip()
+        if not points and not summary:
+            continue
+        # Keep a flat `summary` too, so legacy consumers (and any mid-deploy UI)
+        # still render something coherent.
+        if not summary:
+            summary = " ".join(p["text"] for p in points)
         key = it.get("theme") or "other"
         items.append(
             {
                 "theme": key,
                 "label": label_of.get(key, it.get("label") or "Other"),
-                "summary": it["summary"].strip(),
+                "points": points,
+                "summary": summary,
                 "tickers": [
                     x.upper() for x in (it.get("tickers") or []) if isinstance(x, str)
                 ],

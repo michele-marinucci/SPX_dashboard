@@ -62,10 +62,10 @@ export function DashboardFrame({
             <a
               href="/SPX_inputs.xlsx"
               download="SPX_inputs.xlsx"
-              className="btn-export"
+              className="btn-primary"
               title="Download the Excel file powering this site"
             >
-              <span aria-hidden="true">↓</span> Export Excel
+              <span className="glyph" aria-hidden="true">↓</span> Export Excel
             </a>
           </div>
         </header>

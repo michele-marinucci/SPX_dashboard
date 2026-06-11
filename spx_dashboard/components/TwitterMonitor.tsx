@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
 import { cx } from "@/lib/format";
+import { TOOL_NAMES } from "@/lib/toolMeta";
 import {
   DailySummaryItem,
   RecurringTopic,
@@ -35,7 +36,22 @@ function fmtAsOf(iso: string | null): string | null {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
-  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+  // Render the refresh moment in US Eastern time — with the date AND the time —
+  // so the team can see exactly how fresh the digest is. timeZoneName "short"
+  // prints EST or EDT automatically depending on daylight saving.
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short",
+    }).format(d);
+  } catch {
+    return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+  }
 }
 
 function fmtDay(iso?: string): string {
@@ -260,7 +276,7 @@ export function TwitterMonitor({
       >
         Manage accounts <span className="mono">{followedList.length}</span>
       </button>
-      <HowItWorks title="How Twitter Themes works">
+      <HowItWorks title={`How ${TOOL_NAMES.twitter} works`}>
         <p className="hiw-lead">
           Every <strong>Monday, Wednesday and Friday</strong> morning the monitor
           reads the latest posts from your followed accounts.
@@ -292,8 +308,8 @@ export function TwitterMonitor({
 
   return (
     <AppShell
-      tool="Twitter Themes"
-      title="Twitter Themes"
+      tool={TOOL_NAMES.twitter}
+      title={TOOL_NAMES.twitter}
       subtitle={
         <>
           Digest of followed accounts ·{" "}
@@ -306,7 +322,7 @@ export function TwitterMonitor({
         </>
       }
       actions={actions}
-      footerLeft={`Twitter Themes as of ${asOf ?? "—"}`}
+      footerLeft={`${TOOL_NAMES.twitter} as of ${asOf ?? "—"}`}
     >
       {manageOpen && (
         <div className="tw-manage-overlay" onClick={() => setManageOpen(false)}>
@@ -389,35 +405,11 @@ export function TwitterMonitor({
             <section className="section">
               <div className="section-head">
                 <span className="section-num">01</span>
-                <h2 className="section-title">Summary of the day</h2>
-                {daily.date && <span className="section-note">{fmtDay(daily.date)}</span>}
-              </div>
-              {daily.headline && <p className="tw-headline">{daily.headline}</p>}
-              {daily.items.length === 0 ? (
-                <p className="muted">No summary for the latest run.</p>
-              ) : (
-                <div className="tw-daily">
-                  {daily.items.map((it) => (
-                    <DailyItem
-                      key={it.theme}
-                      item={it}
-                      tweetById={tweetById}
-                      renderedIds={renderedIds}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            <section className="section">
-              <div className="section-head">
-                <span className="section-num">02</span>
                 <h2 className="section-title">Portfolio mentions</h2>
-                <span className="section-note">
-                  <Link href="/dashboard" className="tw-port-link">
-                    holdings → Equities Dashboard
-                  </Link>
-                </span>
+                <Link href="/dashboard" className="btn tw-port-btn">
+                  Go to portfolio positions{" "}
+                  <span className="glyph" aria-hidden="true">→</span>
+                </Link>
               </div>
               {portfolioHits.length === 0 ? (
                 <p className="muted">No portfolio names came up in the latest batch.</p>
@@ -455,6 +447,29 @@ export function TwitterMonitor({
                     ))}
                   </tbody>
                 </table>
+              )}
+            </section>
+
+            <section className="section">
+              <div className="section-head">
+                <span className="section-num">02</span>
+                <h2 className="section-title">Summary of the day</h2>
+                {daily.date && <span className="section-note">{fmtDay(daily.date)}</span>}
+              </div>
+              {daily.headline && <p className="tw-headline">{daily.headline}</p>}
+              {daily.items.length === 0 ? (
+                <p className="muted">No summary for the latest run.</p>
+              ) : (
+                <div className="tw-daily">
+                  {daily.items.map((it) => (
+                    <DailyItem
+                      key={it.theme}
+                      item={it}
+                      tweetById={tweetById}
+                      renderedIds={renderedIds}
+                    />
+                  ))}
+                </div>
               )}
             </section>
 
@@ -496,12 +511,12 @@ export function TwitterMonitor({
               <table className="tw-table tw-tweets-table">
                 <thead>
                   <tr>
+                    <th className="tw-link-col">Post</th>
                     <th>Author</th>
                     <th>Summary</th>
                     <th>Tickers</th>
                     <th className="r">Views</th>
                     <th className="r">Date</th>
-                    <th className="r">Link</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -539,10 +554,40 @@ function DailyItem({
     .slice(0, 4);
   const jumpable = item.tweet_ids.filter((id) => renderedIds.has(id));
 
+  // Prefer the numbered-points shape (key takeaways + lettered sub-details);
+  // fall back to the legacy single-paragraph summary for older data.
+  const points =
+    item.points && item.points.length > 0
+      ? item.points
+      : item.summary
+      ? [{ text: item.summary }]
+      : [];
+  // A lone takeaway with no sub-details reads better as a plain paragraph than
+  // as a one-item "1." list.
+  const asParagraph =
+    points.length === 1 && !(points[0].details && points[0].details.length > 0);
+
   return (
     <div className="tw-daily-item">
       <div className="tw-daily-label">{item.label}</div>
-      <p className="tw-daily-text">{item.summary}</p>
+      {asParagraph ? (
+        <p className="tw-daily-text">{points[0].text}</p>
+      ) : (
+        <ol className="tw-daily-points">
+          {points.map((pt, pi) => (
+            <li key={pi} className="tw-daily-point">
+              {pt.text}
+              {pt.details && pt.details.length > 0 && (
+                <ol className="tw-daily-subs">
+                  {pt.details.map((s, si) => (
+                    <li key={si}>{s}</li>
+                  ))}
+                </ol>
+              )}
+            </li>
+          ))}
+        </ol>
+      )}
       {charts.length > 0 && (
         <div className="tw-daily-charts">
           {charts.map(({ url, tweet }) => (
@@ -599,6 +644,18 @@ function RecurCard({ r }: { r: RecurringTopic }) {
 function TweetRow({ t }: { t: Tweet }) {
   return (
     <tr id={`tw-${t.id}`} className={cx(t.portfolio.length > 0 && "tw-row-port")}>
+      <td className="tw-link-col">
+        <a
+          className="tw-x-link"
+          href={t.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open the post on X"
+          aria-label="Open the post on X"
+        >
+          <XLogo />
+        </a>
+      </td>
       <td className="tw-author">
         <a href={`https://x.com/${t.handle}`} target="_blank" rel="noopener noreferrer">
           @{t.handle}
@@ -625,18 +682,6 @@ function TweetRow({ t }: { t: Tweet }) {
       </td>
       <td className="r mono">{fmtViews(t.views)}</td>
       <td className="r mono">{fmtDay(t.posted_at || t.first_seen)}</td>
-      <td className="r">
-        <a
-          className="tw-x-link"
-          href={t.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Open the post on X"
-          aria-label="Open the post on X"
-        >
-          <XLogo />
-        </a>
-      </td>
     </tr>
   );
 }
