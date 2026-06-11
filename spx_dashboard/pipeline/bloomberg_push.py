@@ -440,14 +440,6 @@ def historical_closes(
     return out
 
 
-def close_on_or_before(rows: list[tuple[dt.date, float]], target: dt.date) -> float | None:
-    best = None
-    for d, px in rows:
-        if d <= target:
-            best = px
-    return best
-
-
 def windowed_closes(
     session: blpapi.Session, securities: list[str], anchor: dt.date, cushion: int = 10
 ) -> dict[str, tuple[dt.date, float]]:
