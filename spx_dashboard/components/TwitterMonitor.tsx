@@ -13,6 +13,10 @@ import {
 
 const ADD_KEY = "xthemes:followed:add";
 const REMOVE_KEY = "xthemes:followed:remove";
+// "Latest tweets" window: the runs fire Mon/Wed/Fri, so a few days covers the
+// gap since the last one; the cap keeps the table to a glanceable ~20.
+const RECENT_DAYS = 4;
+const MAX_RECENT = 20;
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const norm = (h: string) => h.trim().toLowerCase().replace(/^@/, "");
@@ -45,16 +49,6 @@ function fmtViews(v: number | null): string {
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1_000) return `${(v / 1_000).toFixed(1)}k`;
   return String(v);
-}
-
-function fmtMove(v: number | null | undefined): string {
-  if (v == null) return "—";
-  return `${v > 0 ? "+" : ""}${v.toFixed(1)}%`;
-}
-
-function moveClass(v: number | null | undefined): string {
-  if (v == null) return "tw-move-na";
-  return v >= 0 ? "tw-move-up" : "tw-move-down";
 }
 
 export function TwitterMonitor({
@@ -193,11 +187,12 @@ export function TwitterMonitor({
   }, [data.tweets]);
 
   // The tweet table shows the 80 most recent posts, newest first — PLUS any
-  // tweet referenced by the daily summary or recurring topics, so every
-  // "See post" anchor below always resolves to a rendered row.
+  // The tweet table shows the last few days of posts (aiming for ~20, not the
+  // whole store) — PLUS any tweet referenced by the daily summary or recurring
+  // topics, so every "See post" anchor below always resolves to a rendered row.
   const recentTweets = useMemo(() => {
-    const byTime = (a: Tweet, b: Tweet) =>
-      (b.posted_at || b.first_seen || "").localeCompare(a.posted_at || a.first_seen || "");
+    const stamp = (t: Tweet) => t.posted_at || t.first_seen || "";
+    const byTime = (a: Tweet, b: Tweet) => stamp(b).localeCompare(stamp(a));
     const sorted = [...data.tweets].sort(byTime);
 
     const referenced = new Set<string>();
@@ -208,11 +203,29 @@ export function TwitterMonitor({
       (r.tweet_ids || []).forEach((id) => referenced.add(id)),
     );
 
-    const top = sorted.slice(0, 80);
+    // Keep posts from the trailing RECENT_DAYS window, then cap at MAX_RECENT.
+    const newest = sorted[0] ? stamp(sorted[0]).slice(0, 10) : "";
+    let cutoff = "";
+    if (newest) {
+      const d = new Date(newest);
+      d.setUTCDate(d.getUTCDate() - RECENT_DAYS);
+      cutoff = d.toISOString().slice(0, 10);
+    }
+    const windowed = cutoff
+      ? sorted.filter((t) => stamp(t).slice(0, 10) >= cutoff)
+      : sorted;
+    const top = windowed.slice(0, MAX_RECENT);
+
     const shown = new Set(top.map((t) => t.id));
     const extras = sorted.filter((t) => referenced.has(t.id) && !shown.has(t.id));
     return [...top, ...extras].sort(byTime);
   }, [data.tweets, data.daily_summary, data.recurring]);
+
+  const recentDays = useMemo(() => {
+    const days = new Set(recentTweets.map((t) => (t.posted_at || t.first_seen || "").slice(0, 10)));
+    days.delete("");
+    return days.size;
+  }, [recentTweets]);
 
   const renderedIds = useMemo(
     () => new Set(recentTweets.map((t) => t.id)),
@@ -310,6 +323,7 @@ export function TwitterMonitor({
                 {asOf ? `as of ${asOf}` : "awaiting first run"}
               </span>{" "}
               · {recentTweets.length} recent {recentTweets.length === 1 ? "tweet" : "tweets"}
+              {recentDays > 0 ? ` · last ${recentDays} ${recentDays === 1 ? "day" : "days"}` : ""}
             </p>
           </div>
           <div className="header-actions">
@@ -387,38 +401,31 @@ export function TwitterMonitor({
                       <th>Ticker</th>
                       <th>Company</th>
                       <th>Mentions</th>
-                      <th className="r">1W move</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {portfolioHits.map(({ disp, tweets }) => {
-                      const base = disp.split(" ")[0];
-                      return (
-                        <tr key={disp}>
-                          <td>
-                            <Link href="/dashboard" className="tw-ticker" title="Open in Equities Dashboard">
-                              {disp}
-                            </Link>
-                          </td>
-                          <td className="tw-name">{PORTFOLIO_NAMES[disp] ?? ""}</td>
-                          <td>
-                            {tweets.map((t) => (
-                              <a
-                                key={t.id}
-                                href={`#tw-${t.id}`}
-                                className="tw-see-post"
-                                title={t.summary || `Jump to @${t.handle}'s post`}
-                              >
-                                @{t.handle} ↓
-                              </a>
-                            ))}
-                          </td>
-                          <td className={cx("r mono", moveClass(data.ticker_moves[base]))}>
-                            {fmtMove(data.ticker_moves[base])}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {portfolioHits.map(({ disp, tweets }) => (
+                      <tr key={disp}>
+                        <td>
+                          <Link href="/dashboard" className="tw-ticker" title="Open in Equities Dashboard">
+                            {disp}
+                          </Link>
+                        </td>
+                        <td className="tw-name">{PORTFOLIO_NAMES[disp] ?? ""}</td>
+                        <td>
+                          {tweets.map((t) => (
+                            <a
+                              key={t.id}
+                              href={`#tw-${t.id}`}
+                              className="tw-see-post"
+                              title={t.summary || `Jump to @${t.handle}'s post`}
+                            >
+                              @{t.handle} ↓
+                            </a>
+                          ))}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               )}
@@ -444,7 +451,8 @@ export function TwitterMonitor({
                 <span className="section-num">·</span>
                 <h2 className="section-title">Latest tweets</h2>
                 <span className="section-note">
-                  {recentTweets.length} from the latest run · hover a summary for the full text
+                  {recentTweets.length} from the last {recentDays || 1}{" "}
+                  {recentDays === 1 ? "day" : "days"} · hover a summary for the full text
                 </span>
               </div>
               <table className="tw-table tw-tweets-table">
@@ -587,15 +595,27 @@ function TweetRow({ t }: { t: Tweet }) {
       <td className="r mono">{fmtDay(t.posted_at || t.first_seen)}</td>
       <td className="r">
         <a
-          className="tw-see-post"
+          className="tw-x-link"
           href={t.url}
           target="_blank"
           rel="noopener noreferrer"
-          title="Open the tweet on X"
+          title="Open the post on X"
+          aria-label="Open the post on X"
         >
-          See post ↗
+          <XLogo />
         </a>
       </td>
     </tr>
+  );
+}
+
+function XLogo() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+      />
+    </svg>
   );
 }

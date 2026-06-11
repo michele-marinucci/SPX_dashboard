@@ -2319,6 +2319,17 @@ thead .row-head {
   text-decoration: none;
 }
 
+/* X logo link in the tweet table — monochrome, brightens on hover. */
+.tw-x-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  opacity: 0.75;
+  transition: opacity 0.12s;
+}
+.tw-x-link:hover { opacity: 1; }
+
 .tw-recur-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
