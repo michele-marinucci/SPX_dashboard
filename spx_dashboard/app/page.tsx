@@ -99,23 +99,8 @@ export default function HomePage() {
         </div>
       </Link>
 
-      <Link href="/dashboard" className="hub-row wip">
-        <div className="hub-idx">03</div>
-        <div>
-          <div className="rname">Equities Dashboard</div>
-          <p className="rdesc">
-            A consolidated view of the equities book — positions, exposures, and
-            performance in one place.
-          </p>
-        </div>
-        <div>
-          <span className="wiptag">Work in progress</span>
-        </div>
-        <div className="prev">Preview →</div>
-      </Link>
-
       <Link href="/diligence" className="hub-row live">
-        <div className="hub-idx">04</div>
+        <div className="hub-idx">03</div>
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
@@ -148,38 +133,8 @@ export default function HomePage() {
         </div>
       </Link>
 
-      <Link href="/podcast" className="hub-row wip">
-        <div className="hub-idx">05</div>
-        <div>
-          <div className="rname">Podcast Creator</div>
-          <p className="rdesc">
-            Turn research and ideas into a narrated audio briefing you can listen
-            to on the go.
-          </p>
-        </div>
-        <div>
-          <span className="wiptag">Work in progress</span>
-        </div>
-        <div className="prev">Preview →</div>
-      </Link>
-
-      <Link href="/insider" className="hub-row wip">
-        <div className="hub-idx">06</div>
-        <div>
-          <div className="rname">Insider Selling</div>
-          <p className="rdesc">
-            Track insider sell transactions across the universe — who&apos;s
-            selling, how much, and when.
-          </p>
-        </div>
-        <div>
-          <span className="wiptag">Work in progress</span>
-        </div>
-        <div className="prev">Preview →</div>
-      </Link>
-
       <Link href="/morning-news" className="hub-row live">
-        <div className="hub-idx">07</div>
+        <div className="hub-idx">04</div>
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
@@ -210,6 +165,51 @@ export default function HomePage() {
             →
           </span>
         </div>
+      </Link>
+
+      <Link href="/dashboard" className="hub-row wip">
+        <div className="hub-idx">05</div>
+        <div>
+          <div className="rname">Equities Dashboard</div>
+          <p className="rdesc">
+            A consolidated view of the equities book — positions, exposures, and
+            performance in one place.
+          </p>
+        </div>
+        <div>
+          <span className="wiptag">Work in progress</span>
+        </div>
+        <div className="prev">Preview →</div>
+      </Link>
+
+      <Link href="/podcast" className="hub-row wip">
+        <div className="hub-idx">06</div>
+        <div>
+          <div className="rname">Podcast Creator</div>
+          <p className="rdesc">
+            Turn research and ideas into a narrated audio briefing you can listen
+            to on the go.
+          </p>
+        </div>
+        <div>
+          <span className="wiptag">Work in progress</span>
+        </div>
+        <div className="prev">Preview →</div>
+      </Link>
+
+      <Link href="/insider" className="hub-row wip">
+        <div className="hub-idx">07</div>
+        <div>
+          <div className="rname">Insider Selling</div>
+          <p className="rdesc">
+            Track insider sell transactions across the universe — who&apos;s
+            selling, how much, and when.
+          </p>
+        </div>
+        <div>
+          <span className="wiptag">Work in progress</span>
+        </div>
+        <div className="prev">Preview →</div>
       </Link>
 
       <div className="hub-foot">
