@@ -135,7 +135,17 @@ def _summarize(newsletters: list[dict], positions: list[str]) -> dict:
         messages=[{"role": "user", "content": user_content}],
     )
 
-    raw = response.content[0].text.strip()
+    # The response may contain thinking blocks before the text block, so pick
+    # the text block(s) explicitly rather than assuming content[0].
+    raw = "".join(
+        getattr(block, "text", "") for block in response.content
+    ).strip()
+    # Tolerate a ```json … ``` fence if the model adds one.
+    if raw.startswith("```"):
+        raw = raw.split("```", 2)[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+        raw = raw.strip()
     return json.loads(raw)
 
 
