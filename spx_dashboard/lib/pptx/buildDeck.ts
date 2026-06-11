@@ -4,161 +4,33 @@ import pptxgen from "pptxgenjs";
 
 import { getDashboard, ThreeDateTable, GrowthTable, NtmPeTableData } from "@/lib/data";
 import { getTwitterData } from "@/lib/tweets";
-import { getDiligenceLinks } from "@/lib/diligence";
-import { seedCompanies } from "@/lib/equities/seed";
 import type { MorningNote } from "@/app/morning-news/page";
 import morningNewsRaw from "@/data/morning_news.json";
+import { addEquitiesSlides } from "./equitiesSlides";
+import {
+  BRAND,
+  CONTENT_W,
+  INK,
+  MARGIN,
+  MUTED,
+  Row,
+  cols,
+  dividerSlide,
+  num,
+  paginatedTable,
+  pct,
+  sectionSlide,
+  signed,
+} from "./common";
 
 // ---------------------------------------------------------------------------
 // Deterministic "Export All to PPT": one PowerPoint built straight from the
-// committed data of every live tool. No LLM — the same inputs always produce
-// the same deck.
+// committed data of every live tool (Equities priced off prior-day closes).
+// No LLM — the same inputs always produce the same deck. A brand divider
+// introduces each section. The Diligence Tracker is intentionally skipped.
 // ---------------------------------------------------------------------------
 
-const BRAND = "3730E6";
-const INK = "1A1A22";
-const MUTED = "71717F";
-const LINE = "E2E2EA";
-const HEADER_TXT = "FFFFFF";
-
-// ---- number formatting ----------------------------------------------------- //
-function num(v: number | null | undefined, digits = 0): string {
-  if (v == null || Number.isNaN(v)) return "—";
-  return v.toLocaleString("en-US", {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  });
-}
-function signed(v: number | null | undefined, digits = 0): string {
-  if (v == null || Number.isNaN(v)) return "—";
-  const s = num(Math.abs(v), digits);
-  return v < 0 ? `(${s})` : v > 0 ? `+${s}` : s;
-}
-function pct(v: number | null | undefined, digits = 1): string {
-  if (v == null || Number.isNaN(v)) return "—";
-  return `${v >= 0 ? "+" : ""}${v.toLocaleString("en-US", {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  })}%`;
-}
-function latestYearVal(map: Record<string, number> | undefined): number | null {
-  if (!map) return null;
-  const years = Object.keys(map)
-    .map(Number)
-    .filter((n) => !Number.isNaN(n))
-    .sort((a, b) => a - b);
-  if (!years.length) return null;
-  const v = map[String(years[years.length - 1])];
-  return typeof v === "number" ? v : null;
-}
-
-type Cell = string | { text: string; options?: pptxgen.TableCellProps };
-type Row = Cell[];
-
-// ---------------------------------------------------------------------------
-// Slide scaffolding
-// ---------------------------------------------------------------------------
-const PAGE_W = 13.33; // LAYOUT_WIDE inches
-const MARGIN = 0.5;
-const CONTENT_W = PAGE_W - MARGIN * 2;
-
-function sectionSlide(
-  pptx: pptxgen,
-  title: string,
-  subtitle: string,
-): pptxgen.Slide {
-  const slide = pptx.addSlide();
-  slide.background = { color: "FFFFFF" };
-  slide.addShape(pptx.ShapeType.rect, {
-    x: 0,
-    y: 0,
-    w: 0.18,
-    h: 7.5,
-    fill: { color: BRAND },
-    line: { type: "none" },
-  });
-  slide.addText(title, {
-    x: MARGIN,
-    y: 0.32,
-    w: CONTENT_W - 1.2,
-    h: 0.55,
-    fontFace: "Arial",
-    fontSize: 24,
-    bold: true,
-    color: INK,
-  });
-  slide.addText(subtitle, {
-    x: MARGIN,
-    y: 0.86,
-    w: CONTENT_W - 1.2,
-    h: 0.3,
-    fontFace: "Arial",
-    fontSize: 11,
-    color: MUTED,
-  });
-  return slide;
-}
-
-function toCell(c: Cell): pptxgen.TableCell {
-  return typeof c === "string" ? { text: c } : { text: c.text, options: c.options };
-}
-
-function chunk<T>(arr: T[], size: number): T[][] {
-  if (arr.length === 0) return [[]];
-  const out: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
-}
-
-// Deterministic table rendering with manual pagination: rows are split into
-// fixed-size pages (header repeated on each) so we never rely on pptxgenjs's
-// auto-pagination, which over-splits. One section slide per page.
-function paginatedTable(
-  pptx: pptxgen,
-  title: string,
-  subtitle: string,
-  header: string[],
-  body: Row[],
-  opts: { colW?: number[]; rowsPerPage?: number; fontSize?: number } = {},
-) {
-  const { colW, rowsPerPage = 20, fontSize = 9 } = opts;
-  const pages = chunk(body, rowsPerPage);
-  const headRow: Row = header.map((h) => ({
-    text: h,
-    options: {
-      bold: true,
-      color: HEADER_TXT,
-      fill: { color: BRAND },
-      align: "center" as const,
-      valign: "middle" as const,
-    },
-  }));
-  pages.forEach((rows, i) => {
-    const sub = pages.length > 1 ? `${subtitle}  (${i + 1}/${pages.length})` : subtitle;
-    const slide = sectionSlide(pptx, title, sub);
-    const trows: pptxgen.TableRow[] = [headRow, ...rows].map((r) => r.map(toCell));
-    slide.addTable(trows, {
-      x: MARGIN,
-      y: 1.3,
-      w: CONTENT_W,
-      colW,
-      fontFace: "Arial",
-      fontSize,
-      color: INK,
-      border: { type: "solid", color: LINE, pt: 0.5 },
-      align: "right",
-      valign: "middle",
-      margin: [2, 4, 2, 4],
-    });
-  });
-}
-
-// Column widths: a fixed label column, the rest split evenly across CONTENT_W.
-function cols(labelW: number, n: number): number[] {
-  const even = (CONTENT_W - labelW) / n;
-  return [labelW, ...Array(n).fill(even)];
-}
-
+// ---- shared bullet block --------------------------------------------------- //
 function bullets(slide: pptxgen.Slide, items: { title?: string; body: string }[]) {
   const runs: pptxgen.TextProps[] = [];
   items.forEach((it) => {
@@ -189,9 +61,7 @@ function bullets(slide: pptxgen.Slide, items: { title?: string; body: string }[]
   });
 }
 
-// ---------------------------------------------------------------------------
-// Tool sections
-// ---------------------------------------------------------------------------
+// ---- SPX Monitor (Aggregate S&P 500 only) ---------------------------------- //
 function rowFill(cells: Row, r: { is_total: boolean }) {
   if (r.is_total)
     cells.forEach(
@@ -202,18 +72,9 @@ function rowFill(cells: Row, r: { is_total: boolean }) {
 }
 
 function threeDateTableSlide(pptx: pptxgen, t: ThreeDateTable, title: string, digits: number) {
-  const header = [
-    "",
-    ...t.dates.map((d) => `${d}`),
-    "$Δ YTD",
-    "$Δ QTD",
-    "%Δ YTD",
-    "%Δ QTD",
-  ];
+  const header = ["", ...t.dates.map((d) => `${d}`), "$Δ YTD", "$Δ QTD", "%Δ YTD", "%Δ QTD"];
   const body: Row[] = t.rows.map((r) => {
-    const cells: Row = [
-      { text: r.label, options: { align: "left", bold: r.is_total } },
-    ];
+    const cells: Row = [{ text: r.label, options: { align: "left", bold: r.is_total } }];
     r.values.forEach((v) => cells.push(num(v, digits)));
     cells.push(signed(r.delta_abs[0], digits));
     cells.push(signed(r.delta_abs[1], digits));
@@ -222,7 +83,7 @@ function threeDateTableSlide(pptx: pptxgen, t: ThreeDateTable, title: string, di
     rowFill(cells, r);
     return cells;
   });
-  paginatedTable(pptx, "SPX Monitor", title, header, body, {
+  paginatedTable(pptx, "SPX Monitor · Aggregate S&P 500", title, header, body, {
     colW: cols(3.0, header.length - 1),
   });
 }
@@ -236,7 +97,7 @@ function growthTableSlide(pptx: pptxgen, t: GrowthTable) {
     rowFill(cells, r);
     return cells;
   });
-  paginatedTable(pptx, "SPX Monitor", `Earnings Growth · ${t.value_label}`, header, body, {
+  paginatedTable(pptx, "SPX Monitor · Aggregate S&P 500", `Earnings Growth · ${t.value_label}`, header, body, {
     colW: cols(3.0, header.length - 1),
   });
 }
@@ -252,11 +113,12 @@ function ntmPeSlide(pptx: pptxgen, t: NtmPeTableData) {
     rowFill(cells, r);
     return cells;
   });
-  paginatedTable(pptx, "SPX Monitor", t.title || "NTM P/E", header, body, {
+  paginatedTable(pptx, "SPX Monitor · Aggregate S&P 500", t.title || "NTM P/E", header, body, {
     colW: cols(3.0, header.length - 1),
   });
 }
 
+// ---- Twitter Monitor ------------------------------------------------------- //
 function twitterSection(pptx: pptxgen) {
   const d = getTwitterData();
   const when = d.generated_at ? new Date(d.generated_at).toLocaleDateString("en-US") : "";
@@ -280,24 +142,7 @@ function twitterSection(pptx: pptxgen) {
   }
 }
 
-function diligenceSection(pptx: pptxgen) {
-  const links = getDiligenceLinks();
-  const header = ["Ticker", "Name", "Microsoft List"];
-  const body: Row[] = links.map((l) => [
-    { text: l.ticker, options: { align: "left", bold: true } },
-    { text: l.name || "—", options: { align: "left" } },
-    { text: l.url, options: { align: "left", color: BRAND, fontSize: 8, hyperlink: { url: l.url } } },
-  ]);
-  paginatedTable(
-    pptx,
-    "Diligence Tracker",
-    `${links.length} position${links.length === 1 ? "" : "s"} · Microsoft Lists`,
-    header,
-    body,
-    { colW: [1.4, 3.4, CONTENT_W - 4.8], rowsPerPage: 18 },
-  );
-}
-
+// ---- Morning News Summary -------------------------------------------------- //
 function morningNewsSection(pptx: pptxgen) {
   const notes = morningNewsRaw as MorningNote[];
   if (!notes?.length) return;
@@ -352,35 +197,7 @@ function morningNewsSection(pptx: pptxgen) {
   }
 }
 
-function equitiesSection(pptx: pptxgen) {
-  const companies = seedCompanies().filter((c) => !c.removed && !c.is_index);
-  if (!companies.length) return;
-  const header = ["Ticker", "Name", "Group", "Status", "Variant", "Tgt Mult"];
-  const status = (p: number | null) => (p === 1 ? "Owned" : p === 2 ? "Watch" : "—");
-  const sorted = [...companies].sort(
-    (a, b) => a.grp_order - b.grp_order || a.row_order - b.row_order,
-  );
-  const body: Row[] = sorted.map((c) => [
-    { text: c.ticker, options: { align: "left", bold: true } },
-    { text: c.bbg || "—", options: { align: "left" } },
-    { text: c.grp || "—", options: { align: "left" } },
-    { text: status(c.port), options: { align: "left" } },
-    { text: c.variant.toUpperCase(), options: { align: "left" } },
-    num(latestYearVal(c.model.target_mult), 1),
-  ]);
-  paginatedTable(
-    pptx,
-    "Equities Dashboard",
-    `${companies.length} names · model snapshot`,
-    header,
-    body,
-    { colW: [1.5, 3.2, 3.0, 1.3, 1.3, CONTENT_W - 10.3], rowsPerPage: 20 },
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Title slide + assembly
-// ---------------------------------------------------------------------------
+// ---- title ----------------------------------------------------------------- //
 function titleSlide(pptx: pptxgen) {
   const slide = pptx.addSlide();
   slide.background = { color: "FFFFFF" };
@@ -432,7 +249,12 @@ export async function buildHubDeck(): Promise<Buffer> {
 
   titleSlide(pptx);
 
-  // SPX Monitor — aggregate tables.
+  // 1) Equities Dashboard — most important, up front. Two screens.
+  dividerSlide(pptx, "Equities Dashboard", "Valuation, IRRs & decomposition · prior-day closes");
+  await addEquitiesSlides(pptx, new Date());
+
+  // 2) SPX Monitor — Aggregate S&P 500 only.
+  dividerSlide(pptx, "SPX Monitor", "Aggregate S&P 500");
   const t = getDashboard().tables;
   threeDateTableSlide(pptx, t.stock_performance, "Stock Performance · Market cap ($b)", 0);
   growthTableSlide(pptx, t.earnings_growth);
@@ -440,10 +262,13 @@ export async function buildHubDeck(): Promise<Buffer> {
   threeDateTableSlide(pptx, t.est_rev_2027, "Estimate Revisions · 2027 ($b)", 1);
   ntmPeSlide(pptx, t.ntm_pe);
 
+  // 3) Twitter Monitor.
+  dividerSlide(pptx, "Twitter Monitor", "Daily summary & recurring topics");
   twitterSection(pptx);
-  diligenceSection(pptx);
+
+  // 4) Morning News Summary.
+  dividerSlide(pptx, "Morning News Summary", "Pre-market digest");
   morningNewsSection(pptx);
-  equitiesSection(pptx);
 
   const out = (await pptx.write({ outputType: "nodebuffer" })) as Buffer;
   return out;
