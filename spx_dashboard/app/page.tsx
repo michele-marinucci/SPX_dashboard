@@ -2,8 +2,9 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getGeneratedAtLabel, getTweetCount } from "@/lib/tweets";
 
-// The post-login launcher (Ledger "hub"): one ledger row per tool. Three are
-// live (SPX Monitor, Twitter Monitor, Diligence Tracker); the rest are WIP.
+// The post-login launcher (Ledger "hub"): one ledger row per tool. Four are
+// live (SPX Monitor, Twitter Monitor, Diligence Tracker, Morning News); the
+// rest are WIP.
 export default function HomePage() {
   const tweets = getTweetCount();
   const asOf = getGeneratedAtLabel();
@@ -177,24 +178,43 @@ export default function HomePage() {
         <div className="prev">Preview →</div>
       </Link>
 
-      <Link href="/morning-news" className="hub-row wip">
+      <Link href="/morning-news" className="hub-row live">
         <div className="hub-idx">07</div>
         <div>
-          <div className="rname">Morning News Summary</div>
+          <div className="rname">
+            <span className="livedot" aria-hidden="true" />
+            Morning News Summary
+          </div>
           <p className="rdesc">
             A pre-market digest of overnight headlines and the news that moves
             your names, summarized each morning.
           </p>
         </div>
-        <div>
-          <span className="wiptag">Work in progress</span>
+        <div className="stats">
+          <div className="stat">
+            <span className="k">STATUS</span>
+            <span className="v on">LIVE</span>
+          </div>
+          <div className="stat">
+            <span className="k">CADENCE</span>
+            <span className="v">PRE-MARKET</span>
+          </div>
+          <div className="stat">
+            <span className="k">UPDATED</span>
+            <span className="v">DAILY</span>
+          </div>
         </div>
-        <div className="prev">Preview →</div>
+        <div className="cta">
+          Open
+          <span className="arr" aria-hidden="true">
+            →
+          </span>
+        </div>
       </Link>
 
       <div className="hub-foot">
         <span>{asOf ? `TWITTER MONITOR AS OF ${asOf}` : "TWITTER MONITOR"}</span>
-        <span>7 MODULES · 3 LIVE</span>
+        <span>7 MODULES · 4 LIVE</span>
       </div>
     </div>
   );
