@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
-import { PrintAllButton } from "@/components/PrintAllButton";
+import { ExportPptButton } from "@/components/ExportPptButton";
 import { TodayDate } from "@/components/TodayDate";
 import { getGeneratedAtLabel, getTweetCount } from "@/lib/tweets";
 
@@ -16,7 +16,7 @@ export default function HomePage() {
       <div className="hub-top">
         <img src="/meritage-logo.png" alt="Meritage" className="hub-logo" />
         <div className="hub-right">
-          <PrintAllButton />
+          <ExportPptButton />
           <LogoutButton />
         </div>
       </div>
