@@ -910,7 +910,7 @@ thead .row-head {
   width: auto;
   display: block;
 }
-.print-all-btn {
+.export-ppt-btn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -925,10 +925,10 @@ thead .row-head {
   cursor: pointer;
   transition: opacity 0.14s, background 0.14s;
 }
-.print-all-btn:hover {
+.export-ppt-btn:hover {
   opacity: 0.9;
 }
-.print-all-btn:disabled {
+.export-ppt-btn:disabled {
   opacity: 0.55;
   cursor: default;
 }
@@ -3188,88 +3188,4 @@ thead .row-head {
 .hub-row.wip .rdesc {
   font-size: 12px;
   margin-top: 2px;
-}
-
-/* ---------- Combined print view (/print) ---------- */
-.printpage {
-  max-width: 100%;
-  margin: 0 auto;
-}
-.printpage-bar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--line);
-  position: sticky;
-  top: 0;
-  background: var(--bg, #fff);
-  z-index: 5;
-}
-.printpage-status {
-  flex: 1;
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 12px;
-  color: var(--muted);
-  letter-spacing: 0.3px;
-}
-.printpage-frame {
-  width: 100%;
-}
-.printpage-frame iframe {
-  width: 100%;
-  border: 0;
-  display: block;
-  min-height: 200px;
-}
-
-/* ---------- Print rules (direct print + /print iframes) ---------- */
-@media print {
-  /* Strip interactive chrome so the printout is just the data. These rules
-     apply inside the same-origin /print iframes too, since they share this CSS. */
-  .accent-bar,
-  .sidebar,
-  .header-actions,
-  .howto,
-  .howto-reopen,
-  .logout-btn,
-  .print-all-btn,
-  .btn-export,
-  .back-link,
-  .news-toolbar,
-  .news-page-actions,
-  .news-date-picker-wrap,
-  .news-cal-popup,
-  .handles,
-  .hub-top,
-  .printpage-bar {
-    display: none !important;
-  }
-
-  /* Sidebar shells collapse to a single full-width column when printing. */
-  .shell {
-    display: block !important;
-  }
-  .content {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-  }
-
-  /* Each tool starts on a fresh sheet in the combined view. */
-  .printpage-frame {
-    break-after: page;
-    page-break-after: always;
-  }
-  .printpage-frame:last-child {
-    break-after: auto;
-    page-break-after: auto;
-  }
-  .printpage-frame iframe {
-    height: auto !important;
-  }
-
-  body {
-    background: #fff !important;
-  }
 }
