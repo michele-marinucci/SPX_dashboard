@@ -3,21 +3,16 @@ import pptxgen from "pptxgenjs";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { loadCompanies, loadQuotes, latestDataDate } from "@/lib/equities/load";
 import { Company, Quote } from "@/lib/equities/types";
-import {
-  BRAND,
-  CONTENT_W,
-  INK,
-  MARGIN,
-  MUTED,
-  PAGE_H,
-  Row,
-  toCell,
-} from "./common";
+import { BRAND, CONTENT_W, INK, MARGIN, MUTED, PAGE_H } from "./common";
 
 // Faithful PowerPoint of the Equities Dashboard — the two screens the web page
 // shows (Valuation/IRR "Summary" and the "IRR Decomp"), same columns, same
 // Excel-style heatmaps and owned-name shading, ordered by the 2028 IRR within
 // each sector, priced off the prior-day closes the page itself uses.
+//
+// Geometry note: every row gets an explicit height sized so the whole table
+// fits the 7.5" slide — PowerPoint only honors row heights as minimums, so the
+// font sizes are chosen to fit inside them.
 
 // ---- heatmaps (ported 1:1 from components/EquitiesApp.tsx) ----------------- //
 type RGB = [number, number, number];
@@ -28,9 +23,10 @@ const WHITE: RGB = [255, 255, 255];
 const OWNED = "D9EFDC"; // .eq-tick-own
 const BLUE = "1D4ED8"; // .eq-blue
 const NA = "A6A6B2"; // .eq-na faint
+const GRP_FILL = "F2F2F6";
 
 function hex(c: RGB): string {
-  return c.map((x) => Math.round(x).toString(16).padStart(2, "0")).join("");
+  return c.map((x) => Math.round(x).toString(16).padStart(2, "0")).join("").toUpperCase();
 }
 function mix(a: RGB, b: RGB, t: number): RGB {
   const u = Math.max(0, Math.min(1, t));
@@ -65,7 +61,7 @@ function fpx(v: number | null | undefined, ccy: string): string {
   return `${ccy}${s}`;
 }
 
-// A compact slide header (title + subtitle) leaving the most room for a table.
+// A very compact slide header, leaving maximum room for the table.
 function eqSlide(pptx: pptxgen, title: string, subtitle: string): pptxgen.Slide {
   const slide = pptx.addSlide();
   slide.background = { color: "FFFFFF" };
@@ -79,27 +75,31 @@ function eqSlide(pptx: pptxgen, title: string, subtitle: string): pptxgen.Slide 
   });
   slide.addText(title, {
     x: MARGIN,
-    y: 0.16,
-    w: CONTENT_W,
-    h: 0.42,
+    y: 0.1,
+    w: 7.5,
+    h: 0.34,
     fontFace: "Arial",
-    fontSize: 20,
+    fontSize: 16,
     bold: true,
     color: INK,
   });
   slide.addText(subtitle, {
-    x: MARGIN,
-    y: 0.58,
-    w: CONTENT_W,
+    x: 8.1,
+    y: 0.14,
+    w: PAGE_W_SAFE - 8.1,
     h: 0.3,
     fontFace: "Arial",
-    fontSize: 10,
+    fontSize: 8.5,
     color: MUTED,
+    align: "right",
   });
   return slide;
 }
+const PAGE_W_SAFE = 13.33 - 0.25;
 
-function cell(text: string, opts: pptxgen.TableCellProps = {}): { text: string; options: pptxgen.TableCellProps } {
+type TCell = pptxgen.TableCell;
+
+function cell(text: string, opts: pptxgen.TableCellProps = {}): TCell {
   return { text, options: opts };
 }
 function naIf(s: string, base: pptxgen.TableCellProps): pptxgen.TableCellProps {
@@ -167,61 +167,80 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
   const dataDate = latestDataDate(quotes);
   const priceNote = dataDate
     ? `Prices as of prior close ${dataDate}`
-    : enabled
-      ? "Prices as of prior close"
-      : "Read-only snapshot · live prices shown in the app";
+    : "Prices as of prior close";
 
   buildValSlide();
   buildDecompSlide();
 
   // ---- Summary (Valuation / IRR) screen ------------------------------------ //
   function buildValSlide() {
-    const COLS = 22;
     const slide = eqSlide(
       pptx,
       "Equities Dashboard — Summary",
       `${stocks.length} names · ${stocks.filter((c) => c.port === 1).length} owned · ${priceNote}`,
     );
 
-    const grpHdr = (label: string): pptxgen.TableCell =>
-      ({ text: label, options: { colspan: COLS, bold: true, color: INK, align: "left", fill: { color: "F2F2F6" }, fontSize: 7 } });
-
-    const h1: pptxgen.TableCell[] = [
-      hCell(""),
-      hCell(""),
-      hCell("EV / GP", 2),
-      hCell("Mendo P/E", 5),
-      hCell("Target Mult (GP or P/E)", 3),
-      hCell("IRR", 3),
-      hCell("MoM", 4),
-      hCell("Recent Performance", 3),
+    const h1Opts: pptxgen.TableCellProps = {
+      bold: true,
+      color: "FFFFFF",
+      fill: { color: BRAND },
+      align: "center",
+      valign: "middle",
+      fontSize: 6.5,
+    };
+    const h1: TCell[] = [
+      cell("", h1Opts),
+      cell("", h1Opts),
+      cell("EV / GP", { ...h1Opts, colspan: 2 }),
+      cell("Mendo P/E", { ...h1Opts, colspan: 5 }),
+      cell("Target Mult (GP or P/E)", { ...h1Opts, colspan: 3 }),
+      cell("IRR", { ...h1Opts, colspan: 3 }),
+      cell("MoM", { ...h1Opts, colspan: 4 }),
+      cell("Recent Performance", { ...h1Opts, colspan: 3 }),
     ];
-    const h2: pptxgen.TableCell[] = [
-      hCell("Company"),
-      hCell("Px"),
-      ...[y0, y1].map((y) => hCell(String(y))),
-      ...[y0, y1, y2, y3, y4].map((y) => hCell(String(y))),
-      ...[y1, y2, y3].map((y) => hCell(String(y))),
-      ...[y1, y2, y3].map((y) => hCell(String(y))),
-      ...[y0, y1, y2, y3].map((y) => hCell(String(y))),
-      hCell("1M"),
-      hCell("3M"),
-      hCell("6M"),
+    const h2Opts: pptxgen.TableCellProps = {
+      bold: true,
+      color: "FFFFFF",
+      fill: { color: BRAND },
+      align: "right",
+      valign: "middle",
+      fontSize: 6.5,
+    };
+    const h2: TCell[] = [
+      cell("Company", { ...h2Opts, align: "left" }),
+      cell("Px", h2Opts),
+      ...[y0, y1].map((y) => cell(String(y), h2Opts)),
+      ...[y0, y1, y2, y3, y4].map((y) => cell(String(y), h2Opts)),
+      ...[y1, y2, y3].map((y) => cell(String(y), h2Opts)),
+      ...[y1, y2, y3].map((y) => cell(String(y), h2Opts)),
+      ...[y0, y1, y2, y3].map((y) => cell(String(y), h2Opts)),
+      cell("1M", h2Opts),
+      cell("3M", h2Opts),
+      cell("6M", h2Opts),
     ];
 
     const rows: pptxgen.TableRow[] = [h1, h2];
 
-    const valRow = (c: Company): pptxgen.TableCell[] => {
+    const grpRow = (label: string): TCell[] => [
+      cell(label, { colspan: 22, bold: true, color: INK, align: "left", fill: { color: GRP_FILL }, fontSize: 6.5 }),
+    ];
+
+    const valRow = (c: Company): TCell[] => {
       const d = derived.get(c.ticker)!;
       const pf = perfOf(c);
-      const tickOpts: pptxgen.TableCellProps = {
-        align: "left",
-        bold: true,
-        fill: c.port === 1 ? { color: OWNED } : undefined,
-      };
-      const out: pptxgen.TableCell[] = [cell(c.ticker, tickOpts)];
-      out.push(cell(fpx(d.price, c.currency), naIf(fpx(d.price, c.currency), {})));
-      [y0, y1].forEach((y) => out.push(cell(fx(d.evGp[y]), naIf(fx(d.evGp[y]), {}))));
+      const out: TCell[] = [
+        cell(c.ticker, {
+          align: "left",
+          bold: true,
+          fill: c.port === 1 ? { color: OWNED } : undefined,
+        }),
+      ];
+      const px = fpx(d.price, c.currency);
+      out.push(cell(px, naIf(px, {})));
+      [y0, y1].forEach((y) => {
+        const s = fx(d.evGp[y]);
+        out.push(cell(s, naIf(s, {})));
+      });
       [y0, y1, y2, y3, y4].forEach((y) => {
         const s = fx(d.mendoPe[y]);
         const bg = y === y1 ? heatPe(d.mendoPe[y]) : undefined;
@@ -236,7 +255,10 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
         const bg = y === y2 ? heatIrr(d.irr[y]) : undefined;
         out.push(cell(s, naIf(s, bg ? { fill: { color: bg } } : {})));
       });
-      [y0, y1, y2, y3].forEach((y) => out.push(cell(fx(d.mom[y]), naIf(fx(d.mom[y]), {}))));
+      [y0, y1, y2, y3].forEach((y) => {
+        const s = fx(d.mom[y]);
+        out.push(cell(s, naIf(s, {})));
+      });
       ([pf.m1, pf.m3, pf.m6] as (number | null)[]).forEach((v) => {
         const s = fp(v);
         const bg = heatPerf(v);
@@ -246,16 +268,17 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     };
 
     order.forEach((g) => {
-      rows.push([grpHdr(g)]);
+      rows.push(grpRow(g));
       byGrp[g].forEach((c) => rows.push(valRow(c)));
     });
     if (indexRows.length) {
-      rows.push([grpHdr("Index")]);
+      rows.push(grpRow("Index"));
       indexRows.forEach((c) => {
         const d = derived.get(c.ticker)!;
         const pf = perfOf(c);
-        const out: pptxgen.TableCell[] = [cell(c.ticker, { align: "left", bold: true })];
-        out.push(cell(fpx(d.price, c.currency), naIf(fpx(d.price, c.currency), {})));
+        const out: TCell[] = [cell(c.ticker, { align: "left", bold: true })];
+        const px = fpx(d.price, c.currency);
+        out.push(cell(px, naIf(px, {})));
         out.push(cell(""), cell(""));
         [y0, y1, y2, y3, y4].forEach((y) => {
           const v = c.best_pe?.[String(y)];
@@ -271,13 +294,29 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       });
     }
 
-    const cw = colWidths(1.05, 0.6, 20);
-    slide.addTable(rows, tableOpts(cw, 6));
+    // Fit: title strip is 0.52" tall; size every row so the table ends inside
+    // the slide. 46 rows → ~0.149" each; 6.5pt text + 1pt margins fits.
+    const tableTop = 0.52;
+    const rowH = Math.floor(((PAGE_H - tableTop - 0.08) / rows.length) * 1000) / 1000;
+    const numW = (CONTENT_W - 1.0 - 0.62) / 20;
+    slide.addTable(rows, {
+      x: MARGIN,
+      y: tableTop,
+      w: CONTENT_W,
+      colW: [1.0, 0.62, ...Array(20).fill(numW)],
+      rowH,
+      fontFace: "Arial",
+      fontSize: 6.5,
+      color: INK,
+      align: "right",
+      valign: "middle",
+      border: { type: "solid", color: "EFEFF3", pt: 0.25 },
+      margin: [1, 2, 1, 2],
+    });
   }
 
   // ---- IRR Decomp screen --------------------------------------------------- //
   function buildDecompSlide() {
-    const COLS = 11;
     const yy = (y: number) => String(y).slice(2);
     const slide = eqSlide(
       pptx,
@@ -285,38 +324,54 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       `NTM – YE${yy(y2)} IRR decomposition · '${yy(y0)}–'${yy(y3)} CAGR · ${priceNote}`,
     );
 
-    const grpHdr = (label: string): pptxgen.TableCell =>
-      ({ text: label, options: { colspan: COLS, bold: true, color: INK, align: "left", fill: { color: "F2F2F6" }, fontSize: 8 } });
-
-    const h1: pptxgen.TableCell[] = [
-      hCell(""),
-      hCell(""),
-      hCell(`NTM – YE${yy(y2)} IRR Decomp`, 7),
-      hCell(`'${yy(y0)}–'${yy(y3)} CAGR`, 2),
+    const h1Opts: pptxgen.TableCellProps = {
+      bold: true,
+      color: "FFFFFF",
+      fill: { color: BRAND },
+      align: "center",
+      valign: "middle",
+      fontSize: 8,
+    };
+    const h1: TCell[] = [
+      cell("", h1Opts),
+      cell("", h1Opts),
+      cell(`NTM – YE${yy(y2)} IRR Decomp`, { ...h1Opts, colspan: 7 }),
+      cell(`'${yy(y0)}–'${yy(y3)} CAGR`, { ...h1Opts, colspan: 2 }),
     ];
-    const h2: pptxgen.TableCell[] = [
-      "Company",
-      "Px",
-      "Revs",
-      "Margin",
-      "Mendo NI",
-      "Yield",
-      "EPS + Divs",
-      "Multiple",
-      "Return",
-      "GP",
-      "mEPS",
-    ].map((l) => hCell(l));
+    const h2Opts: pptxgen.TableCellProps = {
+      bold: true,
+      color: "FFFFFF",
+      fill: { color: BRAND },
+      align: "right",
+      valign: "middle",
+      fontSize: 8,
+    };
+    const h2: TCell[] = [
+      cell("Company", { ...h2Opts, align: "left" }),
+      ...["Px", "Revs", "Margin", "Mendo NI", "Yield", "EPS + Divs", "Multiple", "Return", "GP", "mEPS"].map(
+        (l) => cell(l, h2Opts),
+      ),
+    ];
 
     const rows: pptxgen.TableRow[] = [h1, h2];
-    const blueIf = (s: string): pptxgen.TableCellProps => (s === "n/a" ? { color: NA } : { color: BLUE });
+    const blueIf = (s: string): pptxgen.TableCellProps =>
+      s === "n/a" ? { color: NA } : { color: BLUE };
 
-    const decompRow = (c: Company): pptxgen.TableCell[] => {
+    const grpRow = (label: string): TCell[] => [
+      cell(label, { colspan: 11, bold: true, color: INK, align: "left", fill: { color: GRP_FILL }, fontSize: 8 }),
+    ];
+
+    const decompRow = (c: Company): TCell[] => {
       const d = derived.get(c.ticker)!;
       const dc: Decomp = d.decomp;
+      const px = fpx(d.price, c.currency);
       return [
-        cell(c.ticker, { align: "left", bold: true, fill: c.port === 1 ? { color: OWNED } : undefined }),
-        cell(fpx(d.price, c.currency), naIf(fpx(d.price, c.currency), {})),
+        cell(c.ticker, {
+          align: "left",
+          bold: true,
+          fill: c.port === 1 ? { color: OWNED } : undefined,
+        }),
+        cell(px, naIf(px, {})),
         cell(fp(dc.revs), blueIf(fp(dc.revs))),
         cell(fp(dc.margin), naIf(fp(dc.margin), {})),
         cell(fp(dc.ni), blueIf(fp(dc.ni))),
@@ -330,51 +385,26 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     };
 
     order.forEach((g) => {
-      rows.push([grpHdr(g)]);
+      rows.push(grpRow(g));
       byGrp[g].forEach((c) => rows.push(decompRow(c)));
     });
 
-    const cw = colWidths(1.5, 0.85, 9);
-    slide.addTable(rows, tableOpts(cw, 9));
+    const tableTop = 0.52;
+    const rowH = Math.floor(((PAGE_H - tableTop - 0.08) / rows.length) * 1000) / 1000;
+    const numW = (CONTENT_W - 1.5 - 0.85) / 9;
+    slide.addTable(rows, {
+      x: MARGIN,
+      y: tableTop,
+      w: CONTENT_W,
+      colW: [1.5, 0.85, ...Array(9).fill(numW)],
+      rowH,
+      fontFace: "Arial",
+      fontSize: 8,
+      color: INK,
+      align: "right",
+      valign: "middle",
+      border: { type: "solid", color: "EFEFF3", pt: 0.25 },
+      margin: [1, 2, 1, 2],
+    });
   }
 }
-
-// ---- table plumbing -------------------------------------------------------- //
-function hCell(text: string, colspan = 1): pptxgen.TableCell {
-  return {
-    text,
-    options: {
-      colspan,
-      bold: true,
-      color: "FFFFFF",
-      fill: { color: BRAND },
-      align: colspan > 1 || text === "" ? "center" : "right",
-      valign: "middle",
-      fontSize: colspan > 1 ? 7 : 6.5,
-    },
-  };
-}
-
-function colWidths(labelW: number, pxW: number, numCols: number): number[] {
-  const rest = (CONTENT_W - labelW - pxW) / numCols;
-  return [labelW, pxW, ...Array(numCols).fill(rest)];
-}
-
-function tableOpts(colW: number[], fontSize: number): pptxgen.TableProps {
-  return {
-    x: MARGIN,
-    y: 0.95,
-    w: CONTENT_W,
-    colW,
-    fontFace: "Arial",
-    fontSize,
-    color: INK,
-    align: "right",
-    valign: "middle",
-    border: { type: "solid", color: "EFEFF3", pt: 0.25 },
-    margin: [0, 2, 0, 2],
-  };
-}
-
-// re-export so the Row type stays available if needed by callers
-export type { Row };

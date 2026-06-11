@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { HowItWorks } from "@/components/HowItWorks";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { ANALYSTS } from "@/lib/equities/config";
 import { Company, EditRecord, Quote } from "@/lib/equities/types";
@@ -310,18 +311,30 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
       <span className="eq-tick-name">{c.ticker}</span>
       {!c.is_index && (
         <span className="eq-btns">
-          <button type="button" onClick={() => setEditTicker(c.ticker)} title="Update model">
-            ✎
+          <button
+            type="button"
+            onClick={() => setEditTicker(c.ticker)}
+            title={`Update the ${c.ticker} model inputs`}
+          >
+            ✎ Edit
           </button>
-          <button type="button" onClick={() => setLogTicker(c.ticker)} title="Edits log">
-            ☰
+          <button
+            type="button"
+            onClick={() => setLogTicker(c.ticker)}
+            title={`See every past change to ${c.ticker}`}
+          >
+            ☰ Past Revisions
           </button>
         </span>
       )}
       {c.is_index && (
         <span className="eq-btns">
-          <button type="button" onClick={() => setEditTicker(c.ticker)} title="Update index P/E">
-            ✎
+          <button
+            type="button"
+            onClick={() => setEditTicker(c.ticker)}
+            title="Update index P/E"
+          >
+            ✎ Edit
           </button>
         </span>
       )}
@@ -345,6 +358,38 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           <h1>Equities Dashboard</h1>
         </div>
         <div className="eq-actions">
+          <HowItWorks title="How the Equities Dashboard works">
+            <p className="hiw-lead">
+              The team&apos;s detailed dashboard, live — recomputed on the fly
+              from shared model inputs and prior-day closing prices.
+            </p>
+            <ul className="hiw-list">
+              <li>
+                <b>Two screens</b> — <b>Summary</b> shows valuation, target
+                multiples, IRRs, and momentum; <b>IRR Decomp</b> breaks the
+                NTM–YE{String(y2).slice(2)} IRR into revenue, margin, yield, and
+                multiple.
+              </li>
+              <li>
+                <b>Edit</b> — click <b>Edit</b> on any row, pick your name, and
+                update the model. You can paste a whole block straight from your
+                Excel model. Changes are shared with the team instantly.
+              </li>
+              <li>
+                <b>Past Revisions</b> — every edit is logged per company; click{" "}
+                <b>Past Revisions</b> on a row to see who changed what, when.
+              </li>
+              <li>
+                <b>Sort</b> — click any column header to rank across the whole
+                book; click again for ascending, then off.
+              </li>
+              <li>
+                <b>Prices</b> — prior-day closes from a Bloomberg terminal push
+                and/or Yahoo. <b>Refresh prices</b> re-fetches; <b>Download
+                Excel</b> exports the live workbook.
+              </li>
+            </ul>
+          </HowItWorks>
           <button
             type="button"
             className="eq-act"
@@ -376,7 +421,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
               setSort(NO_SORT);
             }}
           >
-            Valuation
+            Summary
           </button>
           <button
             type="button"
@@ -386,7 +431,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
               setSort(NO_SORT);
             }}
           >
-            NTM – YE{String(y2).slice(2)} IRR Decomp
+            IRR Decomp
           </button>
         </div>
         <span className="eq-note">
@@ -414,6 +459,32 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           {enabled === false && " · edits disabled (no shared database configured)"}
         </span>
       </div>
+
+      {view === "val" ? (
+        <div className="eq-legend">
+          <span className="eq-legend-swatch" aria-hidden="true" /> Highlighted
+          tickers (in green) indicate names in portfolio
+        </div>
+      ) : (
+        <div className="eq-legend eq-legend-decomp">
+          <b>IRR decomp is approximate:</b>
+          <ol>
+            <li>
+              Revenue CAGR, Mendo NI, and Total Return calculated as exact CAGRs
+              from models
+            </li>
+            <li>
+              EPS + Divs = EPS CAGR (exact) + dividend yield (approximate over
+              2027/2028)
+            </li>
+            <li>&ldquo;Margin&rdquo; = Mendo NI CAGR − Revs CAGR</li>
+            <li>&ldquo;Yield&rdquo; = EPS CAGR + Divs Yield − Mendo NI CAGR</li>
+            <li>
+              &ldquo;Multiple&rdquo; = Total Return IRR − EPS CAGR + Divs Yield
+            </li>
+          </ol>
+        </div>
+      )}
 
       <div className="eq-wrap">
         {view === "val" ? (
@@ -688,6 +759,20 @@ function fmtDraft(v: number | null | undefined, pct?: boolean): string {
   return String(Math.round(x * 10000) / 10000);
 }
 
+// Excel-paste support: analysts copy a block of cells straight from their
+// model and paste it into any grid input — tabs walk right across the year
+// columns, newlines walk down the field rows. Each cell is normalized the way
+// Excel copies it: "1,234.5", "80.50%", "$12.30", "(2.5)" for negatives, and
+// "—"/"-" or blank for empty.
+function cleanCell(raw: string): string {
+  let s = raw.trim().replace(/[$€£,\s]/g, "");
+  if (s === "" || s === "—" || s === "–" || s === "-") return "";
+  const neg = /^\(.*\)$/.test(s);
+  s = s.replace(/[()%]/g, "");
+  if (neg && s && !s.startsWith("-")) s = `-${s}`;
+  return s;
+}
+
 function EditModal({
   company,
   years,
@@ -728,6 +813,32 @@ function EditModal({
   const [draft, setDraft] = useState(initialDraft);
 
   const set = (k: string, v: string) => setDraft((p) => ({ ...p, [k]: v }));
+
+  // Multi-cell pastes from Excel spread across the grid starting at the cell
+  // pasted into; a single value falls through to the browser's normal paste.
+  const pasteAt =
+    (fields: string[], fieldIdx: number, yearIdx: number) =>
+    (e: React.ClipboardEvent<HTMLInputElement>) => {
+      const text = e.clipboardData.getData("text/plain");
+      if (!/[\t\n]/.test(text)) return;
+      e.preventDefault();
+      const rows = text.replace(/\r/g, "").split("\n");
+      if (rows.length && rows[rows.length - 1] === "") rows.pop(); // Excel's trailing newline
+      setDraft((p) => {
+        const next = { ...p };
+        rows.forEach((row, ri) => {
+          const key = fields[fieldIdx + ri];
+          if (!key) return;
+          row.split("\t").forEach((cell, ci) => {
+            const y = years[yearIdx + ci];
+            if (y == null) return;
+            next[`${key}.${y}`] = cleanCell(cell);
+          });
+        });
+        return next;
+      });
+    };
+  const seriesKeys = SERIES_FIELDS.map((f) => f.key);
 
   const save = async () => {
     setError("");
@@ -827,11 +938,12 @@ function EditModal({
             <tbody>
               <tr>
                 <th>BEst P/E</th>
-                {years.map((y) => (
+                {years.map((y, yi) => (
                   <td key={y}>
                     <input
                       value={draft[`best_pe.${y}`]}
                       onChange={(e) => set(`best_pe.${y}`, e.target.value)}
+                      onPaste={pasteAt(["best_pe"], 0, yi)}
                       inputMode="decimal"
                     />
                   </td>
@@ -851,14 +963,15 @@ function EditModal({
                 </tr>
               </thead>
               <tbody>
-                {SERIES_FIELDS.map((f) => (
+                {SERIES_FIELDS.map((f, fi) => (
                   <tr key={f.key}>
                     <th>{f.label}</th>
-                    {years.map((y) => (
+                    {years.map((y, yi) => (
                       <td key={y}>
                         <input
                           value={draft[`${f.key}.${y}`]}
                           onChange={(e) => set(`${f.key}.${y}`, e.target.value)}
+                          onPaste={pasteAt(seriesKeys, fi, yi)}
                           inputMode="decimal"
                           placeholder="—"
                         />
@@ -917,6 +1030,8 @@ function EditModal({
         {error && <p className="eq-error">{error}</p>}
         <div className="eq-modal-foot">
           <span className="eq-note">
+            <b>Paste from Excel:</b> copy a block of cells from your model and
+            paste into any cell — values fill across years and down fields.
             GM % in percent (e.g. 80.5). Clear a cell to delete the value.
           </span>
           <div>

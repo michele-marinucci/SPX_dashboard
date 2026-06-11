@@ -2047,7 +2047,10 @@ thead .row-head {
   color: var(--faint);
 }
 .eq-blue {
-  color: #1d4ed8;
+  /* Formerly blue (the Excel "exact CAGR" convention); kept as a class so the
+     exact columns can still be styled distinctly, but rendered in black. */
+  color: var(--ink);
+  font-weight: 600;
 }
 .eq-grp th {
   text-align: left;
@@ -2082,27 +2085,30 @@ thead .row-head {
 }
 .eq-btns {
   display: inline-flex;
-  gap: 2px;
-  margin-left: 6px;
-  opacity: 0;
-  transition: opacity 80ms;
-}
-.eq-row:hover .eq-btns,
-.eq-tick:focus-within .eq-btns {
-  opacity: 1;
+  gap: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
 }
 .eq-btns button {
-  border: 0;
-  background: transparent;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 600;
   color: var(--muted);
-  padding: 0 3px;
-  border-radius: 4px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  white-space: nowrap;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
 }
 .eq-btns button:hover {
   color: var(--brand-700);
+  border-color: var(--brand-100);
   background: var(--brand-050);
+}
+/* The owned-name green highlight spans the sticky cell; keep buttons legible. */
+.eq-tick-own .eq-btns button {
+  background: rgba(255, 255, 255, 0.65);
 }
 
 /* Modals */
@@ -3174,6 +3180,38 @@ thead .row-head {
 }
 .tw-legend .tw-sent-dot {
   margin-left: 0;
+}
+
+/* ---------- Equities dashboard legends ---------- */
+.eq-legend {
+  margin: 10px 0 2px;
+  padding: 9px 13px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.eq-legend b {
+  color: var(--ink);
+}
+.eq-legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: #d9efdc;
+  border: 1px solid #a9d4b1;
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+.eq-legend-decomp ol {
+  margin: 4px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
 /* ---------- Compact work-in-progress hub rows ---------- */

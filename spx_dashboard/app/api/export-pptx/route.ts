@@ -3,6 +3,9 @@ import { buildHubDeck } from "@/lib/pptx/buildDeck";
 // Node runtime: pptxgenjs (via jszip) needs Node APIs, not the edge runtime.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Quote fetches (when the cache is cold) + deck assembly can exceed the
+// default serverless budget; give the route room to finish.
+export const maxDuration = 60;
 
 export async function GET() {
   const buf = await buildHubDeck();
