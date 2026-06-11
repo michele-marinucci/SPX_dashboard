@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
 import { cx } from "@/lib/format";
+import { TOOL_NAMES } from "@/lib/toolMeta";
 import {
   DailySummaryItem,
   PORTFOLIO_NAMES,
@@ -258,7 +259,7 @@ export function TwitterMonitor({
       >
         Manage accounts <span className="mono">{followedList.length}</span>
       </button>
-      <HowItWorks title="How Twitter Themes works">
+      <HowItWorks title={`How ${TOOL_NAMES.twitter} works`}>
         <p className="hiw-lead">
           Every <strong>Monday, Wednesday and Friday</strong> morning the monitor
           reads the latest posts from your followed accounts.
@@ -290,8 +291,8 @@ export function TwitterMonitor({
 
   return (
     <AppShell
-      tool="Twitter Themes"
-      title="Twitter Themes"
+      tool={TOOL_NAMES.twitter}
+      title={TOOL_NAMES.twitter}
       subtitle={
         <>
           Digest of followed accounts ·{" "}
@@ -304,7 +305,7 @@ export function TwitterMonitor({
         </>
       }
       actions={actions}
-      footerLeft={`Twitter Themes as of ${asOf ?? "—"}`}
+      footerLeft={`${TOOL_NAMES.twitter} as of ${asOf ?? "—"}`}
     >
       {manageOpen && (
         <div className="tw-manage-overlay" onClick={() => setManageOpen(false)}>

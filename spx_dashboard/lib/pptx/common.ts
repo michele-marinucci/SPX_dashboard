@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import pptxgen from "pptxgenjs";
 
 // Shared scaffolding for the "Export All to PPT" deck.
@@ -12,6 +14,106 @@ export const PAGE_W = 13.33; // LAYOUT_WIDE inches
 export const PAGE_H = 7.5;
 export const MARGIN = 0.5;
 export const CONTENT_W = PAGE_W - MARGIN * 2;
+// Top of the footer band on content slides — tables must end above this.
+export const FOOTER_Y = 7.06;
+
+// ---- slide masters (the internal template) --------------------------------- //
+// Content slides share a master: brand spine, footer rule with the firm
+// lockup, deck date, the Meritage logo, and a page number. Dividers get the
+// full-bleed brand background with the white logo.
+
+export const MASTER_CONTENT = "MENDO_CONTENT";
+export const MASTER_DIVIDER = "MENDO_DIVIDER";
+
+const LOGO_AR = 365 / 2242; // meritage-logo.png height / width
+
+export function logoFile(name: string): string | null {
+  const p = path.join(process.cwd(), "public", name);
+  return fs.existsSync(p) ? p : null;
+}
+
+export function defineMasters(pptx: pptxgen, dateLabel: string) {
+  const logo = logoFile("meritage-logo.png");
+  const logoWhite = logoFile("meritage-logo-white.png");
+
+  const footerText: pptxgen.TextPropsOptions = {
+    h: 0.26,
+    fontFace: "Arial",
+    fontSize: 7.5,
+    color: MUTED,
+    valign: "middle",
+  };
+  const content: NonNullable<pptxgen.SlideMasterProps["objects"]> = [
+    { rect: { x: 0, y: 0, w: 0.18, h: PAGE_H, fill: { color: BRAND }, line: { type: "none" } } },
+    { line: { x: MARGIN, y: FOOTER_Y, w: CONTENT_W, h: 0, line: { color: LINE, width: 0.75 } } },
+    {
+      text: {
+        text: "MERITAGE · INTERNAL",
+        options: { ...footerText, x: MARGIN, y: FOOTER_Y + 0.04, w: 3.2, charSpacing: 2, align: "left" },
+      },
+    },
+    {
+      text: {
+        text: dateLabel,
+        options: { ...footerText, x: 7.4, y: FOOTER_Y + 0.04, w: 3.5, align: "right" },
+      },
+    },
+  ];
+  const logoW = 1.0;
+  if (logo) {
+    content.push({
+      image: {
+        x: PAGE_W - MARGIN - logoW,
+        y: FOOTER_Y + 0.115,
+        w: logoW,
+        h: logoW * LOGO_AR,
+        path: logo,
+      },
+    });
+  }
+  pptx.defineSlideMaster({
+    title: MASTER_CONTENT,
+    background: { color: "FFFFFF" },
+    objects: content,
+    slideNumber: {
+      x: 11.05,
+      y: FOOTER_Y + 0.04,
+      w: 0.6,
+      h: 0.26,
+      fontFace: "Arial",
+      fontSize: 7.5,
+      color: MUTED,
+      align: "right",
+    },
+  });
+
+  const divider: NonNullable<pptxgen.SlideMasterProps["objects"]> = [
+    {
+      text: {
+        text: "MERITAGE · INTERNAL",
+        options: {
+          x: MARGIN,
+          y: PAGE_H - 0.62,
+          w: 4,
+          h: 0.3,
+          fontFace: "Arial",
+          fontSize: 8,
+          color: "DAD8FB",
+          charSpacing: 2,
+        },
+      },
+    },
+  ];
+  const dlw = 2.2;
+  if (logoWhite) {
+    divider.push({ image: { x: MARGIN, y: 0.62, w: dlw, h: dlw * LOGO_AR, path: logoWhite } });
+  }
+  pptx.defineSlideMaster({
+    title: MASTER_DIVIDER,
+    background: { color: BRAND },
+    objects: divider,
+  });
+}
 
 export type Cell = string | { text: string; options?: pptxgen.TableCellProps };
 export type Row = Cell[];
@@ -96,18 +198,9 @@ export function blueHeat(v: number | null, scale: ColScale): { fill?: string; co
 
 // ---- slide scaffolding ----------------------------------------------------- //
 
-// A content slide with a small tool title + subtitle and a brand spine.
+// A content slide with a small tool title + subtitle on the template master.
 export function sectionSlide(pptx: pptxgen, title: string, subtitle: string): pptxgen.Slide {
-  const slide = pptx.addSlide();
-  slide.background = { color: "FFFFFF" };
-  slide.addShape(pptx.ShapeType.rect, {
-    x: 0,
-    y: 0,
-    w: 0.18,
-    h: PAGE_H,
-    fill: { color: BRAND },
-    line: { type: "none" },
-  });
+  const slide = pptx.addSlide({ masterName: MASTER_CONTENT });
   slide.addText(title, {
     x: MARGIN,
     y: 0.26,
@@ -132,8 +225,7 @@ export function sectionSlide(pptx: pptxgen, title: string, subtitle: string): pp
 
 // A full-bleed brand divider that introduces a section.
 export function dividerSlide(pptx: pptxgen, title: string, subtitle: string) {
-  const slide = pptx.addSlide();
-  slide.background = { color: BRAND };
+  const slide = pptx.addSlide({ masterName: MASTER_DIVIDER });
   slide.addText(title, {
     x: MARGIN,
     y: 2.7,

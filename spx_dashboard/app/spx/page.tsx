@@ -4,6 +4,7 @@ import { DashboardFrame } from "@/components/DashboardFrame";
 import { ViewHeading } from "@/components/ViewHeading";
 import { bloombergDateLabelOf, getNavModel, GrowthTable, ThreeDateTable } from "@/lib/data";
 import { loadSpxDashboard } from "@/lib/spxLive";
+import { spxSection, TOOL_NAMES } from "@/lib/toolMeta";
 
 // The tables overlay the daily Bloomberg push (when newer than the committed
 // workbook snapshot), so this page must render per-request.
@@ -96,19 +97,10 @@ function growthRows(t: GrowthTable): TableRow[] {
   }));
 }
 
-function Section({
-  id,
-  num,
-  title,
-  note,
-  children,
-}: {
-  id: string;
-  num: string;
-  title: string;
-  note?: string;
-  children: React.ReactNode;
-}) {
+// Headings come from lib/toolMeta.ts (shared with the PPT export) so a rename
+// here automatically propagates to the exported deck.
+function Section({ id, children }: { id: string; children: React.ReactNode }) {
+  const { num, title, note } = spxSection(id);
   return (
     <section id={id} className="section">
       <div className="section-head">
@@ -141,7 +133,7 @@ export default async function SpxMonitorPage() {
       asOf={asOf}
       heading={
         <ViewHeading
-          title="SPX Monitor"
+          title={TOOL_NAMES.spx}
           meta="AI beneficiary & software tracker"
           stockCount={totalStocks}
           compounderCount={totalCompounders}
@@ -149,12 +141,7 @@ export default async function SpxMonitorPage() {
         />
       }
     >
-      <Section
-        id="performance"
-        num="01"
-        title="Stock Performance"
-        note="Market cap ($b) · diverging Δ heatmaps"
-      >
+      <Section id="performance">
         <DataTable
           columns={threeDateColumns(t.stock_performance, 0)}
           rows={threeDateRows(t.stock_performance)}
@@ -162,12 +149,7 @@ export default async function SpxMonitorPage() {
         />
       </Section>
 
-      <Section
-        id="growth"
-        num="02"
-        title="Earnings Growth"
-        note="Adjusted net income ($b)"
-      >
+      <Section id="growth">
         <DataTable
           columns={growthColumns(t.earnings_growth)}
           rows={growthRows(t.earnings_growth)}
@@ -175,12 +157,7 @@ export default async function SpxMonitorPage() {
         />
       </Section>
 
-      <Section
-        id="rev2026"
-        num="03"
-        title="Estimate Revisions · 2026"
-        note="Consensus adj. NI ($b)"
-      >
+      <Section id="rev2026">
         <DataTable
           columns={threeDateColumns(t.est_rev_2026, 1)}
           rows={threeDateRows(t.est_rev_2026)}
@@ -188,12 +165,7 @@ export default async function SpxMonitorPage() {
         />
       </Section>
 
-      <Section
-        id="rev2027"
-        num="04"
-        title="Estimate Revisions · 2027"
-        note="Consensus adj. NI ($b)"
-      >
+      <Section id="rev2027">
         <DataTable
           columns={threeDateColumns(t.est_rev_2027, 1)}
           rows={threeDateRows(t.est_rev_2027)}
@@ -201,12 +173,7 @@ export default async function SpxMonitorPage() {
         />
       </Section>
 
-      <Section
-        id="pe"
-        num="05"
-        title="NTM P/E"
-        note="Current vs historical averages · P/E history"
-      >
+      <Section id="pe">
         <NtmPeTable data={t.ntm_pe} altData={tc?.ntm_pe} />
       </Section>
     </DashboardFrame>

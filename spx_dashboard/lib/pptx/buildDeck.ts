@@ -1,27 +1,31 @@
-import fs from "fs";
-import path from "path";
 import pptxgen from "pptxgenjs";
 
-import { ThreeDateTable, GrowthTable, NtmPeTableData } from "@/lib/data";
+import { DashboardData, ThreeDateTable, GrowthTable, NtmPeTableData } from "@/lib/data";
 import { loadSpxDashboard } from "@/lib/spxLive";
 import { getTwitterData } from "@/lib/tweets";
+import { spxSection, TOOL_NAMES } from "@/lib/toolMeta";
 import type { MorningNote } from "@/app/morning-news/page";
 import morningNewsRaw from "@/data/morning_news.json";
 import { addEquitiesSlides } from "./equitiesSlides";
 import {
   BRAND,
   CONTENT_W,
+  FOOTER_Y,
   INK,
   MARGIN,
   MUTED,
+  PAGE_H,
+  PAGE_W,
   Row,
   blueHeat,
   computeScale,
+  defineMasters,
   dividerSlide,
   fmtMoney,
   fmtNum,
   fmtPct,
   fmtSignedMoney,
+  logoFile,
   paginatedTable,
   rgHeat,
   sectionSlide,
@@ -72,9 +76,27 @@ function bullets(slide: pptxgen.Slide, items: { title?: string; body: string }[]
 // levels, diverging red/green on deltas, with per-column scales computed from
 // the category rows only (totals excluded) and totals left unshaded.
 
-const SPX = "SPX Monitor · Aggregate S&P 500";
+const SPX = `${TOOL_NAMES.spx} · Aggregate S&P 500`;
 
 type HeatKind = "blue" | "rg" | "none";
+
+// Within the AI-capex-beneficiary categories only — the rows above the first
+// subtotal ("Total AI Capex Beneficiaries") — each SPX page is ordered by its
+// own headline column, descending (nulls last). Everything from that subtotal
+// down keeps the workbook order. Returns a new array; never mutates the
+// dashboard data.
+function sortAiCapex<R extends { isTotal: boolean }>(
+  rows: R[],
+  key: (r: R) => number | null,
+): R[] {
+  const cut = rows.findIndex((r) => r.isTotal);
+  if (cut <= 0) return rows;
+  const head = [...rows.slice(0, cut)].sort(
+    (a, b) =>
+      (key(b) ?? Number.NEGATIVE_INFINITY) - (key(a) ?? Number.NEGATIVE_INFINITY),
+  );
+  return [...head, ...rows.slice(cut)];
+}
 
 interface SpxCol {
   label: string;
@@ -158,7 +180,13 @@ function spxTable(
   });
 }
 
-function threeDateTableSlide(pptx: pptxgen, t: ThreeDateTable, title: string, digits: number) {
+function threeDateTableSlide(
+  pptx: pptxgen,
+  t: ThreeDateTable,
+  title: string,
+  digits: number,
+  sortBy: "absYtd" | "pctYtd",
+) {
   const cols: SpxCol[] = [
     ...t.dates.map((d) => ({
       label: d,
@@ -171,11 +199,14 @@ function threeDateTableSlide(pptx: pptxgen, t: ThreeDateTable, title: string, di
     { label: "YTD", group: "% Δ", fmt: (v) => fmtPct(v, 1), heat: "rg" },
     { label: "QTD", group: "% Δ", fmt: (v) => fmtPct(v, 1), heat: "rg" },
   ];
-  const rows = t.rows.map((r) => ({
-    label: r.label,
-    isTotal: r.is_total,
-    cells: [...r.values, ...r.delta_abs, ...r.delta_pct],
-  }));
+  const rows = sortAiCapex(
+    t.rows.map((r) => ({
+      label: r.label,
+      isTotal: r.is_total,
+      cells: [...r.values, ...r.delta_abs, ...r.delta_pct],
+    })),
+    (r) => (sortBy === "absYtd" ? r.cells[t.dates.length] : r.cells[t.dates.length + 2]),
+  );
   spxTable(pptx, title, cols, rows);
 }
 
@@ -200,12 +231,17 @@ function growthTableSlide(pptx: pptxgen, t: GrowthTable) {
       heat: "rg" as const,
     })),
   ];
-  const rows = t.rows.map((r) => ({
-    label: r.label,
-    isTotal: r.is_total,
-    cells: [...r.values, ...r.delta_abs, ...r.delta_pct],
-  }));
-  spxTable(pptx, `Earnings Growth · ${t.value_label}`, cols, rows);
+  // Sorted by the 2026 $ earnings growth ($ Δ YoY 2026 vs 2025).
+  const idx2026 = t.delta_years.indexOf("2026");
+  const rows = sortAiCapex(
+    t.rows.map((r) => ({
+      label: r.label,
+      isTotal: r.is_total,
+      cells: [...r.values, ...r.delta_abs, ...r.delta_pct],
+    })),
+    (r) => (idx2026 === -1 ? null : r.cells[t.years.length + idx2026]),
+  );
+  spxTable(pptx, `${spxSection("growth").title} · ${spxSection("growth").note}`, cols, rows);
 }
 
 function ntmPeSlide(pptx: pptxgen, t: NtmPeTableData) {
@@ -231,19 +267,59 @@ function ntmPeSlide(pptx: pptxgen, t: NtmPeTableData) {
       heat: "rg" as const,
     })),
   ];
-  const rows = t.rows.map((r) => ({
-    label: r.label,
-    isTotal: r.is_total,
-    cells: [r.mkt_cap, r.ntm_ni, r.ntm_pe, ...r.avg_since, ...r.delta_vs_avg],
-  }));
-  spxTable(pptx, t.title || "NTM P/E", cols, rows);
+  // Sorted by market cap.
+  const rows = sortAiCapex(
+    t.rows.map((r) => ({
+      label: r.label,
+      isTotal: r.is_total,
+      cells: [r.mkt_cap, r.ntm_ni, r.ntm_pe, ...r.avg_since, ...r.delta_vs_avg],
+    })),
+    (r) => r.cells[0],
+  );
+  spxTable(pptx, spxSection("pe").title, cols, rows);
 }
 
-// ---- Twitter Monitor ------------------------------------------------------- //
+// ---- AI beneficiaries: each category with its member companies ------------- //
+function aiCategoriesSlide(pptx: pptxgen, d: DashboardData) {
+  const grp =
+    d.tables.categories.groups.find((g) => g.group === "AI Capex Beneficiaries") ??
+    d.tables.categories.groups[0];
+  if (!grp) return;
+  const cats = grp.categories.filter((c) => c.members.length > 0);
+  if (!cats.length) return;
+  const slide = sectionSlide(pptx, SPX, `${grp.group} · categories & constituents`);
+  const nCols = Math.min(5, Math.max(1, Math.ceil(cats.length / 2)));
+  const nRows = Math.ceil(cats.length / nCols);
+  const top = 1.25;
+  const cellW = CONTENT_W / nCols;
+  const cellH = (FOOTER_Y - top - 0.1) / nRows;
+  cats.forEach((c, i) => {
+    const runs: pptxgen.TextProps[] = [
+      {
+        text: c.category,
+        options: { bold: true, color: BRAND, fontSize: 10.5, paraSpaceAfter: 4, breakLine: true },
+      },
+      ...c.members.map((m) => ({
+        text: m,
+        options: { color: INK, fontSize: 8.5, paraSpaceAfter: 2, breakLine: true },
+      })),
+    ];
+    slide.addText(runs, {
+      x: MARGIN + (i % nCols) * cellW,
+      y: top + Math.floor(i / nCols) * cellH,
+      w: cellW - 0.2,
+      h: cellH,
+      fontFace: "Arial",
+      valign: "top",
+    });
+  });
+}
+
+// ---- Twitter Themes --------------------------------------------------------- //
 function twitterSection(pptx: pptxgen) {
   const d = getTwitterData();
   const when = d.generated_at ? new Date(d.generated_at).toLocaleDateString("en-US") : "";
-  const s1 = sectionSlide(pptx, "Twitter Monitor", d.daily_summary.headline || `Daily summary ${when}`);
+  const s1 = sectionSlide(pptx, TOOL_NAMES.twitter, d.daily_summary.headline || `Daily summary ${when}`);
   bullets(
     s1,
     (d.daily_summary.items || []).map((it) => ({
@@ -252,7 +328,7 @@ function twitterSection(pptx: pptxgen) {
     })),
   );
   if (d.recurring?.length) {
-    const s2 = sectionSlide(pptx, "Twitter Monitor", "Recurring topics");
+    const s2 = sectionSlide(pptx, TOOL_NAMES.twitter, "Recurring topics");
     bullets(
       s2,
       d.recurring.map((r) => ({
@@ -263,7 +339,7 @@ function twitterSection(pptx: pptxgen) {
   }
 }
 
-// ---- Morning News Summary (positions first, then themes) ------------------- //
+// ---- Morning Notes (positions first, then themes) --------------------------- //
 function morningNewsSection(pptx: pptxgen) {
   const notes = morningNewsRaw as MorningNote[];
   if (!notes?.length) return;
@@ -288,13 +364,13 @@ function morningNewsSection(pptx: pptxgen) {
       { text: p.name || "—", options: { align: "left" } },
       { text: p.notes, options: { align: "left", fontSize: 9 } },
     ]);
-    paginatedTable(pptx, "Morning News Summary", `Positions in focus · ${dateLabel}`, header, body, {
+    paginatedTable(pptx, TOOL_NAMES.morningNews, `Positions in focus · ${dateLabel}`, header, body, {
       colW: [1.4, 2.6, CONTENT_W - 4.0],
       rowsPerPage: 10,
     });
   }
 
-  const s1 = sectionSlide(pptx, "Morning News Summary", dateLabel);
+  const s1 = sectionSlide(pptx, TOOL_NAMES.morningNews, dateLabel);
   const runs: pptxgen.TextProps[] = [];
   if (latest.one_liner) {
     runs.push({
@@ -324,14 +400,34 @@ function morningNewsSection(pptx: pptxgen) {
 }
 
 // ---- title ----------------------------------------------------------------- //
-function titleSlide(pptx: pptxgen) {
+function titleSlide(pptx: pptxgen, dateLabel: string) {
   const slide = pptx.addSlide();
   slide.background = { color: "FFFFFF" };
-  const logo = path.join(process.cwd(), "public", "meritage-logo.png");
-  if (fs.existsSync(logo)) {
+  // Brand lockup, mirroring the hub header: logo · divider · INTERNAL.
+  const logo = logoFile("meritage-logo.png");
+  if (logo) {
     slide.addImage({ path: logo, x: MARGIN, y: 0.6, w: 3.6, h: 0.586 });
+    slide.addShape(pptx.ShapeType.rect, {
+      x: MARGIN + 3.85,
+      y: 0.66,
+      w: 0.014,
+      h: 0.46,
+      fill: { color: "D6D6DE" },
+      line: { type: "none" },
+    });
+    slide.addText("INTERNAL", {
+      x: MARGIN + 4.0,
+      y: 0.66,
+      w: 1.6,
+      h: 0.46,
+      fontFace: "Arial",
+      fontSize: 11,
+      color: MUTED,
+      charSpacing: 3,
+      valign: "middle",
+    });
   }
-  slide.addText("Mendo Hub", {
+  slide.addText(TOOL_NAMES.hub, {
     x: MARGIN,
     y: 2.6,
     w: CONTENT_W,
@@ -341,13 +437,7 @@ function titleSlide(pptx: pptxgen) {
     bold: true,
     color: INK,
   });
-  const today = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  slide.addText(`All live tools · ${today}`, {
+  slide.addText(dateLabel, {
     x: MARGIN,
     y: 3.7,
     w: CONTENT_W,
@@ -364,36 +454,60 @@ function titleSlide(pptx: pptxgen) {
     fill: { color: BRAND },
     line: { type: "none" },
   });
+  slide.addShape(pptx.ShapeType.rect, {
+    x: 0,
+    y: PAGE_H - 0.18,
+    w: PAGE_W,
+    h: 0.18,
+    fill: { color: BRAND },
+    line: { type: "none" },
+  });
 }
 
 export async function buildHubDeck(): Promise<Buffer> {
   const pptx = new pptxgen();
   pptx.layout = "LAYOUT_WIDE";
-  pptx.author = "Mendo Hub";
+  pptx.author = TOOL_NAMES.hub;
   pptx.company = "Meritage";
-  pptx.title = "Mendo Hub — All live tools";
+  pptx.title = TOOL_NAMES.hub;
 
-  titleSlide(pptx);
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  defineMasters(pptx, today);
+
+  titleSlide(pptx, today);
 
   // 1) Equities Dashboard — most important, up front. Two screens.
-  dividerSlide(pptx, "Equities Dashboard", "Valuation, IRRs & decomposition · prior-day closes");
+  dividerSlide(pptx, TOOL_NAMES.equities, "Valuation, IRRs & decomposition · prior-day closes");
   await addEquitiesSlides(pptx, new Date());
 
   // 2) SPX Monitor — Aggregate S&P 500 only (live-overlaid like the web page).
-  dividerSlide(pptx, "SPX Monitor", "Aggregate S&P 500");
-  const t = (await loadSpxDashboard()).tables;
-  threeDateTableSlide(pptx, t.stock_performance, "Stock Performance · Market cap ($b)", 0);
+  // Page order mirrors /spx (lib/toolMeta.ts), then the AI-beneficiary
+  // categories with their member companies.
+  dividerSlide(pptx, TOOL_NAMES.spx, "Aggregate S&P 500");
+  const spxData = await loadSpxDashboard();
+  const t = spxData.tables;
+  const sec = (id: string) => {
+    const s = spxSection(id);
+    return `${s.title} · ${s.note}`;
+  };
+  threeDateTableSlide(pptx, t.stock_performance, sec("performance"), 0, "absYtd");
   growthTableSlide(pptx, t.earnings_growth);
-  threeDateTableSlide(pptx, t.est_rev_2026, "Estimate Revisions · 2026 ($b)", 1);
-  threeDateTableSlide(pptx, t.est_rev_2027, "Estimate Revisions · 2027 ($b)", 1);
+  threeDateTableSlide(pptx, t.est_rev_2026, sec("rev2026"), 1, "pctYtd");
+  threeDateTableSlide(pptx, t.est_rev_2027, sec("rev2027"), 1, "pctYtd");
   ntmPeSlide(pptx, t.ntm_pe);
+  aiCategoriesSlide(pptx, spxData);
 
-  // 3) Twitter Monitor.
-  dividerSlide(pptx, "Twitter Monitor", "Daily summary & recurring topics");
+  // 3) Twitter Themes.
+  dividerSlide(pptx, TOOL_NAMES.twitter, "Daily summary & recurring topics");
   twitterSection(pptx);
 
-  // 4) Morning News Summary.
-  dividerSlide(pptx, "Morning News Summary", "Pre-market digest");
+  // 4) Morning Notes.
+  dividerSlide(pptx, TOOL_NAMES.morningNews, "Pre-market digest");
   morningNewsSection(pptx);
 
   const out = (await pptx.write({ outputType: "nodebuffer" })) as Buffer;
