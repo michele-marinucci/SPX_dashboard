@@ -623,47 +623,83 @@ def run_equities(session, web, base: str, universe: dict, expected: dt.date) -> 
 
 
 # ---- SPX Monitor leg -------------------------------------------------------- #
-def best_ni_by_year(session, securities: list[str], year: int) -> dict[str, float]:
-    """Calendar-year consensus net income ($ millions) per security. Probes
-    the BEST_FPERIOD_OVERRIDE syntax on a handful of names first so a syntax
-    the terminal doesn't accept never burns a full-universe request."""
-    for override in (f"CY{year}", str(year)):
+# The workbook (public/SPX_inputs.xlsx) pulls consensus through BQL as
+# IS_COMP_NET_INCOME_ADJUST — Bloomberg's comparable ADJUSTED net income.
+# The Desktop API can't run BQL on every login, so the script probes refdata
+# candidates (the comparable field itself, then the BEst equivalents) and
+# keeps whichever one reproduces the workbook's own snapshot values.
+def _ni_candidates(year: int) -> list[tuple[str, dict[str, str]]]:
+    return [
+        ("IS_COMP_NET_INCOME_ADJUST", {"EQY_FUND_YEAR": str(year), "FUND_PER": "A"}),
+        ("BEST_NET_INCOME", {"BEST_FPERIOD_OVERRIDE": f"CY{year}"}),
+        ("BEST_NET_INCOME", {"BEST_FPERIOD_OVERRIDE": str(year)}),
+    ]
+
+
+def _probe_and_pull(
+    session,
+    tickers: list[str],
+    candidates: list[tuple[str, dict[str, str]]],
+    refvals: dict[str, float],
+    label: str,
+) -> dict[str, float]:
+    """Try each (field, overrides) candidate on a handful of names and score
+    it against the workbook snapshot ($b, within 20% — consensus drifts a bit
+    between snapshot and run, so exact equality is too strict). The best
+    scorer is pulled for the whole universe; values returned in $ millions.
+    With no snapshot to score against, falls back to presence-scoring."""
+    probe_names = [t for t in tickers if t in refvals][:8] or tickers[:5]
+    best: tuple[int, str, dict[str, str]] | None = None
+    for field, ov in candidates:
         before = len(ERRORS)
-        probe = reference_data(
-            session, securities[:5], ["BEST_NET_INCOME"],
-            {"BEST_FPERIOD_OVERRIDE": override},
-        )
+        res = reference_data(session, probe_names, [field], ov)
         del ERRORS[before:]  # probe misses are expected, not warnings
-        if sum(1 for v in probe.values() if "BEST_NET_INCOME" in v) >= 2:
-            full = reference_data(
-                session, securities, ["BEST_NET_INCOME"],
-                {"BEST_FPERIOD_OVERRIDE": override},
-            )
-            return {
-                s: v["BEST_NET_INCOME"] for s, v in full.items() if "BEST_NET_INCOME" in v
-            }
-    NOTES.append(f"SPX: consensus NI for {year} unavailable (override not accepted)")
-    return {}
+        score = 0
+        for t in probe_names:
+            v = res.get(t, {}).get(field)
+            if v is None:
+                continue
+            ref = refvals.get(t)
+            if ref is None:
+                score += 1  # no reference → presence is the best signal
+            elif abs(v / 1000.0 - ref) <= 0.2 * max(1e-9, abs(ref)):
+                score += 1
+        if best is None or score > best[0]:
+            best = (score, field, ov)
+        if score >= max(2, int(0.8 * len(probe_names))):
+            break  # near-perfect match — no need to probe further
+    if best is None or best[0] < 2:
+        NOTES.append(f"SPX: no field matched the workbook for {label} — skipped")
+        return {}
+    score, field, ov = best
+    ovs = ", ".join(f"{k}={v}" for k, v in ov.items())
+    NOTES.append(
+        f"SPX: {label} via {field}({ovs}) — matched workbook on "
+        f"{score}/{len(probe_names)} probe names"
+    )
+    full = reference_data(session, tickers, [field], ov)
+    return {s: v[field] for s, v in full.items() if field in v}
 
 
 def best_ntm_ni(
-    session, securities: list[str], ni_by_year: dict[int, dict[str, float]]
+    session,
+    securities: list[str],
+    ni_by_year: dict[int, dict[str, float]],
+    refvals: dict[str, float],
 ) -> dict[str, float]:
     """Next-twelve-months consensus NI ($ millions): the 1BF blended-forward
-    override when the terminal supports it, otherwise a calendar-weighted
-    blend of this year's and next year's consensus."""
-    before = len(ERRORS)
-    probe = reference_data(
-        session, securities[:5], ["BEST_NET_INCOME"], {"BEST_FPERIOD_OVERRIDE": "1BF"}
+    override when the terminal supports it (validated against the workbook's
+    LTM/FPO=1 values), otherwise a calendar-weighted blend of this year's and
+    next year's consensus."""
+    out = _probe_and_pull(
+        session,
+        securities,
+        [("BEST_NET_INCOME", {"BEST_FPERIOD_OVERRIDE": "1BF"})],
+        refvals,
+        "NTM NI",
     )
-    del ERRORS[before:]
-    if sum(1 for v in probe.values() if "BEST_NET_INCOME" in v) >= 2:
-        full = reference_data(
-            session, securities, ["BEST_NET_INCOME"], {"BEST_FPERIOD_OVERRIDE": "1BF"}
-        )
-        out = {s: v["BEST_NET_INCOME"] for s, v in full.items() if "BEST_NET_INCOME" in v}
-        if out:
-            return out
+    if out:
+        return out
 
     today = dt.date.today()
     y = today.year
@@ -684,10 +720,45 @@ def run_spx(session, web, base: str, spx_universe: dict, expected: dt.date) -> s
     S&P 500. ~4 values per name per day; chunked batched requests."""
     tickers: list[str] = spx_universe["tickers"]
     years = [int(y) for y in spx_universe.get("years", [])]
+    snapshot: dict[str, dict] = spx_universe.get("snapshot") or {}
 
     mc = windowed_closes(session, tickers, expected, field="CUR_MKT_CAP")
-    ni_by_year = {y: best_ni_by_year(session, tickers, y) for y in years}
-    ntm = best_ntm_ni(session, tickers, ni_by_year)
+    ni_by_year = {
+        y: _probe_and_pull(
+            session,
+            tickers,
+            _ni_candidates(y),
+            {t: r[str(y)] for t, r in snapshot.items() if str(y) in r},
+            f"consensus NI {y}",
+        )
+        for y in years
+    }
+    ntm = best_ntm_ni(
+        session,
+        tickers,
+        ni_by_year,
+        {t: r["ntm"] for t, r in snapshot.items() if "ntm" in r},
+    )
+
+    # Divergence check vs the workbook snapshot: big gaps would mean the field
+    # choice doesn't line up with the workbook's methodology after all.
+    first = years[0] if years else None
+    if first and ni_by_year.get(first):
+        diffs = []
+        for t, v in ni_by_year[first].items():
+            ref = (snapshot.get(t) or {}).get(str(first))
+            if ref:
+                diffs.append(abs(v / 1000.0 - ref) / abs(ref))
+        if diffs:
+            diffs.sort()
+            med = diffs[len(diffs) // 2]
+            big = sum(1 for x in diffs if x > 0.05)
+            NOTES.append(
+                f"SPX: {first} consensus vs workbook snapshot — median diff "
+                f"{med:.1%}, {big}/{len(diffs)} names differ >5% (drift since "
+                f"the snapshot is expected; a high count would mean a "
+                f"methodology mismatch)"
+            )
 
     quotes = []
     data_date: str | None = None

@@ -16,9 +16,25 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const d = getDashboard();
   const tickers: string[] = [];
+  // Workbook snapshot values per ticker ($b), used by the push script to
+  // VALIDATE its field/override choice: the workbook pulls
+  // IS_COMP_NET_INCOME_ADJUST via BQL, which the Desktop API can't always
+  // request the same way — so the script probes candidates and keeps the one
+  // that reproduces these snapshot values.
+  const snapshot: Record<string, Record<string, number>> = {};
   for (const g of d.tables.categories.groups)
     for (const c of g.categories)
-      for (const s of c.stocks ?? []) if (s.ticker) tickers.push(s.ticker);
+      for (const s of c.stocks ?? []) {
+        if (!s.ticker) continue;
+        tickers.push(s.ticker);
+        const ref: Record<string, number> = {};
+        const e26 = s.est_2026?.values?.[2];
+        const e27 = s.est_2027?.values?.[2];
+        if (typeof e26 === "number") ref["2026"] = e26;
+        if (typeof e27 === "number") ref["2027"] = e27;
+        if (typeof s.pe?.ntm_ni === "number") ref.ntm = s.pe.ntm_ni;
+        if (Object.keys(ref).length) snapshot[s.ticker] = ref;
+      }
 
   // Refresh consensus for the snapshot's forecast years that are current or
   // future; past years are reported actuals and never change.
@@ -41,6 +57,7 @@ export async function GET() {
     years,
     bloomberg_data_date: dataDate,
     snapshot_date: d.bloomberg_date ?? null,
+    snapshot,
   });
 }
 
