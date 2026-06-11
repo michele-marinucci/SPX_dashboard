@@ -2091,6 +2091,111 @@ thead .row-head {
   line-height: 1.55;
 }
 
+/* Numbered points (1, 2, 3) */
+.news-theme-points {
+  margin: 0 0 10px;
+  padding-left: 20px;
+  list-style: decimal;
+}
+
+.news-theme-point {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  margin: 0 0 5px;
+}
+
+/* Lettered jargon sub-bullets (a, b, c) */
+.news-theme-jargon {
+  margin: 4px 0 6px;
+  padding-left: 18px;
+  list-style: lower-alpha;
+}
+
+.news-theme-jargon li {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 2px 0;
+}
+
+.news-jargon-term {
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+/* Mini chart */
+.news-chart {
+  margin: 4px 0 12px;
+  padding: 10px 12px;
+  background: var(--bg, var(--panel));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.news-chart-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.news-chart-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.news-chart-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.news-chart-label {
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.news-chart-track {
+  display: block;
+  width: 100%;
+  height: 12px;
+}
+
+.news-chart-bar {
+  display: block;
+  height: 12px;
+  border-radius: 2px;
+  min-width: 2px;
+}
+
+.news-chart-bar.pos {
+  background: #16a34a;
+}
+
+.news-chart-bar.neg {
+  background: #dc2626;
+}
+
+.news-chart-value {
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.news-chart-foot {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
 .news-theme-sources {
   display: flex;
   flex-wrap: wrap;
@@ -2141,6 +2246,18 @@ thead .row-head {
   border-radius: 4px;
   object-fit: contain;
   flex-shrink: 0;
+}
+
+.news-position-logo-ph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-050);
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  text-transform: uppercase;
 }
 
 .news-position-notes {
