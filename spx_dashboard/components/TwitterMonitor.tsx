@@ -7,7 +7,6 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { cx } from "@/lib/format";
 import {
   DailySummaryItem,
-  PORTFOLIO_NAMES,
   RecurringTopic,
   Tweet,
   TwitterData,
@@ -56,9 +55,12 @@ function fmtViews(v: number | null): string {
 export function TwitterMonitor({
   data: initialData,
   canonicalFollowed,
+  portfolioNames = {},
 }: {
   data: TwitterData;
   canonicalFollowed: string[];
+  // Ticker → company name, sourced from the shared DB portfolio (themes/page).
+  portfolioNames?: Record<string, string>;
 }) {
   const [data, setData] = useState(initialData);
   const [asOf, setAsOf] = useState(fmtAsOf(initialData.generated_at));
@@ -436,7 +438,7 @@ export function TwitterMonitor({
                             {disp}
                           </Link>
                         </td>
-                        <td className="tw-name">{PORTFOLIO_NAMES[disp] ?? ""}</td>
+                        <td className="tw-name">{portfolioNames[disp] ?? ""}</td>
                         <td>
                           {tweets.map((t) => (
                             <a
