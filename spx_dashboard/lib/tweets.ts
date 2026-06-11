@@ -31,10 +31,20 @@ export interface Tweet {
   seen_count: number;
 }
 
+export interface DailySummaryPoint {
+  // A key takeaway, rendered as a numbered bullet (1, 2, 3 …).
+  text: string;
+  // Optional supporting detail, rendered as lettered sub-bullets (a, b, c …).
+  details?: string[];
+}
+
 export interface DailySummaryItem {
   theme: string;
   label: string;
-  summary: string;
+  // Numbered takeaways with lettered sub-bullets (new shape). Older data carries
+  // only `summary`; the UI falls back to it when `points` is absent.
+  points?: DailySummaryPoint[];
+  summary?: string;
   tickers: string[];
   tweet_ids: string[];
 }
