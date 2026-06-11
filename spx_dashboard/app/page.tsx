@@ -3,6 +3,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { ExportPptButton } from "@/components/ExportPptButton";
 import { TodayDate } from "@/components/TodayDate";
 import { getTweetCount } from "@/lib/tweets";
+import { TOOL_NAMES } from "@/lib/toolMeta";
 
 // The post-login launcher (Ledger "hub"): one ledger row per tool. Five are
 // live; the rest are WIP. Order is Equities-first per the team's preference;
@@ -26,7 +27,7 @@ export default function HomePage() {
       </div>
 
       <div className="hub-head">
-        <h1>Mendo Hub</h1>
+        <h1>{TOOL_NAMES.hub}</h1>
         <TodayDate />
       </div>
 
@@ -42,7 +43,7 @@ export default function HomePage() {
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
-            Equities Dashboard
+            {TOOL_NAMES.equities}
           </div>
           <p className="rdesc">
             The detailed dashboard, live. Valuation, IRRs, and the IRR
@@ -72,7 +73,7 @@ export default function HomePage() {
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
-            SPX Monitor
+            {TOOL_NAMES.spx}
           </div>
           <p className="rdesc">
             Track AI beneficiaries and software names in the S&amp;P 500. Sort
@@ -106,7 +107,7 @@ export default function HomePage() {
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
-            Morning Notes
+            {TOOL_NAMES.morningNews}
           </div>
           <p className="rdesc">
             A pre-market digest of overnight headlines and the news that moves
@@ -140,7 +141,7 @@ export default function HomePage() {
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
-            Twitter Themes
+            {TOOL_NAMES.twitter}
           </div>
           <p className="rdesc">
             A daily digest of your followed accounts, organized by theme with
@@ -174,7 +175,7 @@ export default function HomePage() {
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
-            Diligence Tracker
+            {TOOL_NAMES.diligence}
           </div>
           <p className="rdesc">
             Every position&apos;s Microsoft List in one place. Open a name&apos;s
