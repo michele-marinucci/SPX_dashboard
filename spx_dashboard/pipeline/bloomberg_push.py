@@ -97,27 +97,47 @@ def dbg(text: str) -> None:
         pass
 
 
-def dbg_message(msg, context: str) -> None:
-    """Dump everything we can learn about a Bloomberg message to the debug
-    file: its toPy() form, its string form, and the 'results' element if any."""
+def _top_elements(msg) -> str:
+    """Top-level element names + child element names of a Bloomberg message —
+    the message's schema, which tells us how to read it."""
+    try:
+        name = str(msg.messageType())
+    except Exception:
+        name = "?"
+    kids = []
+    try:
+        el = msg.asElement()
+        for i in range(el.numElements()):
+            child = el.getElement(i)
+            try:
+                sub = [str(child.getElement(j).name()) for j in range(min(child.numElements(), 6))]
+            except Exception:
+                sub = []
+            kids.append(f"{child.name()}{sub if sub else ''}")
+    except Exception as e:
+        kids.append(f"<asElement failed: {e}>")
+    return f"messageType={name} elements={kids}"
+
+
+def dbg_message(msg, context: str) -> str:
+    """Summarize a Bloomberg message: schema, toPy() form (truncated), and a
+    truncated string form. Returns the schema line so callers can also surface
+    it on the console. Full (truncated) detail goes to the debug file."""
+    schema = _top_elements(msg)
     if not DEBUG:
-        return
+        return schema
     dbg(f"\n===== raw message ({context}) =====")
+    dbg(schema)
     try:
         py = msg.toPy()
-        dbg(f"toPy type={type(py).__name__} value={py!r}")
+        dbg(f"toPy type={type(py).__name__} value={repr(py)[:1500]}")
     except Exception as e:
         dbg(f"toPy raised {type(e).__name__}: {e}")
-    for el in ("results", "error"):
-        try:
-            if msg.hasElement(el):
-                dbg(f"element[{el}] as string:\n{msg.getElementAsString(el)}")
-        except Exception as e:
-            dbg(f"element[{el}] raised {type(e).__name__}: {e}")
     try:
-        dbg(f"str(msg):\n{msg}")
+        dbg(f"str(msg) (truncated):\n{str(msg)[:1500]}")
     except Exception as e:
         dbg(f"str(msg) raised {type(e).__name__}: {e}")
+    return schema
 
 # Diagnostics gathered during a run: request-level and per-security errors
 # from Bloomberg, printed when the run produces nothing so failures are never
@@ -294,7 +314,9 @@ def bql_anchor_closes(
                 ERRORS.append("bql: timed out waiting for response")
                 break
             for msg in ev:
-                dbg_message(msg, "bql")
+                schema = dbg_message(msg, "bql")
+                if DEBUG:
+                    print(f"  [bql msg] {schema}")
                 try:
                     parsed = _bql_results(msg)
                     dbg(f"_bql_results -> {len(parsed)} items: {parsed[:1]!r}")
