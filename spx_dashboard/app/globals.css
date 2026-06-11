@@ -2180,39 +2180,56 @@ thead .row-head {
 }
 .eq-grid {
   border-collapse: collapse;
-  width: 100%;
+  width: auto;
   font-size: 12px;
 }
 .eq-grid th {
   text-align: left;
   font-size: 11px;
   color: var(--ink-soft);
-  padding: 4px 6px;
+  padding: 5px 8px;
   white-space: nowrap;
 }
+/* Excel-style header band over the year columns. */
 .eq-grid thead th {
-  text-align: right;
-  border-bottom: 1px solid var(--line-strong);
+  text-align: center;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
 }
 .eq-grid thead th:first-child {
   text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line-strong);
 }
+/* Row-header (field name) — like Excel's left gutter. */
+.eq-grid tbody th {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  font-weight: 600;
+}
+/* The year cells butt up against each other to read as one pasteable block. */
 .eq-grid td {
-  padding: 2px 3px;
+  padding: 0;
+  border: 1px solid var(--line);
 }
 .eq-grid input {
-  width: 104px;
-  padding: 5px 7px;
-  border: 1px solid var(--line-2);
-  border-radius: 6px;
+  width: 92px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   font-size: 12px;
   text-align: right;
   font-family: var(--font-mono, ui-monospace, monospace);
 }
 .eq-grid input:focus {
-  outline: none;
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--brand-050);
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+  background: var(--brand-050);
 }
 .eq-scalars {
   display: flex;
