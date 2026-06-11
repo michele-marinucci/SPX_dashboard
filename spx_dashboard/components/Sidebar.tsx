@@ -44,7 +44,7 @@ export function Sidebar({ nav }: { nav?: NavGroup[] }) {
   );
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 820px)");
+    const mq = window.matchMedia("(max-width: 768px)");
     setIsMobile(mq.matches);
     const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mq.addEventListener("change", onChange);
@@ -54,7 +54,7 @@ export function Sidebar({ nav }: { nav?: NavGroup[] }) {
   // Auto-collapse on route change on mobile (ref guards the initial mount).
   const prevPathname = useRef<string | null>(null);
   useEffect(() => {
-    const mobile = window.matchMedia("(max-width: 820px)").matches;
+    const mobile = window.matchMedia("(max-width: 768px)").matches;
     if (mobile && prevPathname.current !== null && prevPathname.current !== pathname) {
       setCollapsed(true);
     }
@@ -62,7 +62,7 @@ export function Sidebar({ nav }: { nav?: NavGroup[] }) {
   }, [pathname, setCollapsed]);
 
   const handleSelect = () => {
-    if (window.matchMedia("(max-width: 820px)").matches) setCollapsed(true);
+    if (window.matchMedia("(max-width: 768px)").matches) setCollapsed(true);
   };
 
   const activeSlug = pathname.startsWith("/category/")

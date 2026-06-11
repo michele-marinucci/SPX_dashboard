@@ -28,8 +28,11 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   minimumScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  // Zoom is intentionally allowed: the dense data tables need pinch-zoom to
+  // stay legible on small screens. On desktop-class viewports ZoomLock still
+  // suppresses pinch/double-tap so the fixed dashboard layout doesn't shift.
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({
