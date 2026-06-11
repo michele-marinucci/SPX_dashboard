@@ -336,7 +336,17 @@ def main() -> None:
     if not (r.ok and r.json().get("ok")):
         sys.exit(f"Login failed: HTTP {r.status_code} {r.text[:200]}")
 
-    universe = web.get(f"{base}/api/equities/bloomberg", timeout=30).json()
+    ur = web.get(f"{base}/api/equities/bloomberg", timeout=30)
+    try:
+        universe = ur.json()
+    except ValueError:
+        body = ur.text[:200].replace("\n", " ")
+        sys.exit(
+            f"{base}/api/equities/bloomberg did not return JSON "
+            f"(HTTP {ur.status_code}). The Equities Dashboard may not be deployed "
+            f"at this URL yet — check that the branch with the equities pages is "
+            f"the one live at {base}.\nResponse started with: {body!r}"
+        )
     stocks = [s for s in universe["securities"] if not s["is_index"]]
     indexes = [s for s in universe["securities"] if s["is_index"]]
     years: list[int] = universe["years"]
