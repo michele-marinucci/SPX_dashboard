@@ -3958,3 +3958,79 @@ thead .row-head {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ---- Equities Edit-model: Excel-like spreadsheet grid ---- */
+.eq-grid-wrap {
+  display: inline-block;
+  outline: none;
+  max-width: 100%;
+  overflow-x: auto;
+}
+/* The grid cells own their borders; values sit inside a padded block so empty
+   cells keep a uniform height (like an Excel range). */
+.eq-grid td.eq-cell {
+  padding: 0;
+  border: 1px solid var(--line);
+  position: relative;
+  cursor: cell;
+  background: var(--surface);
+}
+.eq-cell-val {
+  display: block;
+  min-width: 92px;
+  min-height: 17px;
+  padding: 6px 8px;
+  text-align: right;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 17px;
+}
+.eq-cell-input {
+  width: 92px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: right;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 17px;
+}
+.eq-cell-input:focus {
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+}
+.eq-cell.is-sel {
+  background: var(--brand-050);
+}
+.eq-cell.is-active {
+  background: var(--surface);
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+  z-index: 2;
+}
+.eq-grid-wrap:focus-within .eq-cell.is-active {
+  outline-color: var(--brand);
+}
+/* Marching-ants border on the copied range (Ctrl/Cmd+C). */
+.eq-cell.is-copied::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    linear-gradient(90deg, var(--brand) 50%, transparent 0) repeat-x,
+    linear-gradient(90deg, var(--brand) 50%, transparent 0) repeat-x,
+    linear-gradient(0deg, var(--brand) 50%, transparent 0) repeat-y,
+    linear-gradient(0deg, var(--brand) 50%, transparent 0) repeat-y;
+  background-size: 6px 1px, 6px 1px, 1px 6px, 1px 6px;
+  background-position: 0 0, 0 100%, 0 0, 100% 0;
+  animation: eq-ants 0.5s linear infinite;
+}
+@keyframes eq-ants {
+  to {
+    background-position: 6px 0, -6px 100%, 0 -6px, 100% 6px;
+  }
+}
