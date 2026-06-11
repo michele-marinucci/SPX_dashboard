@@ -21,16 +21,19 @@ Env:
 from __future__ import annotations
 
 import datetime as dt
+import base64
 import json
 import os
 import smtplib
 import sys
+from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 DATA_DIR = os.path.join(REPO, "data")
+LOGO_PATH = os.path.join(REPO, "public", "meritage-logo.png")
 PORTFOLIO_JSON = os.path.join(DATA_DIR, "portfolio.json")
 MORNING_NEWS_JSON = os.path.join(DATA_DIR, "morning_news.json")
 
@@ -189,7 +192,7 @@ def _summarize(newsletters: list[dict], positions: list[str]) -> dict:
 # Email delivery
 # ---------------------------------------------------------------------------
 
-def _send_email(summary: dict, html_body: str) -> None:
+def _send_email(summary: dict) -> None:
     recipients_raw = _env("MORNING_NEWS_RECIPIENTS") or ""
     recipients = [r.strip() for r in recipients_raw.split(",") if r.strip()]
     if not recipients:
@@ -205,11 +208,7 @@ def _send_email(summary: dict, html_body: str) -> None:
 
     subject = f"Morning Notes · {summary.get('date', dt.date.today().isoformat())}"
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = from_addr
-    msg["To"] = ", ".join(recipients)
-
+    # Build plain-text body first.
     one_liner = summary.get("one_liner", "")
     plain_lines = [f"Morning Notes — {summary.get('date', '')}", "", one_liner, ""]
     positions = summary.get("positions", [])
@@ -238,8 +237,39 @@ def _send_email(summary: dict, html_body: str) -> None:
             plain_lines.append(f"   Sources: {', '.join(srcs)}")
         plain_lines.append("")
 
-    msg.attach(MIMEText("\n".join(plain_lines), "plain"))
-    msg.attach(MIMEText(html_body, "html"))
+    # Attach the Meritage logo as a CID image so email clients show it inline.
+    logo_cid = "meritage-logo"
+    logo_data: bytes | None = None
+    try:
+        with open(LOGO_PATH, "rb") as fh:
+            logo_data = fh.read()
+    except OSError:
+        logo_cid = None  # type: ignore[assignment]
+
+    html_body = _build_html(summary, logo_cid=logo_cid)
+
+    # Use multipart/related when we have an embedded image, otherwise alternative.
+    if logo_data:
+        msg_outer = MIMEMultipart("related")
+        msg_outer["Subject"] = subject
+        msg_outer["From"] = from_addr
+        msg_outer["To"] = ", ".join(recipients)
+        alt = MIMEMultipart("alternative")
+        alt.attach(MIMEText("\n".join(plain_lines), "plain"))
+        alt.attach(MIMEText(html_body, "html"))
+        msg_outer.attach(alt)
+        img = MIMEImage(logo_data, _subtype="png")
+        img.add_header("Content-ID", f"<{logo_cid}>")
+        img.add_header("Content-Disposition", "inline", filename="meritage-logo.png")
+        msg_outer.attach(img)
+        msg = msg_outer
+    else:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = from_addr
+        msg["To"] = ", ".join(recipients)
+        msg.attach(MIMEText("\n".join(plain_lines), "plain"))
+        msg.attach(MIMEText(html_body, "html"))
 
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(from_addr, password)
@@ -292,7 +322,7 @@ def _chart_html(chart: dict) -> str:
     )
 
 
-def _build_html(summary: dict) -> str:
+def _build_html(summary: dict, logo_cid: str | None = None) -> str:
     date = summary.get("date", "")
     one_liner = summary.get("one_liner", "")
 
@@ -345,8 +375,23 @@ def _build_html(summary: dict) -> str:
             f"</div>"
         )
 
+    if logo_cid:
+        logo_html = (
+            f'<img src="cid:{logo_cid}" alt="Meritage" height="32" '
+            f'style="height:32px;width:auto;display:block;margin-bottom:12px">'
+        )
+    else:
+        logo_html = (
+            '<div style="font-size:13px;font-weight:700;letter-spacing:.08em;'
+            'color:#3730e6;margin-bottom:12px">MERITAGE</div>'
+        )
+
     return f"""<!DOCTYPE html>
 <html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#1a1a22">
+<div style="border-bottom:1px solid #eee;padding-bottom:14px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+  {logo_html}
+  <span style="font-size:12px;color:#aaa;margin-left:4px">|&nbsp;&nbsp;Morning Note</span>
+</div>
 <div style="border-top:3px solid #3730e6;padding-top:16px;margin-bottom:24px">
   <span style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.05em">Morning Notes · {date}</span>
   <p style="font-size:15px;font-weight:600;margin:8px 0 0">{one_liner}</p>
@@ -420,8 +465,7 @@ def main() -> int:
     print(f"UPDATED: morning_news.json ({len(archive)} entries in archive)", file=sys.stderr)
 
     if newsletters:
-        html = _build_html(summary)
-        _send_email(summary, html)
+        _send_email(summary)
 
     return 0
 
