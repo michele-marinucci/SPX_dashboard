@@ -31,7 +31,7 @@ from email.mime.text import MIMEText
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 DATA_DIR = os.path.join(REPO, "data")
-DASHBOARD_JSON = os.path.join(DATA_DIR, "dashboard.json")
+PORTFOLIO_JSON = os.path.join(DATA_DIR, "portfolio.json")
 MORNING_NEWS_JSON = os.path.join(DATA_DIR, "morning_news.json")
 
 sys.path.insert(0, HERE)
@@ -48,19 +48,16 @@ def _env(name: str, default: str | None = None) -> str | None:
 # ---------------------------------------------------------------------------
 
 def _get_positions() -> list[str]:
+    # The team's actual portfolio, maintained in data/portfolio.json (also the
+    # source for the Equities Dashboard page). NOT the SPX monitor universe.
     try:
-        with open(DASHBOARD_JSON) as f:
+        with open(PORTFOLIO_JSON) as f:
             data = json.load(f)
-        tickers: list[str] = []
-        groups = data.get("tables", {}).get("categories", {}).get("groups", [])
-        for group in groups:
-            for cat in group.get("categories", []):
-                for stock in cat.get("stocks", []):
-                    t = stock.get("ticker")
-                    n = stock.get("name")
-                    if t:
-                        tickers.append(f"{t} ({n})" if n else t)
-        return tickers
+        return [
+            f"{p['ticker']} ({p['name']})" if p.get("name") else p["ticker"]
+            for p in data.get("positions", [])
+            if p.get("ticker")
+        ]
     except Exception:
         return []
 

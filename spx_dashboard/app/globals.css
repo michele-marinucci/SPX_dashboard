@@ -1870,8 +1870,50 @@ thead .row-head {
 }
 
 /* ============================================================================
-   Morning News
+   Morning News — standalone page, no dashboard rail
    ========================================================================== */
+
+.news-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 36px 24px 48px;
+}
+
+.news-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.news-page-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.news-page-header .subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.news-page-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.news-page-foot {
+  margin-top: 48px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+}
 
 .news-toolbar {
   display: flex;

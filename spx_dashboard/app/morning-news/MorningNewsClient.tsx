@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { DashboardFrame } from "@/components/DashboardFrame";
+import Link from "next/link";
+import { LogoutButton } from "@/components/LogoutButton";
 import type { MorningNote } from "./page";
 
 // ---------------------------------------------------------------------------
@@ -143,14 +144,20 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
   const closeCal = useCallback(() => setCalOpen(false), []);
 
   return (
-    <DashboardFrame
-      heading={
+    <div className="news-page">
+      <header className="news-page-header">
         <div>
           <h1>Morning Note</h1>
           <p className="subtitle">Daily newsletter digest · AI-generated</p>
         </div>
-      }
-    >
+        <div className="news-page-actions">
+          <Link href="/" className="btn-back" title="Back to all views">
+            ← All views
+          </Link>
+          <LogoutButton />
+        </div>
+      </header>
+
       <div className="news-toolbar">
         <div className="news-date-picker-wrap">
           <button className="news-date-btn" onClick={() => setCalOpen((o) => !o)}>
@@ -219,6 +226,8 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
           )}
         </>
       )}
-    </DashboardFrame>
+
+      <footer className="news-page-foot">MERITAGE · INTERNAL</footer>
+    </div>
   );
 }
