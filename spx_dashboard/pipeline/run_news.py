@@ -324,6 +324,12 @@ def _chart_html(chart: dict) -> str:
 
 def _build_html(summary: dict, logo_cid: str | None = None) -> str:
     date = summary.get("date", "")
+    # Header date as e.g. "June 11, 2026"; fall back to the raw value if it
+    # isn't a parseable ISO date.
+    try:
+        date = dt.date.fromisoformat(date).strftime("%B %-d, %Y")
+    except ValueError:
+        pass
     one_liner = summary.get("one_liner", "")
 
     positions_html = ""
@@ -377,21 +383,22 @@ def _build_html(summary: dict, logo_cid: str | None = None) -> str:
 
     if logo_cid:
         logo_html = (
-            f'<img src="cid:{logo_cid}" alt="Meritage" height="32" '
-            f'style="height:32px;width:auto;display:block;margin-bottom:12px">'
+            f'<img src="cid:{logo_cid}" alt="Meritage" height="26" '
+            f'style="height:26px;width:auto;display:inline-block;vertical-align:middle">'
         )
     else:
         logo_html = (
-            '<div style="font-size:13px;font-weight:700;letter-spacing:.08em;'
-            'color:#3730e6;margin-bottom:12px">MERITAGE</div>'
+            '<span style="font-size:15px;font-weight:800;letter-spacing:.04em;'
+            'color:#3730e6;vertical-align:middle">MERITAGE</span>'
         )
 
     return f"""<!DOCTYPE html>
 <html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#1a1a22">
-<div style="margin-bottom:20px">
+<div style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #eee">
   {logo_html}
+  <span style="font-size:13px;color:#aaa;vertical-align:middle">&nbsp;&nbsp;|&nbsp;&nbsp;Morning Notes&nbsp;·&nbsp;{date}</span>
 </div>
-<div style="border-top:3px solid #3730e6;padding-top:16px;margin-bottom:24px">
+<div style="margin-bottom:24px">
   <p style="font-size:15px;font-weight:600;margin:0">{one_liner}</p>
 </div>
 {pos_section}
