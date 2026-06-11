@@ -1,8 +1,88 @@
 [
   {
     "date": "2026-06-11",
-    "top_themes": [],
-    "positions": [],
-    "one_liner": "No newsletters received this morning."
+    "top_themes": [
+      {
+        "headline": "Anthropic releases Fable 5; capability jump, prices double, guardrails tighten",
+        "detail": "Anthropic publicly released Claude Fable 5, a Mythos-class model that materially outperforms prior models on complex, long-duration tasks (e.g., Stripe migrating a 50M-line codebase in a day). Pricing is 2x Opus ($10/$50 per million tokens) with usage-credit requirements after 14 days, prompting 'the subsidy era is over' commentary \u2014 a signal that frontier labs will push pricing up ahead of Anthropic's IPO. New guardrails block cybersecurity/biology queries and explicitly restrict use for rival frontier LLM development. Read-through: continued strong AI demand and improving lab unit economics support the AI infrastructure capex complex.",
+        "sources": [
+          "Stratechery",
+          "TLDR",
+          "TLDR AI",
+          "Axios AI+",
+          "The Information AI Agenda"
+        ]
+      },
+      {
+        "headline": "Rates and Iran keep pressuring equities; chips hit hardest",
+        "detail": "S&P 500 closed down 1.6% Wednesday with chip stocks tumbling again, following Friday's 4.8% Nasdaq 100 drop after a hot jobs report reignited inflation/rate-hike fears. Equities have become unusually sensitive to 10-year yield moves into the May CPI print (consensus 4.2% y/y headline); Morgan Stanley's Wilson draws a 2021 parallel with a Warsh Fed leaning accommodative. Fresh US-Iran strikes pushed oil higher and weighed on futures. Direct risk to the portfolio's semis and AI-beta names.",
+        "sources": [
+          "Axios Markets",
+          "Axios Closer"
+        ]
+      },
+      {
+        "headline": "Creative financing scales AI chip deals: Broadcom, Google, private credit",
+        "detail": "Broadcom is securing financing from Apollo and Blackstone for projects tied to its Anthropic and OpenAI chip deals, while Google is backstopping payments on Anthropic's $35B chip lease across five data centers. The circular, credit-enhanced structure of AI capex is deepening \u2014 positive near term for custom silicon and datacenter suppliers, but worth monitoring for systemic interdependence risk.",
+        "sources": [
+          "The Information AM",
+          "TLDR AI"
+        ]
+      },
+      {
+        "headline": "Datacenter leasing on track for ~30GW in 2026; capex breadth widens",
+        "detail": "SemiAnalysis (from Datacloud Cannes) sees Q2 leasing matching giant Q4/Q1 levels, with credible developers planning 5GW+ and even 20GW Texas sites, Anthropic on an 80GW roadmap, Microsoft leasing ~1GW in the US in Q2 plus a 2GW Europe region for OpenAI/Anthropic, and Meta actively leasing GWs (Applied Digital, Vantage Millersport). Single source, but highly material for portfolio power/cooling/electrical names (GEV, VRT, ETN, PWR, EME, CEG, VST) and networking/compute suppliers. Note Google moving away from turnkey leases toward powered land/shells, pressuring developer economics (Crusoe out of Wyoming).",
+        "sources": [
+          "SemiAnalysis"
+        ]
+      },
+      {
+        "headline": "SpaceX IPO this week; Starlink India approval stalls over Iran war",
+        "detail": "The SpaceX IPO prices later this week with index funds potentially absorbing ~30% of float, raising concerns about market plumbing and feedback loops. Separately, Starlink's India regulatory approval has stalled on security grounds tied to the Iran conflict, a pre-IPO headline risk. SpaceX also detailed its AI1 orbital compute satellite and has filed for up to one million orbital datacenter satellites.",
+        "sources": [
+          "The Information AM",
+          "Axios Markets",
+          "TLDR"
+        ]
+      }
+    ],
+    "positions": [
+      {
+        "ticker": "ORCL",
+        "name": "Oracle Corp",
+        "notes": "Shares fell ~6% in extended trading after reporting higher-than-expected datacenter spending; capex intensity remains the market's key concern into the print."
+      },
+      {
+        "ticker": "AVGO",
+        "name": "Broadcom Inc",
+        "notes": "Reported to be securing financing from Apollo and Blackstone for projects tied to its Anthropic and OpenAI custom chip deals \u2014 supports the durability of its AI ASIC pipeline while shifting funding risk to private credit."
+      },
+      {
+        "ticker": "GOOGL",
+        "name": "Alphabet Inc",
+        "notes": "Backstopping Anthropic's $35B chip lease payments at five datacenters. SemiAnalysis reports Google is likely going direct with Tallgrass on the Wyoming site (Crusoe out), self-building datacenters and favoring powered land/shells over turnkey leases; also launched Gemini 3.5 Live Translate."
+      },
+      {
+        "ticker": "MSFT",
+        "name": "Microsoft Corp",
+        "notes": "Leased nearly 1GW in the US in Q2 (on par with Q1) and is building a 2GW European region driven by OpenAI and Anthropic demand, ~1GW of which was signed in Q2."
+      },
+      {
+        "ticker": "META",
+        "name": "Meta Platforms Inc",
+        "notes": "Actively leasing GWs of capacity; likely the customer behind 810MW of Applied Digital deals and the 900MW Vantage Millersport site, expanding its Prometheus cluster to 3GW."
+      },
+      {
+        "ticker": "APO",
+        "name": "Apollo Global Management Inc",
+        "notes": "Alongside Blackstone, providing financing for Broadcom projects tied to Anthropic and OpenAI chip deals \u2014 further evidence of private credit's growing role in AI infrastructure."
+      },
+      {
+        "ticker": "BX",
+        "name": "Blackstone Inc",
+        "notes": "Co-financing Broadcom's Anthropic/OpenAI-linked chip projects with Apollo."
+      }
+    ],
+    "one_liner": "Anthropic's pricier, more capable Fable 5 reinforces the AI capex supercycle \u2014 now increasingly funded by Google backstops and private credit via Broadcom \u2014 even as hot inflation data, Iran strikes, and Oracle's capex-driven after-hours drop keep rate-sensitive chip and AI names under pressure into CPI."
   }
 ]
