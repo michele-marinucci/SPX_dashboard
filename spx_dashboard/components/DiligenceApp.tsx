@@ -2,7 +2,36 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { HowItWorks } from "@/components/HowItWorks";
 import { DiligenceLink, logoUrl, normTicker } from "@/lib/diligence";
+
+// The Microsoft Lists app glyph: a teal rounded tile with list rows and a
+// check. Inlined so the "open" affordance reads clearly instead of a faint ↗.
+function MsListsIcon() {
+  return (
+    <svg
+      className="dil-ms"
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="2" y="2" width="20" height="20" rx="4" fill="#03787C" />
+      <rect x="6.5" y="7" width="11" height="1.8" rx="0.9" fill="#fff" />
+      <rect x="6.5" y="11.1" width="11" height="1.8" rx="0.9" fill="#fff" />
+      <rect x="6.5" y="15.2" width="7" height="1.8" rx="0.9" fill="#fff" />
+      <path
+        d="M15.4 15.6l1.4 1.4 2.7-2.8"
+        fill="none"
+        stroke="#7FE5B6"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 const STORE_KEY = "diligence:links";
 
@@ -188,6 +217,27 @@ export function DiligenceApp({
         <div className="solo-title">
           <h1>Diligence Tracker</h1>
         </div>
+        <div className="header-actions">
+          <HowItWorks title="How the Diligence Tracker works">
+            <p className="hiw-lead">
+              Every position&apos;s Microsoft List, gathered in one place.
+            </p>
+            <ul className="hiw-list">
+              <li>
+                <b>Open a tracker</b> — click any row to jump straight to that
+                name&apos;s Microsoft List.
+              </li>
+              <li>
+                <b>Add a link</b> — enter a ticker and paste its Microsoft List
+                URL. The company name auto-fills for tracked S&amp;P names.
+              </li>
+              <li>
+                <b>Shared</b> — adds and removes are saved to the team database,
+                so everyone sees the same list (not just your browser).
+              </li>
+            </ul>
+          </HowItWorks>
+        </div>
       </div>
 
       <p className="dil-intro">
@@ -244,8 +294,9 @@ export function DiligenceApp({
                   <LogoMark ticker={l.ticker} />
                   <span className="dil-ticker">{l.ticker}</span>
                   <span className="dil-name">{l.name || names[l.ticker] || ""}</span>
-                  <span className="dil-open" aria-hidden="true">
-                    Open list ↗
+                  <span className="dil-open">
+                    <MsListsIcon />
+                    Open list
                   </span>
                 </a>
                 <button
