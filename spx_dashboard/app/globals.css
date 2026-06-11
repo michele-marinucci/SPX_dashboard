@@ -4034,3 +4034,22 @@ thead .row-head {
     background-position: 6px 0, -6px 100%, 0 -6px, 100% 6px;
   }
 }
+
+/* ---- Edit-model: balance-sheet scalars as an adjacent Excel block ---- */
+.eq-scalars-block {
+  margin-top: 16px;
+}
+.eq-scalars-cap {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 6px;
+}
+/* A grid with no row-label gutter (the scalar block): header sits over the
+   first data column, so left-align the header cells flush with the values. */
+.eq-grid-nolabels thead th:first-child {
+  border: 1px solid var(--line-strong);
+  text-align: center;
+}
