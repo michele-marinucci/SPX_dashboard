@@ -15,8 +15,9 @@ Built to sip, not gulp, the monthly data allowance:
   3. ONE BQL QUERY FOR THE WHOLE UNIVERSE — all tickers × all four anchor
      dates go through a single BQL request (same engine as the workbook's
      range formulas), which is far cheaper than per-security reference hits.
-     If the BQL service isn't available, it falls back to one batched
-     historical-data request and says so.
+     If the BQL service isn't available or the login isn't entitled to BQL,
+     it falls back to a handful of SHORT windowed historical requests (a few
+     days around each anchor date — not months of history) and says so.
 
 What it pushes (all as-of the prior trading day):
   * prior close + 1M/3M/6M change for every name    → prices on the site
@@ -143,6 +144,9 @@ def dbg_message(msg, context: str) -> str:
 # from Bloomberg, printed when the run produces nothing so failures are never
 # silent (entitlement problems, service issues, bad tickers, ...).
 ERRORS: list[str] = []
+# Informational notes (expected, non-fatal): e.g. "BQL not entitled, using
+# historical instead" — surfaced once, calmly, not as a scary warning.
+NOTES: list[str] = []
 
 
 def _note_errors(msg, context: str) -> None:
@@ -279,6 +283,25 @@ def _bql_results(msg) -> list[dict]:
     return []
 
 
+def _bql_exception_text(msg) -> str | None:
+    """If a BQL response carries responseExceptions (e.g. 'User not authorized
+    to use BQL'), return the human-readable message(s); else None."""
+    try:
+        d = _as_dict(msg.toPy())
+    except Exception:
+        d = {}
+    exns = d.get("responseExceptions") if isinstance(d, dict) else None
+    if not isinstance(exns, list) or not exns:
+        return None
+    msgs = []
+    for e in exns:
+        e = _as_dict(e)
+        m = e.get("message") or e.get("internalMessage")
+        if m:
+            msgs.append(str(m))
+    return "; ".join(msgs) or None
+
+
 def bql_anchor_closes(
     session: blpapi.Session,
     securities: list[str],
@@ -317,6 +340,10 @@ def bql_anchor_closes(
                 schema = dbg_message(msg, "bql")
                 if DEBUG:
                     print(f"  [bql msg] {schema}")
+                exn = _bql_exception_text(msg)
+                if exn:
+                    NOTES.append(f"BQL unavailable: {exn}")
+                    dbg(f"bql responseException: {exn}")
                 try:
                     parsed = _bql_results(msg)
                     dbg(f"_bql_results -> {len(parsed)} items: {parsed[:1]!r}")
@@ -348,10 +375,13 @@ def bql_anchor_closes(
             done = ev.eventType() == blpapi.Event.RESPONSE
 
         # Sanity: the query must have produced a prior close for at least
-        # half the universe, otherwise treat it as failed and fall back.
+        # half the universe, otherwise treat it as failed and fall back. If a
+        # responseException already explained why (e.g. not entitled), don't
+        # pile on a second, noisier error.
         good = sum(1 for r in out.values() if "px" in r)
         if good < max(1, len(securities) // 2):
-            ERRORS.append(f"bql: only {good}/{len(securities)} securities returned a close")
+            if not NOTES:
+                ERRORS.append(f"bql: only {good}/{len(securities)} securities returned a close")
             return None
         return out
     except Exception as e:
@@ -418,6 +448,22 @@ def close_on_or_before(rows: list[tuple[dt.date, float]], target: dt.date) -> fl
     return best
 
 
+def windowed_closes(
+    session: blpapi.Session, securities: list[str], anchor: dt.date, cushion: int = 10
+) -> dict[str, tuple[dt.date, float]]:
+    """Most recent close on/before `anchor` for each security, from one SHORT
+    HistoricalDataRequest (a `cushion`-day window). Pulling a handful of days
+    around each anchor — instead of months of daily history — keeps the
+    monthly Bloomberg data usage minimal while still surviving holidays."""
+    hist = historical_closes(session, securities, anchor - dt.timedelta(days=cushion), anchor)
+    out: dict[str, tuple[dt.date, float]] = {}
+    for sec, rows in hist.items():  # rows are sorted ascending by date
+        on_or_before = [(d, px) for d, px in rows if d <= anchor]
+        if on_or_before:
+            out[sec] = on_or_before[-1]
+    return out
+
+
 def flush_events(session: blpapi.Session) -> None:
     """Drain any leftover events from an aborted request so they can't be
     mistaken for the next request's response."""
@@ -455,18 +501,22 @@ def gather_prices(
             out[sec] = entry
         return out, "BQL"
 
-    today = dt.date.today()
-    history = historical_closes(session, securities, today - dt.timedelta(days=220), today)
+    # Lean fallback: one short windowed request per anchor date (≈4 small
+    # pulls) rather than months of daily history, so a BQL-less terminal still
+    # sips the data quota.
+    anchor_closes = {
+        key: windowed_closes(session, securities, day) for key, day in anchors.items()
+    }
     out = {}
-    for sec, rows in history.items():
-        past = [(d, px) for d, px in rows if d < today]
-        if not past:
+    for sec in securities:
+        pxrow = anchor_closes["px"].get(sec)
+        if not pxrow:
             continue
-        close_date, close_px = past[-1]
+        close_date, close_px = pxrow
         entry = {"price": close_px, "date": close_date.isoformat()}
-        for key, days in PERF_DAYS.items():
-            base = close_on_or_before(past, close_date - dt.timedelta(days=days))
-            entry[key] = (close_px / base - 1) if base else None
+        for key in PERF_DAYS:
+            base = anchor_closes[key].get(sec)
+            entry[key] = (close_px / base[1] - 1) if base and base[1] else None
         out[sec] = entry
 
     if not out:
@@ -481,7 +531,8 @@ def gather_prices(
             "    'Desktop API' access for your login.\n"
             "Re-run with --debug to dump the raw Bloomberg responses."
         )
-    return out, "historical fallback (BQL service unavailable)"
+    method = "historical (BQL not entitled on this login)" if NOTES else "historical data"
+    return out, method
 
 
 # --------------------------------------------------------------------------- #
@@ -599,6 +650,9 @@ def main() -> None:
         f"Pushed {d.get('quotes', 0)} quotes and patched {d.get('companies', 0)} names — "
         f"closes as of {data_date}, via {method} (run {dt.datetime.now():%Y-%m-%d %H:%M})."
     )
+    # De-duplicated, calm notes (e.g. BQL not entitled — expected, not a fault).
+    for n in dict.fromkeys(NOTES):
+        print(f"Note: {n}")
     if ERRORS:
         print("Warnings (some securities/fields had issues):")
         for e in ERRORS[:20]:
