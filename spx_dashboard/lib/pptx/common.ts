@@ -2,13 +2,21 @@ import fs from "fs";
 import path from "path";
 import pptxgen from "pptxgenjs";
 
-// Shared scaffolding for the "Export All to PPT" deck.
+// Shared scaffolding for the "Export All to PPT" deck. The chrome follows the
+// firm's internal template: navy titles and table bands (#000042), gray
+// secondary text, a short accent-blue underline rule, Aptos type, the logo
+// bottom-left and the page number bottom-right. Conditional formatting
+// (heatmaps) is independent of these constants and stays untouched.
 
-export const BRAND = "3730E6";
+export const BRAND = "3730E6"; // logo blue (heatmap base lives in blueHeat)
+export const NAVY = "000042"; // template titles & table header bands
+export const ACCENT = "3230EC"; // template underline rule
 export const INK = "1A1A22";
-export const MUTED = "71717F";
-export const LINE = "E2E2EA";
+export const MUTED = "6B6B78"; // template secondary gray
+export const LINE = "E4E4E6"; // template hairline
 export const HEADER_TXT = "FFFFFF";
+export const FONT = "Aptos"; // template typeface (Office falls back if absent)
+export const CONFIDENTIAL = "Confidential and Proprietary";
 
 export const PAGE_W = 13.33; // LAYOUT_WIDE inches
 export const PAGE_H = 7.5;
@@ -18,14 +26,17 @@ export const CONTENT_W = PAGE_W - MARGIN * 2;
 export const FOOTER_Y = 7.06;
 
 // ---- slide masters (the internal template) --------------------------------- //
-// Content slides share a master: brand spine, footer rule with the firm
-// lockup, deck date, the Meritage logo, and a page number. Dividers get the
-// full-bleed brand background with the white logo.
+// Content slides share a master: white page, the Meritage logo bottom-left
+// and the page number bottom-right (as in the firm template). Dividers get a
+// full-bleed navy background with the white logo.
 
 export const MASTER_CONTENT = "MENDO_CONTENT";
 export const MASTER_DIVIDER = "MENDO_DIVIDER";
 
 const LOGO_AR = 365 / 2242; // meritage-logo.png height / width
+
+// "As of" label shown top-right on content slides; set by defineMasters.
+let deckDate = "";
 
 export function logoFile(name: string): string | null {
   const p = path.join(process.cwd(), "public", name);
@@ -33,37 +44,16 @@ export function logoFile(name: string): string | null {
 }
 
 export function defineMasters(pptx: pptxgen, dateLabel: string) {
+  deckDate = dateLabel;
   const logo = logoFile("meritage-logo.png");
   const logoWhite = logoFile("meritage-logo-white.png");
 
-  const footerText: pptxgen.TextPropsOptions = {
-    h: 0.26,
-    fontFace: "Arial",
-    fontSize: 7.5,
-    color: MUTED,
-    valign: "middle",
-  };
-  const content: NonNullable<pptxgen.SlideMasterProps["objects"]> = [
-    { rect: { x: 0, y: 0, w: 0.18, h: PAGE_H, fill: { color: BRAND }, line: { type: "none" } } },
-    { line: { x: MARGIN, y: FOOTER_Y, w: CONTENT_W, h: 0, line: { color: LINE, width: 0.75 } } },
-    {
-      text: {
-        text: "MERITAGE · INTERNAL",
-        options: { ...footerText, x: MARGIN, y: FOOTER_Y + 0.04, w: 3.2, charSpacing: 2, align: "left" },
-      },
-    },
-    {
-      text: {
-        text: dateLabel,
-        options: { ...footerText, x: 7.4, y: FOOTER_Y + 0.04, w: 3.5, align: "right" },
-      },
-    },
-  ];
-  const logoW = 1.0;
+  const content: NonNullable<pptxgen.SlideMasterProps["objects"]> = [];
+  const logoW = 1.05;
   if (logo) {
     content.push({
       image: {
-        x: PAGE_W - MARGIN - logoW,
+        x: MARGIN,
         y: FOOTER_Y + 0.115,
         w: logoW,
         h: logoW * LOGO_AR,
@@ -76,12 +66,12 @@ export function defineMasters(pptx: pptxgen, dateLabel: string) {
     background: { color: "FFFFFF" },
     objects: content,
     slideNumber: {
-      x: 11.05,
-      y: FOOTER_Y + 0.04,
+      x: PAGE_W - MARGIN - 0.6,
+      y: FOOTER_Y + 0.08,
       w: 0.6,
       h: 0.26,
-      fontFace: "Arial",
-      fontSize: 7.5,
+      fontFace: FONT,
+      fontSize: 8,
       color: MUTED,
       align: "right",
     },
@@ -90,16 +80,16 @@ export function defineMasters(pptx: pptxgen, dateLabel: string) {
   const divider: NonNullable<pptxgen.SlideMasterProps["objects"]> = [
     {
       text: {
-        text: "MERITAGE · INTERNAL",
+        text: CONFIDENTIAL,
         options: {
           x: MARGIN,
           y: PAGE_H - 0.62,
           w: 4,
           h: 0.3,
-          fontFace: "Arial",
+          fontFace: FONT,
           fontSize: 8,
-          color: "DAD8FB",
-          charSpacing: 2,
+          color: "B9B9D6",
+          charSpacing: 1,
         },
       },
     },
@@ -110,7 +100,7 @@ export function defineMasters(pptx: pptxgen, dateLabel: string) {
   }
   pptx.defineSlideMaster({
     title: MASTER_DIVIDER,
-    background: { color: BRAND },
+    background: { color: NAVY },
     objects: divider,
   });
 }
@@ -198,32 +188,59 @@ export function blueHeat(v: number | null, scale: ColScale): { fill?: string; co
 
 // ---- slide scaffolding ----------------------------------------------------- //
 
-// A content slide with a small tool title + subtitle on the template master.
+// A content slide in the template's header style: big navy title, gray
+// subtitle, a short accent underline, and the confidential/as-of block
+// top-right.
 export function sectionSlide(pptx: pptxgen, title: string, subtitle: string): pptxgen.Slide {
   const slide = pptx.addSlide({ masterName: MASTER_CONTENT });
   slide.addText(title, {
     x: MARGIN,
-    y: 0.26,
-    w: CONTENT_W - 1.2,
-    h: 0.5,
-    fontFace: "Arial",
-    fontSize: 22,
+    y: 0.24,
+    w: CONTENT_W - 3.2,
+    h: 0.46,
+    fontFace: FONT,
+    fontSize: 21,
     bold: true,
-    color: INK,
+    color: NAVY,
   });
   slide.addText(subtitle, {
     x: MARGIN,
-    y: 0.78,
-    w: CONTENT_W - 1.2,
-    h: 0.3,
-    fontFace: "Arial",
-    fontSize: 11,
+    y: 0.7,
+    w: CONTENT_W - 3.2,
+    h: 0.28,
+    fontFace: FONT,
+    fontSize: 11.5,
     color: MUTED,
   });
+  slide.addShape(pptx.ShapeType.rect, {
+    x: MARGIN + 0.02,
+    y: 1.06,
+    w: 0.42,
+    h: 0.035,
+    fill: { color: ACCENT },
+    line: { type: "none" },
+  });
+  slide.addText(
+    [
+      { text: CONFIDENTIAL, options: { breakLine: true } },
+      { text: deckDate ? `As of ${deckDate}` : "", options: {} },
+    ],
+    {
+      x: PAGE_W - MARGIN - 3.4,
+      y: 0.24,
+      w: 3.4,
+      h: 0.45,
+      fontFace: FONT,
+      fontSize: 9,
+      color: MUTED,
+      align: "right",
+      valign: "top",
+    },
+  );
   return slide;
 }
 
-// A full-bleed brand divider that introduces a section.
+// A full-bleed navy divider that introduces a section.
 export function dividerSlide(pptx: pptxgen, title: string, subtitle: string) {
   const slide = pptx.addSlide({ masterName: MASTER_DIVIDER });
   slide.addText(title, {
@@ -231,7 +248,7 @@ export function dividerSlide(pptx: pptxgen, title: string, subtitle: string) {
     y: 2.7,
     w: CONTENT_W,
     h: 1.2,
-    fontFace: "Arial",
+    fontFace: FONT,
     fontSize: 40,
     bold: true,
     color: "FFFFFF",
@@ -241,7 +258,7 @@ export function dividerSlide(pptx: pptxgen, title: string, subtitle: string) {
     y: 3.95,
     w: 1.8,
     h: 0.06,
-    fill: { color: "FFFFFF" },
+    fill: { color: ACCENT },
     line: { type: "none" },
   });
   if (subtitle) {
@@ -250,9 +267,9 @@ export function dividerSlide(pptx: pptxgen, title: string, subtitle: string) {
       y: 4.15,
       w: CONTENT_W,
       h: 0.5,
-      fontFace: "Arial",
+      fontFace: FONT,
       fontSize: 15,
-      color: "DAD8FB",
+      color: "C9C9E4",
     });
   }
   return slide;
@@ -286,7 +303,7 @@ export function paginatedTable(
   const hdrOpts: pptxgen.TableCellProps = {
     bold: true,
     color: HEADER_TXT,
-    fill: { color: BRAND },
+    fill: { color: NAVY },
     align: "center",
     valign: "middle",
   };
@@ -317,7 +334,7 @@ export function paginatedTable(
       w: CONTENT_W,
       colW,
       rowH,
-      fontFace: "Arial",
+      fontFace: FONT,
       fontSize,
       color: INK,
       border: { type: "solid", color: LINE, pt: 0.5 },
