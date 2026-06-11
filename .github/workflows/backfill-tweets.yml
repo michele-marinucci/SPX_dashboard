@@ -44,12 +44,20 @@ jobs:
 
       - name: Commit the backfilled store (triggers Vercel redeploy)
         run: |
-          if [ -n "$(git status --porcelain spx_dashboard/data/tweets.json)" ]; then
-            git config user.name "spx-dashboard-bot"
-            git config user.email "actions@github.com"
-            git add spx_dashboard/data/tweets.json
-            git commit -m "data: backfill Twitter Monitor store"
-            git push
-          else
+          if [ -z "$(git status --porcelain spx_dashboard/data/tweets.json)" ]; then
             echo "No changes; nothing to commit."
+            exit 0
           fi
+          git config user.name "spx-dashboard-bot"
+          git config user.email "actions@github.com"
+          git add spx_dashboard/data/tweets.json
+          git commit -m "data: backfill Twitter Monitor store"
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "push attempt $i failed; re-syncing and retrying..."
+            sleep 5
+          done
+          echo "push failed after 5 attempts" >&2
+          exit 1

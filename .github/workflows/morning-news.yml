@@ -47,12 +47,20 @@ jobs:
 
       - name: Commit updated morning news data (triggers Vercel redeploy)
         run: |
-          if [ -n "$(git status --porcelain spx_dashboard/data/morning_news.json)" ]; then
-            git config user.name "spx-dashboard-bot"
-            git config user.email "actions@github.com"
-            git add spx_dashboard/data/morning_news.json
-            git commit -m "data: morning news summary $(date -u +%Y-%m-%d)"
-            git push
-          else
+          if [ -z "$(git status --porcelain spx_dashboard/data/morning_news.json)" ]; then
             echo "No changes to morning_news.json; nothing to deploy."
+            exit 0
           fi
+          git config user.name "spx-dashboard-bot"
+          git config user.email "actions@github.com"
+          git add spx_dashboard/data/morning_news.json
+          git commit -m "data: morning news summary $(date -u +%Y-%m-%d)"
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "push attempt $i failed; re-syncing and retrying..."
+            sleep 5
+          done
+          echo "push failed after 5 attempts" >&2
+          exit 1
