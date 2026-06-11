@@ -68,7 +68,8 @@ export interface Quote {
   m3: number | null;
   m6: number | null;
   source?: string | null; // "Yahoo" | "Bloomberg" — freshest write wins
-  as_of: string;
+  data_date?: string | null; // trading date the values are as-of (prior close)
+  as_of: string; // when the row was fetched/written (drives the once-a-day refresh)
 }
 
 export interface FieldChange {

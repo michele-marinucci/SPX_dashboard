@@ -3,16 +3,18 @@
 // else — the script logs in with SITE_PASSWORD and reuses the session cookie.
 //
 // GET  → the universe the script should fetch: every non-removed name's
-//        Bloomberg ID + Yahoo symbol, plus which forecast years the index
-//        BEst P/E columns currently display.
-// POST → { quotes: [...], companies: [...] }:
+//        Bloomberg ID + Yahoo symbol, which forecast years the index BEst
+//        P/E columns currently display, and the close date already cached
+//        (`bloomberg_data_date`) so the script can skip redundant runs
+//        without spending a single Bloomberg hit.
+// POST → { quotes: [...], companies: [...], data_date }:
 //        quotes    → upserted into eq_market (source "Bloomberg"; the
 //                     freshest write wins over the Yahoo self-refresh)
 //        companies → per-ticker patches for the Bloomberg-only fields the
 //                     site can't get elsewhere: 1M/3M/6M perf fallback,
 //                     3M ADV, and index BEst P/E by year.
 import { NextRequest, NextResponse } from "next/server";
-import { dbUpdateCompany, dbUpsertQuotes, equitiesEnabled } from "@/lib/equitiesDb";
+import { dbGetQuotes, dbUpdateCompany, dbUpsertQuotes, equitiesEnabled } from "@/lib/equitiesDb";
 import { loadCompanies } from "@/lib/equities/load";
 import { displayYears } from "@/lib/equities/calc";
 import { Quote } from "@/lib/equities/types";
@@ -20,9 +22,25 @@ import { Quote } from "@/lib/equities/types";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const { companies } = await loadCompanies();
+  const { enabled, companies } = await loadCompanies();
+
+  // Latest close date a previous Bloomberg push wrote (null if none yet).
+  let bbgDataDate: string | null = null;
+  if (enabled) {
+    try {
+      for (const q of await dbGetQuotes()) {
+        if (q.source === "Bloomberg" && q.data_date) {
+          if (!bbgDataDate || q.data_date > bbgDataDate) bbgDataDate = q.data_date;
+        }
+      }
+    } catch {
+      /* pre-upgrade table — script will just do a full run */
+    }
+  }
+
   return NextResponse.json({
     years: displayYears(new Date()),
+    bloomberg_data_date: bbgDataDate,
     securities: companies
       .filter((c) => !c.removed)
       .map((c) => ({
@@ -54,6 +72,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const now = new Date().toISOString();
+    // The trading day the pushed values are as-of (prior close). The script
+    // sends it; fall back to today's date if it's missing or malformed.
+    const rawDate = String(body.data_date ?? "");
+    const dataDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : now.slice(0, 10);
     let wroteQuotes = 0;
     let patched = 0;
 
@@ -70,6 +92,7 @@ export async function POST(req: NextRequest) {
           m3: asNum(q.m3),
           m6: asNum(q.m6),
           source: "Bloomberg",
+          data_date: dataDate,
           as_of: now,
         });
       }

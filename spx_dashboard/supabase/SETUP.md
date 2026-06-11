@@ -50,7 +50,8 @@ analyst edits and the per-company edits log:
 1. Open **SQL** in Supabase → paste the contents of `supabase/equities.sql` → **Run**.
 2. That's it. On the next page load the app seeds `eq_companies` from the
    committed workbook parse (`data/equities_seed.json`), and starts caching
-   Yahoo prices in `eq_market` (refreshed automatically when older than 4h).
+   prior-day closes in `eq_market` (refreshed at most once per trading day,
+   from Yahoo and/or a Bloomberg terminal push — see `pipeline/BLOOMBERG_PUSH.md`).
 
 Without these tables the page still works read-only from the committed snapshot
-(live prices, but no shared edits).
+(prior-day closes, but no shared edits).

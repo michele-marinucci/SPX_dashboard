@@ -1,9 +1,9 @@
 // Equities Dashboard API. Sits behind the password gate (middleware).
 //
 // GET  → full state: companies (DB if configured, committed seed otherwise)
-//        plus market quotes. Quotes are cached in Supabase and refreshed from
-//        Yahoo when older than 4h (or on ?refresh=1), so any visitor
-//        self-heals stale prices without a cron job.
+//        plus market quotes (prior-day closes). Quotes are cached in Supabase
+//        and refreshed from Yahoo at most once a day (or on ?refresh=1), so
+//        any visitor self-heals stale prices without a cron job.
 // POST → analyst actions: update / add / remove / log. Every model change is
 //        appended to the eq_edits log with old → new values.
 import { NextRequest, NextResponse } from "next/server";
@@ -16,7 +16,7 @@ import {
   dbUpdateCompany,
   equitiesEnabled,
 } from "@/lib/equitiesDb";
-import { latestAsOf, loadCompanies, loadQuotes } from "@/lib/equities/load";
+import { latestAsOf, latestDataDate, loadCompanies, loadQuotes } from "@/lib/equities/load";
 import { Company, emptyModel, EquityModel, FieldChange } from "@/lib/equities/types";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +44,7 @@ export async function GET(req: NextRequest) {
     companies,
     quotes,
     prices_as_of: latestAsOf(quotes),
+    prices_data_date: latestDataDate(quotes),
   });
 }
 

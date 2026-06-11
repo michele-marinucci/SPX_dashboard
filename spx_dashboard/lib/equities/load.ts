@@ -12,7 +12,15 @@ import { seedCompanies } from "./seed";
 import { fetchYahooQuotes } from "./yahoo";
 import { Company, Quote } from "./types";
 
-const QUOTE_TTL_MS = 4 * 60 * 60 * 1000;
+// The most recent weekday strictly before `isoDay` — i.e. the date of the
+// newest close that can possibly exist (ignoring market holidays).
+export function lastWeekdayBefore(isoDay: string): string {
+  const d = new Date(`${isoDay}T00:00:00Z`);
+  do {
+    d.setUTCDate(d.getUTCDate() - 1);
+  } while (d.getUTCDay() === 0 || d.getUTCDay() === 6);
+  return d.toISOString().slice(0, 10);
+}
 
 export async function loadCompanies(): Promise<{ enabled: boolean; companies: Company[] }> {
   if (!equitiesEnabled()) return { enabled: false, companies: seedCompanies() };
@@ -46,10 +54,20 @@ export async function loadQuotes(
   const by: Record<string, Quote> = {};
   for (const q of cached) by[q.symbol] = q;
 
-  const now = Date.now();
+  // Prices are prior-day closes, so a refresh is only worth anything when a
+  // NEW weekday close exists that the cache doesn't have. A symbol is
+  // refetched only if (a) it has no quote, or (b) its cached close predates
+  // the latest weekday close AND we haven't already tried today. So: no
+  // same-day re-pulls, nothing on Sundays/Mondays (Friday's close is already
+  // the latest), and a Bloomberg push that already ran is left untouched.
+  const todayUtc = new Date().toISOString().slice(0, 10);
+  const expected = lastWeekdayBefore(todayUtc);
   const stale = symbols.filter((s) => {
     const q = by[s];
-    return !q || now - Date.parse(q.as_of) > QUOTE_TTL_MS;
+    if (!q) return true;
+    const dataDay = q.data_date ?? (q.as_of ?? "").slice(0, 10);
+    if (dataDay >= expected) return false; // latest close already cached
+    return (q.as_of ?? "").slice(0, 10) !== todayUtc; // retry at most once a day
   });
 
   if (force || stale.length) {
@@ -70,6 +88,18 @@ export function latestAsOf(quotes: Record<string, Quote>): string | null {
   return (
     Object.values(quotes)
       .map((q) => q.as_of)
+      .sort()
+      .pop() ?? null
+  );
+}
+
+// The trading date the displayed prices are as-of (prior close). All quotes
+// on a given day share it; the latest wins if a refresh straddles midnight.
+export function latestDataDate(quotes: Record<string, Quote>): string | null {
+  return (
+    Object.values(quotes)
+      .map((q) => q.data_date)
+      .filter((d): d is string => !!d)
       .sort()
       .pop() ?? null
   );

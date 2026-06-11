@@ -1,24 +1,32 @@
 // Server-only Yahoo Finance quotes (free, unofficial; fine for an internal
-// team dashboard). One chart call per symbol returns the live price plus six
-// months of daily closes, from which 1M/3M/6M performance is computed — the
-// replacement for the workbook's Bloomberg CHG_PCT fields.
+// team dashboard). One chart call per symbol returns ~eight months of daily
+// closes. We deliberately use the PRIOR trading day's close (never the live
+// intraday price), so the dashboard shows a stable as-of date and we never
+// need to poll more than once a day — the replacement for the workbook's
+// Bloomberg PX_LAST / CHG_PCT fields.
 import { Quote } from "./types";
 
 const DAY = 86_400_000;
 
 interface ChartResult {
-  meta?: { regularMarketPrice?: number };
   timestamp?: number[];
   indicators?: { quote?: { close?: (number | null)[] }[] };
 }
 
-// Last close on or before `target`. Ratios are unaffected by pence/points
-// scaling, so raw quotes are fine here; px_scale is applied at display time.
-function closeAt(ts: number[], closes: (number | null)[], target: number): number | null {
-  let best: number | null = null;
+// The last daily bar on or before `target`: its close plus the trading date.
+// Ratios are unaffected by pence/points scaling, so raw quotes are fine here;
+// px_scale is applied at display time.
+function barAt(
+  ts: number[],
+  closes: (number | null)[],
+  target: number,
+): { close: number; date: string } | null {
+  let best: { close: number; date: string } | null = null;
   for (let i = 0; i < ts.length; i++) {
     const c = closes[i];
-    if (ts[i] * 1000 <= target && c != null && isFinite(c)) best = c;
+    if (ts[i] * 1000 <= target && c != null && isFinite(c)) {
+      best = { close: c, date: new Date(ts[i] * 1000).toISOString().slice(0, 10) };
+    }
   }
   return best;
 }
@@ -26,7 +34,7 @@ function closeAt(ts: number[], closes: (number | null)[], target: number): numbe
 async function fetchOne(symbol: string): Promise<Quote | null> {
   const url =
     `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}` +
-    `?range=7mo&interval=1d`;
+    `?range=8mo&interval=1d`;
   const res = await fetch(url, {
     headers: { "User-Agent": "Mozilla/5.0 (internal dashboard)" },
     cache: "no-store",
@@ -36,22 +44,32 @@ async function fetchOne(symbol: string): Promise<Quote | null> {
   const r = data.chart?.result?.[0];
   const ts = r?.timestamp ?? [];
   const closes = r?.indicators?.quote?.[0]?.close ?? [];
-  const price =
-    r?.meta?.regularMarketPrice ?? closeAt(ts, closes, Date.now()) ?? null;
-  if (price == null) return null;
 
+  // Endpoint = the most recent close strictly before today (UTC), i.e. the
+  // prior trading day. Today's still-forming bar is excluded.
+  const startOfToday = Date.UTC(
+    new Date().getUTCFullYear(),
+    new Date().getUTCMonth(),
+    new Date().getUTCDate(),
+  );
+  const endpoint = barAt(ts, closes, startOfToday);
+  if (endpoint == null) return null;
+
+  // Performance windows are measured back from the endpoint's date.
+  const anchor = Date.parse(`${endpoint.date}T12:00:00Z`);
   const perf = (days: number): number | null => {
-    const base = closeAt(ts, closes, Date.now() - days * DAY);
-    return base != null && base !== 0 ? price / base - 1 : null;
+    const base = barAt(ts, closes, anchor - days * DAY);
+    return base != null && base.close !== 0 ? endpoint.close / base.close - 1 : null;
   };
 
   return {
     symbol,
-    price,
+    price: endpoint.close,
     m1: perf(30),
     m3: perf(91),
     m6: perf(182),
     source: "Yahoo",
+    data_date: endpoint.date,
     as_of: new Date().toISOString(),
   };
 }

@@ -66,6 +66,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
   const [quotes, setQuotes] = useState<Record<string, Quote>>({});
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [asOf, setAsOf] = useState<string | null>(null);
+  const [dataDate, setDataDate] = useState<string | null>(null);
   const [view, setView] = useState<"val" | "decomp">("val");
   const [editTicker, setEditTicker] = useState<string | null>(null);
   const [logTicker, setLogTicker] = useState<string | null>(null);
@@ -85,6 +86,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
     if (d?.quotes) setQuotes(d.quotes);
     setEnabled(!!d?.enabled);
     setAsOf(d?.prices_as_of ?? null);
+    setDataDate(d?.prices_data_date ?? null);
   }, []);
 
   useEffect(() => {
@@ -348,7 +350,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
             className="eq-act"
             onClick={refreshPrices}
             disabled={refreshing}
-            title="Re-fetch prices from Yahoo Finance"
+            title="Re-fetch the latest prior-day closes"
           >
             {refreshing ? "Refreshing…" : "⟳ Refresh prices"}
           </button>
@@ -388,13 +390,25 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           </button>
         </div>
         <span className="eq-note">
-          {asOf
-            ? `Prices as of ${new Date(asOf).toLocaleString()} · ${priceSource}`
-            : "Loading prices…"}
-          {asOf && Date.now() - Date.parse(asOf) > 20 * 3_600_000 && (
+          {dataDate || asOf ? (
+            <>
+              Prices as of{" "}
+              {dataDate
+                ? new Date(`${dataDate}T12:00:00`).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : new Date(asOf as string).toLocaleDateString()}{" "}
+              (prior close) · {priceSource}
+            </>
+          ) : (
+            "Loading prices…"
+          )}
+          {dataDate && Date.now() - Date.parse(`${dataDate}T00:00:00Z`) > 4 * 86_400_000 && (
             <strong className="eq-stale">
               {" "}
-              · price feed unavailable — showing last cached prices
+              · price feed stale — last available close shown
             </strong>
           )}
           {enabled === false && " · edits disabled (no shared database configured)"}
