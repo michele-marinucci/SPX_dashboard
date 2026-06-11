@@ -1,0 +1,20 @@
+{
+  "positions": [
+    { "ticker": "MSFT", "name": "Microsoft" },
+    { "ticker": "AMZN", "name": "Amazon" },
+    { "ticker": "TRU", "name": "TransUnion" },
+    { "ticker": "COF", "name": "Capital One" },
+    { "ticker": "AON", "name": "Aon" },
+    { "ticker": "WDAY", "name": "Workday" },
+    { "ticker": "SPGI", "name": "S&P Global" },
+    { "ticker": "LSEG LN", "name": "London Stock Exchange Group" },
+    { "ticker": "CSGP", "name": "CoStar Group" },
+    { "ticker": "DSV DC", "name": "DSV" },
+    { "ticker": "MSCI", "name": "MSCI" },
+    { "ticker": "META", "name": "Meta Platforms" },
+    { "ticker": "SAP GY", "name": "SAP" },
+    { "ticker": "TOST", "name": "Toast" },
+    { "ticker": "EFX", "name": "Equifax" },
+    { "ticker": "VSAT", "name": "Viasat" }
+  ]
+}
