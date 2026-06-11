@@ -1,4 +1,5 @@
 import tweetsFile from "@/data/tweets.json";
+import portfolioFile from "@/data/portfolio.json";
 
 // ---- Types mirroring pipeline/fetch_tweets.py output ---------------------- //
 export type Sentiment = "positive" | "negative" | "neutral";
@@ -66,25 +67,10 @@ export interface TwitterData {
   tweets: Tweet[];
 }
 
-// Company names for portfolio lines not covered by the SPX universe map.
-export const PORTFOLIO_NAMES: Record<string, string> = {
-  MSFT: "Microsoft",
-  AMZN: "Amazon",
-  TRU: "TransUnion",
-  COF: "Capital One",
-  AON: "Aon",
-  WDAY: "Workday",
-  SPGI: "S&P Global",
-  "LSEG LN": "London Stock Exchange Group",
-  CSGP: "CoStar Group",
-  "DSV DC": "DSV",
-  MSCI: "MSCI",
-  META: "Meta Platforms",
-  "SAP GY": "SAP",
-  TOST: "Toast",
-  EFX: "Equifax",
-  VSAT: "Viasat",
-};
+// Company names for portfolio lines — sourced from the canonical data/portfolio.json.
+export const PORTFOLIO_NAMES: Record<string, string> = Object.fromEntries(
+  portfolioFile.positions.map((p) => [p.ticker, p.name])
+);
 
 // Fallback followed set if the data file predates the first pipeline run.
 // Kept in sync with pipeline/themes_config.py FOLLOWED_HANDLES.

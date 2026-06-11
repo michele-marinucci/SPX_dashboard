@@ -5,28 +5,14 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
 import type { MorningNote, ThemeChart } from "./page";
 
-// Map ticker → Clearbit logo domain
-const TICKER_DOMAIN: Record<string, string> = {
-  MSFT: "microsoft.com",
-  AMZN: "amazon.com",
-  TRU: "transunion.com",
-  COF: "capitalone.com",
-  AON: "aon.com",
-  WDAY: "workday.com",
-  SPGI: "spglobal.com",
-  "LSEG LN": "lseg.com",
-  CSGP: "costargroup.com",
-  "DSV DC": "dsv.com",
-  MSCI: "msci.com",
-  META: "meta.com",
-  "SAP GY": "sap.com",
-  TOST: "toasttab.com",
-  EFX: "equifax.com",
-  VSAT: "viasat.com",
-};
-
-function TickerLogo({ ticker }: { ticker: string }) {
-  const domain = TICKER_DOMAIN[ticker];
+function TickerLogo({
+  ticker,
+  tickerDomain,
+}: {
+  ticker: string;
+  tickerDomain: Record<string, string>;
+}) {
+  const domain = tickerDomain[ticker];
   const [failed, setFailed] = useState(false);
 
   if (!domain || failed) {
@@ -215,7 +201,13 @@ function CalendarPopup({
 // Main component
 // ---------------------------------------------------------------------------
 
-export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
+export function MorningNewsClient({
+  notes,
+  tickerDomain,
+}: {
+  notes: MorningNote[];
+  tickerDomain: Record<string, string>;
+}) {
   const availableDates = new Set(notes.map((n) => n.date));
   const latestDate = notes[0]?.date ?? null;
 
@@ -287,7 +279,7 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
                 {selected.positions.map((p, i) => (
                   <div key={i} className="news-position-row">
                     <span className="news-position-ticker">
-                      <TickerLogo ticker={p.ticker} />
+                      <TickerLogo ticker={p.ticker} tickerDomain={tickerDomain} />
                       {p.ticker}
                     </span>
                     <span className="news-position-notes">{p.notes}</span>

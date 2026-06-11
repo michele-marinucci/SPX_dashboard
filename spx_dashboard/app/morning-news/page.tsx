@@ -1,5 +1,6 @@
 import { MorningNewsClient } from "./MorningNewsClient";
 import morningNewsRaw from "@/data/morning_news.json";
+import portfolioFile from "@/data/portfolio.json";
 
 export interface JargonNote {
   term: string;
@@ -47,5 +48,10 @@ export interface MorningNote {
 
 export default function MorningNewsPage() {
   const notes = morningNewsRaw as MorningNote[];
-  return <MorningNewsClient notes={notes} />;
+  const tickerDomain: Record<string, string> = Object.fromEntries(
+    portfolioFile.positions
+      .filter((p) => p.domain)
+      .map((p) => [p.ticker, p.domain!])
+  );
+  return <MorningNewsClient notes={notes} tickerDomain={tickerDomain} />;
 }
