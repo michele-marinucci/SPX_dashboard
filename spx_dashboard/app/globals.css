@@ -2779,6 +2779,25 @@ thead .row-head {
   color: var(--ink-soft);
   line-height: 1.5;
 }
+/* "Claude's take" — our read on a held name, set off from the news recap. */
+.news-take {
+  display: block;
+  margin-top: 6px;
+  padding-left: 10px;
+  border-left: 2px solid var(--brand);
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.news-take-label {
+  display: inline-block;
+  margin-right: 6px;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--brand);
+}
 
 .news-empty {
   padding: 48px 0;

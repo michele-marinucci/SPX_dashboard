@@ -269,7 +269,8 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
           </li>
           <li>
             <b>Portfolio mentions</b> — the names in the book that moved
-            overnight, with a one-line read.
+            overnight, each with a <b>Claude&apos;s take</b> on what it means for
+            our long thesis.
           </li>
           <li>
             <b>Top themes</b> — the day&apos;s big stories, with a quick chart
@@ -317,7 +318,15 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
                       <TickerLogo ticker={p.ticker} />
                       {p.ticker}
                     </span>
-                    <span className="news-position-notes">{p.notes}</span>
+                    <span className="news-position-notes">
+                      {p.notes}
+                      {p.claude_take && (
+                        <span className="news-take">
+                          <span className="news-take-label">Claude&apos;s take</span>
+                          {p.claude_take}
+                        </span>
+                      )}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -344,24 +353,30 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
                       <p className="news-theme-headline">{theme.headline}</p>
                       {points.length > 0 && (
                         <ol className="news-theme-points">
-                          {points.map((pt, pi) => (
-                            <li key={pi} className="news-theme-point">
-                              {pt.text}
-                              {pt.jargon && pt.jargon.length > 0 && (
-                                <ol className="news-theme-jargon">
-                                  {pt.jargon.map((j, ji) => (
-                                    <li key={ji}>
-                                      <span className="news-jargon-term">
-                                        {j.term}
-                                      </span>
-                                      {" — "}
-                                      {j.definition}
-                                    </li>
-                                  ))}
-                                </ol>
-                              )}
-                            </li>
-                          ))}
+                          {points.map((pt, pi) => {
+                            // New notes carry plain `details`; older ones carry
+                            // term/definition `jargon` pairs. Render whichever.
+                            const subs =
+                              pt.details && pt.details.length > 0
+                                ? pt.details
+                                : (pt.jargon ?? []).map((j) =>
+                                    j.definition
+                                      ? `${j.term} — ${j.definition}`
+                                      : j.term,
+                                  );
+                            return (
+                              <li key={pi} className="news-theme-point">
+                                {pt.text}
+                                {subs.length > 0 && (
+                                  <ol className="news-theme-jargon">
+                                    {subs.map((s, ji) => (
+                                      <li key={ji}>{s}</li>
+                                    ))}
+                                  </ol>
+                                )}
+                              </li>
+                            );
+                          })}
                         </ol>
                       )}
                       {theme.chart && <ThemeChartView chart={theme.chart} />}

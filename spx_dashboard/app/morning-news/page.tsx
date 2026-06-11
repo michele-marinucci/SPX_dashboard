@@ -8,6 +8,9 @@ export interface JargonNote {
 
 export interface ThemePoint {
   text: string;
+  // Lettered supporting sub-bullets under the key takeaway.
+  details?: string[];
+  // Legacy: older notes carried term/definition pairs here instead.
   jargon?: JargonNote[];
 }
 
@@ -36,6 +39,8 @@ export interface NewsPosition {
   ticker: string;
   name?: string;
   notes: string;
+  // Our analytical read on what the news means for the (long) position.
+  claude_take?: string;
 }
 
 export interface MorningNote {

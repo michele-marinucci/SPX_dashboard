@@ -67,32 +67,43 @@ def _get_positions() -> list[str]:
 # ---------------------------------------------------------------------------
 
 _SYSTEM = """\
-You are a senior investment analyst writing the daily morning notes for a small team of investment professionals.
-Your job is to distill the key investment-relevant signal from the day's newsletters — clearly and precisely.
+You are a senior analyst writing the daily morning note for a small team of professional investors at a long-only equity fund.
+Your readers are sophisticated and run the portfolio listed below. Write for them.
 
-WRITING STYLE (very important):
-- Use plain, simple English. Write so a smart person with no finance background understands it.
-- One idea per sentence. Keep sentences short.
-- Do NOT use jargon, acronyms, or insider shorthand in the main points.
-- If a technical term is genuinely unavoidable, you may use it in the main point, but you MUST add a short sub-note that explains that exact term in plain words.
-- Be factual. No hype.
+AUDIENCE & TONE:
+- They are investors. NEVER explain basic finance concepts (e.g. what an IPO, an index fund, a buyback, or a P/E ratio is). No definitions of common terms.
+- Assume deep familiarity with the portfolio positions. Do not explain what the companies do.
+- Be concise. Short, simple sentences — one idea each. Avoid long or complex sentences.
+- Avoid unnecessary jargon and buzzwords, but ordinary financial terms are completely fine and expected.
+- Be factual and specific. No hype, no filler.
 
-Prioritize themes that appear in MULTIPLE newsletters. Repetition = signal.
-Ignore promotional content, ads, and generic market colour that appears in only one source.
+PRIORITIES:
+- Portfolio positions come FIRST. Lead with anything material to the names we own and give them the most space.
+- Then the broad themes that recur across MULTIPLE newsletters. Repetition = signal. Ignore ads, promos, and one-off market colour.
+
+FORMAT (built to be skimmed):
+- Every key takeaway is its own numbered bullet (1, 2, 3 …).
+- Supporting detail goes in lettered sub-bullets (a, b, c …) under the relevant takeaway.
+- A busy reader should get the whole gist from the numbered bullets alone.
+
+PORTFOLIO POSITIONS — "Claude's take":
+- The fund is LONG every position. For each position you mention, after stating what happened, add your own read called "Claude's take".
+- "Claude's take" = the implications for our long thesis: competitive moat, durability, future revenue growth, earnings power, pricing, competitive threats. Be specific to that name. 1-3 short sentences. It is analysis, not a recap of the news.
 
 Structure the output as JSON exactly matching this schema:
 
 {
   "date": "YYYY-MM-DD",
-  "one_liner": "One simple sentence summarising the morning in plain English.",
+  "one_liner": "One concise sentence framing the morning.",
   "top_themes": [
     {
-      "headline": "short plain-English headline (max 10 words, no jargon)",
+      "headline": "short headline (max 10 words)",
       "points": [
         {
-          "text": "One plain sentence. One idea. No jargon.",
-          "jargon": [
-            { "term": "the exact technical term used above", "definition": "a short plain-English explanation of that term" }
+          "text": "The key takeaway. One concise sentence.",
+          "details": [
+            "A supporting detail, kept short. Shown as a lettered sub-bullet.",
+            "Another supporting detail, only if it adds something."
           ]
         }
       ],
@@ -110,19 +121,19 @@ Structure the output as JSON exactly matching this schema:
   ],
   "positions": [
     {
-      "ticker": "AAPL",
-      "name": "Apple Inc.",
-      "notes": "1-3 plain-English sentences of what was said specifically about this name. No jargon."
+      "ticker": "MSFT",
+      "name": "Microsoft",
+      "notes": "The key takeaway about this name — what happened and why it matters. Concise.",
+      "claude_take": "Your read on the implications for our long position: moat, growth, earnings power. Specific. 1-3 short sentences."
     }
   ]
 }
 
 Field rules:
+- positions: list every owned name with something specific and material in today's mail — these are the priority, so put them first. Order by materiality. Omit names with nothing meaningful; do not pad. Always include "claude_take" for each name you list.
 - top_themes: up to 5 items, most cross-cited first. Only include a theme if >=2 sources touched it, OR if it is highly material to a portfolio position.
-- points: 2-5 short bullets per theme, each a single plain sentence with one idea. These are shown as a numbered list.
-- jargon: ONLY include when the point's text actually contains a technical term a layperson would not know. Each entry explains one term. If the point has no jargon, omit the field or use an empty list. These are shown as lettered sub-bullets.
+- points: 2-5 per theme. "text" is the key takeaway (numbered bullet); "details" is 0-3 short supporting sub-bullets (lettered). Omit "details" or use an empty list when the takeaway stands alone.
 - chart: include ONLY when the newsletters contain concrete, comparable numbers worth visualising (e.g. several index moves, a set of values across names, a trend). Provide 2-8 labeled numeric values in "series". Use "bar" for comparisons and "line" for a time trend. Set "unit" to the measure (e.g. "%", "$", "bps"). If there is nothing meaningful to chart, set "chart" to null.
-- positions: only include positions where something specific and meaningful was said. Do NOT pad with generic commentary.
 - Output ONLY the JSON object, no markdown fences, no preamble.
 """
 
@@ -206,15 +217,17 @@ def _send_email(summary: dict, html_body: str) -> None:
         plain_lines.append("Portfolio mentions:")
         for p in positions:
             plain_lines.append(f"  [{p['ticker']}] {p['notes']}")
+            if p.get("claude_take"):
+                plain_lines.append(f"      Claude's take: {p['claude_take']}")
         plain_lines.append("")
     for theme in summary.get("top_themes", []):
         plain_lines.append(theme["headline"].upper())
         points = theme.get("points") or _legacy_points(theme)
         for pi, point in enumerate(points, 1):
             plain_lines.append(f"   {pi}. {point.get('text', '')}")
-            for ji, j in enumerate(point.get("jargon") or []):
-                letter = chr(ord("a") + ji)
-                plain_lines.append(f"      {letter}. {j.get('term', '')}: {j.get('definition', '')}")
+            for di, sub in enumerate(_point_subs(point)):
+                letter = chr(ord("a") + di)
+                plain_lines.append(f"      {letter}. {sub}")
         chart = theme.get("chart")
         if chart and chart.get("series"):
             unit = chart.get("unit", "")
@@ -237,7 +250,18 @@ def _send_email(summary: dict, html_body: str) -> None:
 def _legacy_points(theme: dict) -> list[dict]:
     """Adapt an older single-paragraph theme to the new points shape."""
     detail = theme.get("detail")
-    return [{"text": detail, "jargon": []}] if detail else []
+    return [{"text": detail, "details": []}] if detail else []
+
+
+def _point_subs(point: dict) -> list[str]:
+    """Lettered sub-bullets for a point: the new `details`, or — for notes
+    generated under the old schema — the legacy `jargon` term/definition pairs."""
+    if point.get("details"):
+        return [str(d) for d in point["details"]]
+    return [
+        f"{j.get('term', '')}: {j.get('definition', '')}"
+        for j in (point.get("jargon") or [])
+    ]
 
 
 def _chart_html(chart: dict) -> str:
@@ -274,9 +298,18 @@ def _build_html(summary: dict) -> str:
 
     positions_html = ""
     for p in summary.get("positions", []):
+        take = p.get("claude_take")
+        take_html = (
+            f'<div style="margin:4px 0 0 14px;font-size:12px;color:#555;'
+            f'border-left:2px solid #3730e6;padding-left:8px">'
+            f'<b style="color:#3730e6">Claude’s take:</b> {take}</div>'
+            if take
+            else ""
+        )
         positions_html += (
-            f'<div style="margin-bottom:8px">'
+            f'<div style="margin-bottom:12px">'
             f'<b style="color:#3730e6">{p["ticker"]}</b> — {p["notes"]}'
+            f"{take_html}"
             f"</div>"
         )
     pos_section = (
@@ -290,18 +323,17 @@ def _build_html(summary: dict) -> str:
         points = t.get("points") or _legacy_points(t)
         points_html = ""
         for point in points:
-            jargon_html = ""
-            jargon = point.get("jargon") or []
-            if jargon:
+            subs = _point_subs(point)
+            subs_html = ""
+            if subs:
                 items = "".join(
-                    f'<li style="margin:2px 0"><b>{j.get("term", "")}</b>: {j.get("definition", "")}</li>'
-                    for j in jargon
+                    f'<li style="margin:2px 0">{s}</li>' for s in subs
                 )
-                jargon_html = (
+                subs_html = (
                     f'<ol type="a" style="margin:4px 0 4px 18px;padding:0;'
                     f'font-size:12px;color:#666">{items}</ol>'
                 )
-            points_html += f'<li style="margin:4px 0">{point.get("text", "")}{jargon_html}</li>'
+            points_html += f'<li style="margin:4px 0">{point.get("text", "")}{subs_html}</li>'
         chart_html = _chart_html(t["chart"]) if t.get("chart") else ""
         srcs = ", ".join(t.get("sources", []))
         themes_html += (
