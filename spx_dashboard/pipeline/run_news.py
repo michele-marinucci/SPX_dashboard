@@ -67,36 +67,62 @@ def _get_positions() -> list[str]:
 # ---------------------------------------------------------------------------
 
 _SYSTEM = """\
-You are a senior investment analyst writing the daily morning note for a small team of investment professionals.
-Your job is to distill the key investment-relevant signal from the day's newsletters — concisely and precisely.
+You are a senior investment analyst writing the daily morning notes for a small team of investment professionals.
+Your job is to distill the key investment-relevant signal from the day's newsletters — clearly and precisely.
 
-Rules:
-- Prioritize themes that appear in MULTIPLE newsletters. Repetition = signal.
-- Ignore promotional content, ads, and generic market colour that appears in only one source.
-- Structure the output as JSON exactly matching this schema:
+WRITING STYLE (very important):
+- Use plain, simple English. Write so a smart person with no finance background understands it.
+- One idea per sentence. Keep sentences short.
+- Do NOT use jargon, acronyms, or insider shorthand in the main points.
+- If a technical term is genuinely unavoidable, you may use it in the main point, but you MUST add a short sub-note that explains that exact term in plain words.
+- Be factual. No hype.
+
+Prioritize themes that appear in MULTIPLE newsletters. Repetition = signal.
+Ignore promotional content, ads, and generic market colour that appears in only one source.
+
+Structure the output as JSON exactly matching this schema:
 
 {
   "date": "YYYY-MM-DD",
+  "one_liner": "One simple sentence summarising the morning in plain English.",
   "top_themes": [
     {
-      "headline": "short headline (max 12 words)",
-      "detail": "2-4 sentences. What is happening, why it matters for equities.",
-      "sources": ["Newsletter Name 1", "Newsletter Name 2"]
+      "headline": "short plain-English headline (max 10 words, no jargon)",
+      "points": [
+        {
+          "text": "One plain sentence. One idea. No jargon.",
+          "jargon": [
+            { "term": "the exact technical term used above", "definition": "a short plain-English explanation of that term" }
+          ]
+        }
+      ],
+      "sources": ["Newsletter Name 1", "Newsletter Name 2"],
+      "chart": {
+        "type": "bar",
+        "title": "short chart title",
+        "unit": "%",
+        "series": [
+          { "label": "S&P 500", "value": -1.6 },
+          { "label": "Nasdaq 100", "value": -2.3 }
+        ]
+      }
     }
   ],
   "positions": [
     {
       "ticker": "AAPL",
       "name": "Apple Inc.",
-      "notes": "1-3 sentences of what was said specifically about this name. Omit if nothing meaningful."
+      "notes": "1-3 plain-English sentences of what was said specifically about this name. No jargon."
     }
-  ],
-  "one_liner": "One crisp sentence summarising the morning in plain English."
+  ]
 }
 
-- top_themes: up to 5 items, most cross-cited first. Only include a theme if ≥2 sources touched it, OR if it is highly material to a portfolio position.
+Field rules:
+- top_themes: up to 5 items, most cross-cited first. Only include a theme if >=2 sources touched it, OR if it is highly material to a portfolio position.
+- points: 2-5 short bullets per theme, each a single plain sentence with one idea. These are shown as a numbered list.
+- jargon: ONLY include when the point's text actually contains a technical term a layperson would not know. Each entry explains one term. If the point has no jargon, omit the field or use an empty list. These are shown as lettered sub-bullets.
+- chart: include ONLY when the newsletters contain concrete, comparable numbers worth visualising (e.g. several index moves, a set of values across names, a trend). Provide 2-8 labeled numeric values in "series". Use "bar" for comparisons and "line" for a time trend. Set "unit" to the measure (e.g. "%", "$", "bps"). If there is nothing meaningful to chart, set "chart" to null.
 - positions: only include positions where something specific and meaningful was said. Do NOT pad with generic commentary.
-- Keep the tone factual, no hyperbole.
 - Output ONLY the JSON object, no markdown fences, no preamble.
 """
 
@@ -166,7 +192,7 @@ def _send_email(summary: dict, html_body: str) -> None:
         print("Missing email credentials; skipping send.", file=sys.stderr)
         return
 
-    subject = f"Morning Note · {summary.get('date', dt.date.today().isoformat())}"
+    subject = f"Morning Notes · {summary.get('date', dt.date.today().isoformat())}"
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
@@ -174,19 +200,30 @@ def _send_email(summary: dict, html_body: str) -> None:
     msg["To"] = ", ".join(recipients)
 
     one_liner = summary.get("one_liner", "")
-    plain_lines = [f"Morning Note — {summary.get('date', '')}", "", one_liner, ""]
-    for theme in summary.get("top_themes", []):
-        plain_lines.append(f"• {theme['headline']}")
-        plain_lines.append(f"  {theme['detail']}")
-        srcs = theme.get("sources", [])
-        if srcs:
-            plain_lines.append(f"  Sources: {', '.join(srcs)}")
-        plain_lines.append("")
+    plain_lines = [f"Morning Notes — {summary.get('date', '')}", "", one_liner, ""]
     positions = summary.get("positions", [])
     if positions:
         plain_lines.append("Portfolio mentions:")
         for p in positions:
             plain_lines.append(f"  [{p['ticker']}] {p['notes']}")
+        plain_lines.append("")
+    for theme in summary.get("top_themes", []):
+        plain_lines.append(theme["headline"].upper())
+        points = theme.get("points") or _legacy_points(theme)
+        for pi, point in enumerate(points, 1):
+            plain_lines.append(f"   {pi}. {point.get('text', '')}")
+            for ji, j in enumerate(point.get("jargon") or []):
+                letter = chr(ord("a") + ji)
+                plain_lines.append(f"      {letter}. {j.get('term', '')}: {j.get('definition', '')}")
+        chart = theme.get("chart")
+        if chart and chart.get("series"):
+            unit = chart.get("unit", "")
+            vals = ", ".join(f"{s.get('label')}: {s.get('value')}{unit}" for s in chart["series"])
+            plain_lines.append(f"   [{chart.get('title', 'Chart')}] {vals}")
+        srcs = theme.get("sources", [])
+        if srcs:
+            plain_lines.append(f"   Sources: {', '.join(srcs)}")
+        plain_lines.append("")
 
     msg.attach(MIMEText("\n".join(plain_lines), "plain"))
     msg.attach(MIMEText(html_body, "html"))
@@ -197,19 +234,44 @@ def _send_email(summary: dict, html_body: str) -> None:
     print(f"Email sent to {recipients}", file=sys.stderr)
 
 
+def _legacy_points(theme: dict) -> list[dict]:
+    """Adapt an older single-paragraph theme to the new points shape."""
+    detail = theme.get("detail")
+    return [{"text": detail, "jargon": []}] if detail else []
+
+
+def _chart_html(chart: dict) -> str:
+    series = chart.get("series") or []
+    if not series:
+        return ""
+    unit = chart.get("unit", "")
+    vals = [float(s.get("value", 0)) for s in series]
+    peak = max((abs(v) for v in vals), default=0) or 1
+    rows = ""
+    for s in series:
+        v = float(s.get("value", 0))
+        width = int(abs(v) / peak * 100)
+        colour = "#dc2626" if v < 0 else "#16a34a"
+        rows += (
+            f'<tr>'
+            f'<td style="font-size:12px;color:#444;padding:3px 8px 3px 0;white-space:nowrap">{s.get("label", "")}</td>'
+            f'<td style="width:100%;padding:3px 0">'
+            f'<span style="display:inline-block;height:12px;width:{width}%;background:{colour};border-radius:2px;vertical-align:middle"></span>'
+            f'<span style="font-size:11px;color:#666;margin-left:6px">{v}{unit}</span>'
+            f'</td></tr>'
+        )
+    return (
+        f'<div style="margin:10px 0 4px">'
+        f'<div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">{chart.get("title", "")}</div>'
+        f'<table style="border-collapse:collapse;width:100%">{rows}</table>'
+        f"</div>"
+    )
+
+
 def _build_html(summary: dict) -> str:
     date = summary.get("date", "")
     one_liner = summary.get("one_liner", "")
-    themes_html = ""
-    for t in summary.get("top_themes", []):
-        srcs = ", ".join(t.get("sources", []))
-        themes_html += (
-            f'<div style="margin-bottom:16px">'
-            f'<b>{t["headline"]}</b><br>'
-            f'<span style="color:#444">{t["detail"]}</span><br>'
-            f'<span style="color:#888;font-size:12px">{srcs}</span>'
-            f"</div>"
-        )
+
     positions_html = ""
     for p in summary.get("positions", []):
         positions_html += (
@@ -222,15 +284,44 @@ def _build_html(summary: dict) -> str:
         if positions_html
         else ""
     )
+
+    themes_html = ""
+    for t in summary.get("top_themes", []):
+        points = t.get("points") or _legacy_points(t)
+        points_html = ""
+        for point in points:
+            jargon_html = ""
+            jargon = point.get("jargon") or []
+            if jargon:
+                items = "".join(
+                    f'<li style="margin:2px 0"><b>{j.get("term", "")}</b>: {j.get("definition", "")}</li>'
+                    for j in jargon
+                )
+                jargon_html = (
+                    f'<ol type="a" style="margin:4px 0 4px 18px;padding:0;'
+                    f'font-size:12px;color:#666">{items}</ol>'
+                )
+            points_html += f'<li style="margin:4px 0">{point.get("text", "")}{jargon_html}</li>'
+        chart_html = _chart_html(t["chart"]) if t.get("chart") else ""
+        srcs = ", ".join(t.get("sources", []))
+        themes_html += (
+            f'<div style="margin-bottom:20px">'
+            f'<b>{t["headline"]}</b>'
+            f'<ol style="margin:6px 0 6px 18px;padding:0;color:#333;font-size:13px">{points_html}</ol>'
+            f"{chart_html}"
+            f'<div style="color:#888;font-size:12px;margin-top:4px">{srcs}</div>'
+            f"</div>"
+        )
+
     return f"""<!DOCTYPE html>
 <html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#1a1a22">
 <div style="border-top:3px solid #3730e6;padding-top:16px;margin-bottom:24px">
-  <span style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.05em">Morning Note · {date}</span>
+  <span style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.05em">Morning Notes · {date}</span>
   <p style="font-size:15px;font-weight:600;margin:8px 0 0">{one_liner}</p>
 </div>
-<h2 style="font-size:14px;margin-bottom:12px">Top Themes</h2>
-{themes_html}
 {pos_section}
+<h2 style="font-size:14px;margin:24px 0 12px">Top Themes</h2>
+{themes_html}
 <p style="font-size:11px;color:#aaa;margin-top:32px;border-top:1px solid #eee;padding-top:12px">
   MERITAGE · INTERNAL · Generated automatically from morning newsletters
 </p>

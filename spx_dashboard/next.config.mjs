@@ -8,6 +8,14 @@ const nextConfig = {
       "/api/equities/export": ["./data/detailed_dashboard_template.xlsx"],
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "logo.clearbit.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
