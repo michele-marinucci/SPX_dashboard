@@ -82,6 +82,42 @@ REF_FIELDS = ["AVG_DAILY_VALUE_TRADED_3M"]
 PERF_DAYS = {"m1": 30, "m3": 91, "m6": 182}
 
 DEBUG = "--debug" in sys.argv
+DEBUG_PATH = "bql_debug.txt"
+
+
+def dbg(text: str) -> None:
+    """Append a line to the debug file (written from Python directly, so it
+    doesn't depend on shell stderr redirection). Only active with --debug."""
+    if not DEBUG:
+        return
+    try:
+        with open(DEBUG_PATH, "a", encoding="utf-8") as fh:
+            fh.write(text + "\n")
+    except Exception:
+        pass
+
+
+def dbg_message(msg, context: str) -> None:
+    """Dump everything we can learn about a Bloomberg message to the debug
+    file: its toPy() form, its string form, and the 'results' element if any."""
+    if not DEBUG:
+        return
+    dbg(f"\n===== raw message ({context}) =====")
+    try:
+        py = msg.toPy()
+        dbg(f"toPy type={type(py).__name__} value={py!r}")
+    except Exception as e:
+        dbg(f"toPy raised {type(e).__name__}: {e}")
+    for el in ("results", "error"):
+        try:
+            if msg.hasElement(el):
+                dbg(f"element[{el}] as string:\n{msg.getElementAsString(el)}")
+        except Exception as e:
+            dbg(f"element[{el}] raised {type(e).__name__}: {e}")
+    try:
+        dbg(f"str(msg):\n{msg}")
+    except Exception as e:
+        dbg(f"str(msg) raised {type(e).__name__}: {e}")
 
 # Diagnostics gathered during a run: request-level and per-security errors
 # from Bloomberg, printed when the run produces nothing so failures are never
@@ -244,6 +280,7 @@ def bql_anchor_closes(
         universe = ", ".join(f"'{s}'" for s in securities)
         expression = f"get({items}) for([{universe}])"
 
+        dbg(f"BQL expression sent:\n{expression}")
         svc = session.getService("//blp/bqlsvc")
         req = svc.createRequest("sendQuery")
         req.set("expression", expression)
@@ -257,10 +294,10 @@ def bql_anchor_closes(
                 ERRORS.append("bql: timed out waiting for response")
                 break
             for msg in ev:
-                if DEBUG:
-                    print(f"--- raw message (bql) ---\n{msg}\n", file=sys.stderr)
+                dbg_message(msg, "bql")
                 try:
                     parsed = _bql_results(msg)
+                    dbg(f"_bql_results -> {len(parsed)} items: {parsed[:1]!r}")
                 except Exception as e:
                     ERRORS.append(f"bql: parse: {type(e).__name__}: {e}")
                     parsed = []
@@ -434,6 +471,12 @@ def main() -> None:
     base = (args[0] if args else os.environ.get("DASHBOARD_URL", "")).rstrip("/")
     if not base:
         sys.exit("Usage: python bloomberg_push.py https://your-dashboard.vercel.app [--force]")
+    if DEBUG:
+        try:
+            open(DEBUG_PATH, "w").close()  # start each debug run with a clean file
+        except Exception:
+            pass
+        print(f"--debug: writing raw Bloomberg responses to {os.path.abspath(DEBUG_PATH)}")
     password = os.environ.get("DASHBOARD_PASSWORD") or input("Site password: ").strip()
 
     web = requests.Session()
