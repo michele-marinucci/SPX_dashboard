@@ -112,13 +112,20 @@ def fetch_recent_newsletters(lookback_hours: int = 24) -> list[dict]:
 
     imap = imaplib.IMAP4_SSL(IMAP_HOST)
     imap.login(address, password)
+    print(f"[fetch_news] logged in as {address}", file=sys.stderr)
     results: list[dict] = []
+    skipped_time = skipped_empty = 0
     try:
         imap.select("INBOX")
         typ, data = imap.search(None, "SINCE", since_str)
         if typ != "OK":
+            print(f"[fetch_news] IMAP search failed: {typ}", file=sys.stderr)
             return []
         ids = data[0].split()
+        print(
+            f"[fetch_news] INBOX search SINCE {since_str} -> {len(ids)} message(s)",
+            file=sys.stderr,
+        )
         if not ids:
             return []
 
@@ -139,19 +146,36 @@ def fetch_recent_newsletters(lookback_hours: int = 24) -> list[dict]:
             import time
             epoch = time.mktime(internal_tuple)
             msg_dt = datetime.fromtimestamp(epoch, tz=timezone.utc)
-            if msg_dt < cutoff:
-                continue
 
             sender_raw = msg.get("From", "")
+            subject = msg.get("Subject", "(no subject)")
+
+            if msg_dt < cutoff:
+                skipped_time += 1
+                print(
+                    f"[fetch_news] skip (too old, {msg_dt.isoformat()}): "
+                    f"{sender_raw} | {subject}",
+                    file=sys.stderr,
+                )
+                continue
+
             sender_lower = sender_raw.lower()
             if sender_filters and not any(f in sender_lower for f in sender_filters):
                 continue
 
-            subject = msg.get("Subject", "(no subject)")
             text = _extract_text(msg)
             if not text:
+                skipped_empty += 1
+                print(
+                    f"[fetch_news] skip (empty body): {sender_raw} | {subject}",
+                    file=sys.stderr,
+                )
                 continue
 
+            print(
+                f"[fetch_news] keep: {sender_raw} | {subject} ({len(text)} chars)",
+                file=sys.stderr,
+            )
             results.append(
                 {
                     "subject": subject,
@@ -161,6 +185,11 @@ def fetch_recent_newsletters(lookback_hours: int = 24) -> list[dict]:
                 }
             )
 
+        print(
+            f"[fetch_news] kept {len(results)}, skipped {skipped_time} old / "
+            f"{skipped_empty} empty",
+            file=sys.stderr,
+        )
     finally:
         try:
             imap.close()
