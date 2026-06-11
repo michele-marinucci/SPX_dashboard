@@ -27,25 +27,71 @@ export function chunk<T>(arr: T[], size: number): T[][] {
   return out;
 }
 
-// ---- number formatting ----------------------------------------------------- //
-export function num(v: number | null | undefined, digits = 0): string {
+// ---- number formatting (identical to lib/format.ts, so the deck reads like
+// the web tables: "—" for nulls, parentheses for negative $, pct ×100) ------- //
+export function fmtMoney(v: number | null | undefined, digits = 0): string {
   if (v == null || Number.isNaN(v)) return "—";
   return v.toLocaleString("en-US", {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   });
 }
-export function signed(v: number | null | undefined, digits = 0): string {
+export function fmtSignedMoney(v: number | null | undefined, digits = 0): string {
   if (v == null || Number.isNaN(v)) return "—";
-  const s = num(Math.abs(v), digits);
-  return v < 0 ? `(${s})` : v > 0 ? `+${s}` : s;
+  const s = fmtMoney(Math.abs(v), digits);
+  return v < 0 ? `(${s})` : s;
 }
-export function pct(v: number | null | undefined, digits = 1): string {
+export function fmtPct(v: number | null | undefined, digits = 1): string {
   if (v == null || Number.isNaN(v)) return "—";
-  return `${v >= 0 ? "+" : ""}${v.toLocaleString("en-US", {
+  return `${(v * 100).toFixed(digits)}%`;
+}
+export function fmtNum(v: number | null | undefined, digits = 1): string {
+  if (v == null || Number.isNaN(v)) return "—";
+  return v.toLocaleString("en-US", {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
-  })}%`;
+  });
+}
+
+// ---- conditional formatting (ported from lib/heatmap.ts; rgba blends are
+// flattened onto white since PPTX fills have no alpha) ----------------------- //
+export interface ColScale {
+  min: number;
+  max: number;
+  maxAbs: number;
+}
+export function computeScale(values: (number | null)[]): ColScale {
+  const nums = values.filter((v): v is number => v !== null && !Number.isNaN(v));
+  if (nums.length === 0) return { min: 0, max: 0, maxAbs: 0 };
+  const min = Math.min(...nums);
+  const max = Math.max(...nums);
+  return { min, max, maxAbs: Math.max(Math.abs(min), Math.abs(max)) || 1 };
+}
+
+function onWhite(rgb: [number, number, number], alpha: number): string {
+  return rgb
+    .map((c) => Math.round(255 + (c - 255) * alpha).toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+}
+
+// Diverging red/green for deltas — rgba(22,163,74,a) / rgba(220,38,38,a).
+export function rgHeat(v: number | null, scale: ColScale): { fill?: string } {
+  if (v == null || Number.isNaN(v) || v === 0) return {};
+  const t = Math.min(1, Math.abs(v) / (scale.maxAbs || 1));
+  const alpha = 0.12 + 0.6 * t;
+  return { fill: onWhite(v > 0 ? [22, 163, 74] : [220, 38, 38], alpha) };
+}
+
+// Sequential brand-indigo for levels — rgba(55,48,230,a), white text when dark.
+export function blueHeat(v: number | null, scale: ColScale): { fill?: string; color?: string } {
+  if (v == null || Number.isNaN(v)) return {};
+  const range = scale.max - scale.min || 1;
+  const t = Math.min(1, Math.max(0, (v - scale.min) / range));
+  const alpha = 0.08 + 0.62 * t;
+  const out: { fill?: string; color?: string } = { fill: onWhite([55, 48, 230], alpha) };
+  if (alpha > 0.5) out.color = "F4F4FF";
+  return out;
 }
 
 // ---- slide scaffolding ----------------------------------------------------- //
@@ -126,37 +172,59 @@ export function cols(labelW: number, n: number): number[] {
   return [labelW, ...Array(n).fill(even)];
 }
 
-// Deterministic table with manual pagination (header repeated per page). One
+// Deterministic table with manual pagination (headers repeated per page). One
 // section slide per page; avoids pptxgenjs auto-pagination over-splitting.
+// `groupHeader` is an optional extra top row (e.g. grouped column bands).
 export function paginatedTable(
   pptx: pptxgen,
   title: string,
   subtitle: string,
-  header: string[],
+  header: Row,
   body: Row[],
-  opts: { colW?: number[]; rowsPerPage?: number; fontSize?: number } = {},
+  opts: {
+    colW?: number[];
+    rowsPerPage?: number;
+    fontSize?: number;
+    groupHeader?: Row;
+    rowH?: number;
+  } = {},
 ) {
-  const { colW, rowsPerPage = 20, fontSize = 9 } = opts;
+  const { colW, rowsPerPage = 20, fontSize = 9, groupHeader, rowH } = opts;
   const pages = chunk(body, rowsPerPage);
-  const headRow: Row = header.map((h) => ({
-    text: h,
-    options: {
-      bold: true,
-      color: HEADER_TXT,
-      fill: { color: BRAND },
-      align: "center" as const,
-      valign: "middle" as const,
-    },
-  }));
+  const hdrOpts: pptxgen.TableCellProps = {
+    bold: true,
+    color: HEADER_TXT,
+    fill: { color: BRAND },
+    align: "center",
+    valign: "middle",
+  };
+  const headRows: Row[] = [];
+  if (groupHeader) {
+    headRows.push(
+      groupHeader.map((c) =>
+        typeof c === "string"
+          ? { text: c, options: hdrOpts }
+          : { text: c.text, options: { ...hdrOpts, ...c.options } },
+      ),
+    );
+  }
+  headRows.push(
+    header.map((c) =>
+      typeof c === "string"
+        ? { text: c, options: hdrOpts }
+        : { text: c.text, options: { ...hdrOpts, ...c.options } },
+    ),
+  );
   pages.forEach((rows, i) => {
     const sub = pages.length > 1 ? `${subtitle}  (${i + 1}/${pages.length})` : subtitle;
     const slide = sectionSlide(pptx, title, sub);
-    const trows: pptxgen.TableRow[] = [headRow, ...rows].map((r) => r.map(toCell));
+    const trows: pptxgen.TableRow[] = [...headRows, ...rows].map((r) => r.map(toCell));
     slide.addTable(trows, {
       x: MARGIN,
       y: 1.3,
       w: CONTENT_W,
       colW,
+      rowH,
       fontFace: "Arial",
       fontSize,
       color: INK,

@@ -14,13 +14,16 @@ import {
   MARGIN,
   MUTED,
   Row,
-  cols,
+  blueHeat,
+  computeScale,
   dividerSlide,
-  num,
+  fmtMoney,
+  fmtNum,
+  fmtPct,
+  fmtSignedMoney,
   paginatedTable,
-  pct,
+  rgHeat,
   sectionSlide,
-  signed,
 } from "./common";
 
 // ---------------------------------------------------------------------------
@@ -61,61 +64,171 @@ function bullets(slide: pptxgen.Slide, items: { title?: string; body: string }[]
   });
 }
 
-// ---- SPX Monitor (Aggregate S&P 500 only) ---------------------------------- //
-function rowFill(cells: Row, r: { is_total: boolean }) {
-  if (r.is_total)
-    cells.forEach(
-      (c) =>
-        typeof c === "object" &&
-        (c.options = { ...c.options, fill: { color: "EFEFF3" }, bold: true }),
-    );
+// ---- SPX Monitor (Aggregate S&P 500, mirroring components/DataTable.tsx) --- //
+//
+// Cells reproduce the web tables 1:1: same number formats (lib/format.ts) and
+// the same conditional formatting (lib/heatmap.ts) — sequential brand-blue on
+// levels, diverging red/green on deltas, with per-column scales computed from
+// the category rows only (totals excluded) and totals left unshaded.
+
+const SPX = "SPX Monitor · Aggregate S&P 500";
+
+type HeatKind = "blue" | "rg" | "none";
+
+interface SpxCol {
+  label: string;
+  group: string;
+  fmt: (v: number | null) => string;
+  heat: HeatKind;
+}
+
+function spxTable(
+  pptx: pptxgen,
+  subtitle: string,
+  cols: SpxCol[],
+  rows: { label: string; isTotal: boolean; cells: (number | null)[] }[],
+) {
+  const scales = cols.map((_, ci) =>
+    computeScale(rows.filter((r) => !r.isTotal).map((r) => r.cells[ci] ?? null)),
+  );
+
+  // Grouped header band (like the web's group-row) + per-column label row.
+  const groupHeader: Row = [{ text: "", options: {} }];
+  let i = 0;
+  while (i < cols.length) {
+    let span = 1;
+    while (i + span < cols.length && cols[i + span].group === cols[i].group) span += 1;
+    groupHeader.push({ text: cols[i].group, options: { colspan: span } });
+    i += span;
+  }
+  const header: Row = ["", ...cols.map((c) => c.label)];
+
+  const body: Row[] = rows.map((r) => {
+    const out: Row = [
+      {
+        text: r.label,
+        options: {
+          align: "left",
+          bold: r.isTotal,
+          fill: r.isTotal ? { color: "EFEFF3" } : undefined,
+        },
+      },
+    ];
+    r.cells.forEach((v, ci) => {
+      const col = cols[ci];
+      const text = col.fmt(v);
+      if (r.isTotal) {
+        out.push({ text, options: { bold: true, fill: { color: "EFEFF3" } } });
+        return;
+      }
+      if (col.heat === "blue") {
+        const h = blueHeat(v, scales[ci]);
+        out.push({
+          text,
+          options: {
+            fill: h.fill ? { color: h.fill } : undefined,
+            color: h.color,
+          },
+        });
+      } else if (col.heat === "rg") {
+        const h = rgHeat(v, scales[ci]);
+        out.push({ text, options: { fill: h.fill ? { color: h.fill } : undefined } });
+      } else {
+        out.push({ text, options: {} });
+      }
+    });
+    return out;
+  });
+
+  const labelW = 2.6;
+  const numW = (CONTENT_W - labelW) / cols.length;
+  paginatedTable(pptx, SPX, subtitle, header, body, {
+    colW: [labelW, ...Array(cols.length).fill(numW)],
+    rowsPerPage: 20,
+    fontSize: 9,
+    groupHeader,
+  });
 }
 
 function threeDateTableSlide(pptx: pptxgen, t: ThreeDateTable, title: string, digits: number) {
-  const header = ["", ...t.dates.map((d) => `${d}`), "$Δ YTD", "$Δ QTD", "%Δ YTD", "%Δ QTD"];
-  const body: Row[] = t.rows.map((r) => {
-    const cells: Row = [{ text: r.label, options: { align: "left", bold: r.is_total } }];
-    r.values.forEach((v) => cells.push(num(v, digits)));
-    cells.push(signed(r.delta_abs[0], digits));
-    cells.push(signed(r.delta_abs[1], digits));
-    cells.push(pct(r.delta_pct[0]));
-    cells.push(pct(r.delta_pct[1]));
-    rowFill(cells, r);
-    return cells;
-  });
-  paginatedTable(pptx, "SPX Monitor · Aggregate S&P 500", title, header, body, {
-    colW: cols(3.0, header.length - 1),
-  });
+  const cols: SpxCol[] = [
+    ...t.dates.map((d) => ({
+      label: d,
+      group: t.value_label,
+      fmt: (v: number | null) => fmtMoney(v, digits),
+      heat: "blue" as const,
+    })),
+    { label: "YTD", group: "$ Δ", fmt: (v) => fmtSignedMoney(v, digits), heat: "rg" },
+    { label: "QTD", group: "$ Δ", fmt: (v) => fmtSignedMoney(v, digits), heat: "rg" },
+    { label: "YTD", group: "% Δ", fmt: (v) => fmtPct(v, 1), heat: "rg" },
+    { label: "QTD", group: "% Δ", fmt: (v) => fmtPct(v, 1), heat: "rg" },
+  ];
+  const rows = t.rows.map((r) => ({
+    label: r.label,
+    isTotal: r.is_total,
+    cells: [...r.values, ...r.delta_abs, ...r.delta_pct],
+  }));
+  spxTable(pptx, title, cols, rows);
 }
 
 function growthTableSlide(pptx: pptxgen, t: GrowthTable) {
-  const header = ["", ...t.years, ...t.delta_years.map((y) => `%Δ ${y}`)];
-  const body: Row[] = t.rows.map((r) => {
-    const cells: Row = [{ text: r.label, options: { align: "left", bold: r.is_total } }];
-    r.values.forEach((v) => cells.push(num(v, 1)));
-    r.delta_pct.forEach((v) => cells.push(pct(v)));
-    rowFill(cells, r);
-    return cells;
-  });
-  paginatedTable(pptx, "SPX Monitor · Aggregate S&P 500", `Earnings Growth · ${t.value_label}`, header, body, {
-    colW: cols(3.0, header.length - 1),
-  });
+  const cols: SpxCol[] = [
+    ...t.years.map((y) => ({
+      label: y,
+      group: t.value_label,
+      fmt: (v: number | null) => fmtMoney(v, 1),
+      heat: "blue" as const,
+    })),
+    ...t.delta_years.map((y) => ({
+      label: y,
+      group: "$ Δ YoY",
+      fmt: (v: number | null) => fmtSignedMoney(v, 1),
+      heat: "rg" as const,
+    })),
+    ...t.delta_years.map((y) => ({
+      label: y,
+      group: "% Δ YoY",
+      fmt: (v: number | null) => fmtPct(v, 1),
+      heat: "rg" as const,
+    })),
+  ];
+  const rows = t.rows.map((r) => ({
+    label: r.label,
+    isTotal: r.is_total,
+    cells: [...r.values, ...r.delta_abs, ...r.delta_pct],
+  }));
+  spxTable(pptx, `Earnings Growth · ${t.value_label}`, cols, rows);
 }
 
 function ntmPeSlide(pptx: pptxgen, t: NtmPeTableData) {
-  const header = ["", "Mkt Cap", "NTM NI", "NTM P/E", ...t.avg_dates.map((d) => `Avg ${d}`)];
-  const body: Row[] = t.rows.map((r) => {
-    const cells: Row = [{ text: r.label, options: { align: "left", bold: r.is_total } }];
-    cells.push(num(r.mkt_cap, 0));
-    cells.push(num(r.ntm_ni, 1));
-    cells.push(num(r.ntm_pe, 1));
-    r.avg_since.forEach((v) => cells.push(num(v, 1)));
-    rowFill(cells, r);
-    return cells;
-  });
-  paginatedTable(pptx, "SPX Monitor · Aggregate S&P 500", t.title || "NTM P/E", header, body, {
-    colW: cols(3.0, header.length - 1),
-  });
+  const cols: SpxCol[] = [
+    { label: "$b", group: "Mkt cap", fmt: (v) => fmtMoney(v, 0), heat: "none" },
+    { label: "$b", group: "NTM NI", fmt: (v) => fmtNum(v, 1), heat: "none" },
+    {
+      label: t.current_label.replace(/[()]/g, ""),
+      group: "NTM P/E",
+      fmt: (v) => fmtNum(v, 1),
+      heat: "blue",
+    },
+    ...t.avg_dates.map((d) => ({
+      label: d,
+      group: "Avg P/E since",
+      fmt: (v: number | null) => fmtNum(v, 1),
+      heat: "blue" as const,
+    })),
+    ...t.avg_dates.map((d) => ({
+      label: d,
+      group: "Current vs avg since",
+      fmt: (v: number | null) => fmtPct(v, 1),
+      heat: "rg" as const,
+    })),
+  ];
+  const rows = t.rows.map((r) => ({
+    label: r.label,
+    isTotal: r.is_total,
+    cells: [r.mkt_cap, r.ntm_ni, r.ntm_pe, ...r.avg_since, ...r.delta_vs_avg],
+  }));
+  spxTable(pptx, t.title || "NTM P/E", cols, rows);
 }
 
 // ---- Twitter Monitor ------------------------------------------------------- //
@@ -142,7 +255,7 @@ function twitterSection(pptx: pptxgen) {
   }
 }
 
-// ---- Morning News Summary -------------------------------------------------- //
+// ---- Morning News Summary (positions first, then themes) ------------------- //
 function morningNewsSection(pptx: pptxgen) {
   const notes = morningNewsRaw as MorningNote[];
   if (!notes?.length) return;
@@ -155,6 +268,24 @@ function morningNewsSection(pptx: pptxgen) {
         day: "numeric",
       })
     : "";
+
+  if (latest.positions?.length) {
+    const header: Row = [
+      { text: "Ticker", options: { align: "left" } },
+      { text: "Name", options: { align: "left" } },
+      { text: "Notes", options: { align: "left" } },
+    ];
+    const body: Row[] = latest.positions.map((p) => [
+      { text: p.ticker, options: { align: "left", bold: true } },
+      { text: p.name || "—", options: { align: "left" } },
+      { text: p.notes, options: { align: "left", fontSize: 9 } },
+    ]);
+    paginatedTable(pptx, "Morning News Summary", `Positions in focus · ${dateLabel}`, header, body, {
+      colW: [1.4, 2.6, CONTENT_W - 4.0],
+      rowsPerPage: 10,
+    });
+  }
+
   const s1 = sectionSlide(pptx, "Morning News Summary", dateLabel);
   const runs: pptxgen.TextProps[] = [];
   if (latest.one_liner) {
@@ -182,19 +313,6 @@ function morningNewsSection(pptx: pptxgen) {
     fontSize: 11,
     valign: "top",
   });
-
-  if (latest.positions?.length) {
-    const header = ["Ticker", "Name", "Notes"];
-    const body: Row[] = latest.positions.map((p) => [
-      { text: p.ticker, options: { align: "left", bold: true } },
-      { text: p.name || "—", options: { align: "left" } },
-      { text: p.notes, options: { align: "left", fontSize: 9 } },
-    ]);
-    paginatedTable(pptx, "Morning News Summary", "Positions in focus", header, body, {
-      colW: [1.4, 2.6, CONTENT_W - 4.0],
-      rowsPerPage: 10,
-    });
-  }
 }
 
 // ---- title ----------------------------------------------------------------- //
