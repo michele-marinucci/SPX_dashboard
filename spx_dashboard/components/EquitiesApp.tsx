@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
+import { ModelGrid } from "@/components/ModelGrid";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { ANALYSTS } from "@/lib/equities/config";
 import { Company, EditRecord, Quote } from "@/lib/equities/types";
@@ -1190,31 +1191,14 @@ function EditModal({
 
   const set = (k: string, v: string) => setDraft((p) => ({ ...p, [k]: v }));
 
-  // Multi-cell pastes from Excel spread across the grid starting at the cell
-  // pasted into; a single value falls through to the browser's normal paste.
-  const pasteAt =
-    (fields: string[], fieldIdx: number, yearIdx: number) =>
-    (e: React.ClipboardEvent<HTMLInputElement>) => {
-      const text = e.clipboardData.getData("text/plain");
-      if (!/[\t\n]/.test(text)) return;
-      e.preventDefault();
-      const rows = text.replace(/\r/g, "").split("\n");
-      if (rows.length && rows[rows.length - 1] === "") rows.pop(); // Excel's trailing newline
-      setDraft((p) => {
-        const next = { ...p };
-        rows.forEach((row, ri) => {
-          const key = fields[fieldIdx + ri];
-          if (!key) return;
-          row.split("\t").forEach((cell, ci) => {
-            const y = years[yearIdx + ci];
-            if (y == null) return;
-            next[`${key}.${y}`] = cleanCell(cell);
-          });
-        });
-        return next;
-      });
-    };
-  const seriesKeys = SERIES_FIELDS.map((f) => f.key);
+  // Batch writes from the spreadsheet grid (paste, delete, per-cell edits).
+  const applyCells = useCallback((ups: { key: string; value: string }[]) => {
+    setDraft((p) => {
+      const next = { ...p };
+      for (const u of ups) next[u.key] = u.value;
+      return next;
+    });
+  }, []);
 
   const save = async () => {
     setError("");
@@ -1302,61 +1286,22 @@ function EditModal({
         <AnalystSelect value={analyst} onChange={setAnalyst} />
 
         {company.is_index ? (
-          <table className="eq-grid">
-            <thead>
-              <tr>
-                <th>Field</th>
-                {years.map((y) => (
-                  <th key={y}>{y}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>BEst P/E</th>
-                {years.map((y, yi) => (
-                  <td key={y}>
-                    <input
-                      value={draft[`best_pe.${y}`]}
-                      onChange={(e) => set(`best_pe.${y}`, e.target.value)}
-                      onPaste={pasteAt(["best_pe"], 0, yi)}
-                      inputMode="decimal"
-                    />
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
+          <ModelGrid
+            rows={[{ key: "best_pe", label: "BEst P/E" }]}
+            cols={years}
+            values={draft}
+            onCommit={applyCells}
+            cleanCell={cleanCell}
+          />
         ) : (
           <>
-            <table className="eq-grid">
-              <thead>
-                <tr>
-                  <th>Field</th>
-                  {years.map((y) => (
-                    <th key={y}>{y}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {SERIES_FIELDS.map((f, fi) => (
-                  <tr key={f.key}>
-                    <th>{f.label}</th>
-                    {years.map((y, yi) => (
-                      <td key={y}>
-                        <input
-                          value={draft[`${f.key}.${y}`]}
-                          onChange={(e) => set(`${f.key}.${y}`, e.target.value)}
-                          onPaste={pasteAt(seriesKeys, fi, yi)}
-                          inputMode="decimal"
-                          placeholder="—"
-                        />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <ModelGrid
+              rows={SERIES_FIELDS.map((f) => ({ key: f.key, label: f.label }))}
+              cols={years}
+              values={draft}
+              onCommit={applyCells}
+              cleanCell={cleanCell}
+            />
 
             <div className="eq-scalars">
               {SCALAR_FIELDS.map((f) => (
@@ -1406,9 +1351,9 @@ function EditModal({
         {error && <p className="eq-error">{error}</p>}
         <div className="eq-modal-foot">
           <span className="eq-note">
-            <b>Paste from Excel:</b> copy a block of cells from your model and
-            paste into any cell — values fill across years and down fields.
-            GM % in percent (e.g. 80.5). Clear a cell to delete the value.
+            <b>Works like Excel:</b> arrows to move, Shift+arrows to select,
+            Ctrl/Cmd+C to copy and Ctrl/Cmd+V to paste a block, F2 to edit,
+            Esc to cancel, Delete to clear. GM % in percent (e.g. 80.5).
           </span>
           <div>
             <button type="button" className="eq-act" onClick={onClose} disabled={busy}>
