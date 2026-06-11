@@ -388,13 +388,11 @@ def _build_html(summary: dict, logo_cid: str | None = None) -> str:
 
     return f"""<!DOCTYPE html>
 <html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#1a1a22">
-<div style="border-bottom:1px solid #eee;padding-bottom:14px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+<div style="margin-bottom:20px">
   {logo_html}
-  <span style="font-size:12px;color:#aaa;margin-left:4px">|&nbsp;&nbsp;Morning Note</span>
 </div>
 <div style="border-top:3px solid #3730e6;padding-top:16px;margin-bottom:24px">
-  <span style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.05em">Morning Notes · {date}</span>
-  <p style="font-size:15px;font-weight:600;margin:8px 0 0">{one_liner}</p>
+  <p style="font-size:15px;font-weight:600;margin:0">{one_liner}</p>
 </div>
 {pos_section}
 <h2 style="font-size:14px;margin:24px 0 12px">Top Themes</h2>
