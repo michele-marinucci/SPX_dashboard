@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
 import { DiligenceLink, logoUrl, normTicker } from "@/lib/diligence";
 
@@ -207,44 +207,46 @@ export function DiligenceApp({
       : "Saved in this browser only (no shared database configured).";
   }, [dbEnabled]);
 
-  return (
-    <div className="solo">
-      <Link href="/" className="back-link">
-        ← All views
-      </Link>
+  const subtitle = (
+    <>
+      Every position&apos;s Microsoft List ·{" "}
+      <span className="mono">
+        {links.length} {links.length === 1 ? "name" : "names"}
+      </span>{" "}
+      · <span className="mono">shared with the team</span>
+    </>
+  );
 
-      <div className="solo-header">
-        <div className="solo-title">
-          <h1>Diligence Tracker</h1>
-        </div>
-        <div className="header-actions">
-          <HowItWorks title="How the Diligence Tracker works">
-            <p className="hiw-lead">
-              Every position&apos;s Microsoft List, gathered in one place.
-            </p>
-            <ul className="hiw-list">
-              <li>
-                <b>Open a tracker</b> — click any row to jump straight to that
-                name&apos;s Microsoft List.
-              </li>
-              <li>
-                <b>Add a link</b> — enter a ticker and paste its Microsoft List
-                URL. The company name auto-fills for tracked S&amp;P names.
-              </li>
-              <li>
-                <b>Shared</b> — adds and removes are saved to the team database,
-                so everyone sees the same list (not just your browser).
-              </li>
-            </ul>
-          </HowItWorks>
-        </div>
-      </div>
-
-      <p className="dil-intro">
-        Every position&apos;s Microsoft List in one place. Click a row to open its
-        tracker; add or remove links below — changes are shared with the team.
+  const actions = (
+    <HowItWorks title="How the Diligence Tracker works">
+      <p className="hiw-lead">
+        Every position&apos;s Microsoft List, gathered in one place.
       </p>
+      <ul className="hiw-list">
+        <li>
+          <b>Open a tracker</b> — click any row to jump straight to that
+          name&apos;s Microsoft List.
+        </li>
+        <li>
+          <b>Add a link</b> — enter a ticker and paste its Microsoft List URL.
+          The company name auto-fills for tracked S&amp;P names.
+        </li>
+        <li>
+          <b>Shared</b> — adds and removes are saved to the team database, so
+          everyone sees the same list (not just your browser).
+        </li>
+      </ul>
+    </HowItWorks>
+  );
 
+  return (
+    <AppShell
+      tool="Diligence Tracker"
+      title="Diligence Tracker"
+      subtitle={subtitle}
+      actions={actions}
+      footerLeft={`Diligence Tracker · ${links.length} ${links.length === 1 ? "position" : "positions"}`}
+    >
       <form className="dil-add" onSubmit={add}>
         <input
           className="dil-in dil-in-ticker"
@@ -316,11 +318,6 @@ export function DiligenceApp({
       </div>
 
       {note && <p className="dil-note">{note}</p>}
-
-      <footer className="view-foot">
-        <span>Diligence Tracker · {links.length} {links.length === 1 ? "position" : "positions"}</span>
-        <span>MERITAGE · INTERNAL</span>
-      </footer>
-    </div>
+    </AppShell>
   );
 }

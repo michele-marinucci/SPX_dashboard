@@ -6,7 +6,7 @@
 // an analyst edit updates the whole row for everyone immediately.
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { ANALYSTS } from "@/lib/equities/config";
@@ -68,7 +68,8 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [asOf, setAsOf] = useState<string | null>(null);
   const [dataDate, setDataDate] = useState<string | null>(null);
-  const [view, setView] = useState<"val" | "decomp">("val");
+  const [view, setView] = useState<"val" | "decomp" | "signal" | "focus">("val");
+  const [focusTicker, setFocusTicker] = useState<string | null>(null);
   const [editTicker, setEditTicker] = useState<string | null>(null);
   const [logTicker, setLogTicker] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
@@ -313,17 +314,21 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         <span className="eq-btns">
           <button
             type="button"
+            className="eq-actbtn"
             onClick={() => setEditTicker(c.ticker)}
-            title={`Update the ${c.ticker} model inputs`}
+            title={`Edit the ${c.ticker} model`}
+            aria-label={`Edit the ${c.ticker} model`}
           >
-            ✎ Edit
+            ✎
           </button>
           <button
             type="button"
+            className="eq-actbtn"
             onClick={() => setLogTicker(c.ticker)}
-            title={`See every past change to ${c.ticker}`}
+            title={`View ${c.ticker} edit history`}
+            aria-label={`View ${c.ticker} edit history`}
           >
-            ☰ Past Revisions
+            ↺
           </button>
         </span>
       )}
@@ -331,10 +336,12 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         <span className="eq-btns">
           <button
             type="button"
+            className="eq-actbtn"
             onClick={() => setEditTicker(c.ticker)}
-            title="Update index P/E"
+            title="Edit index P/E"
+            aria-label="Edit index P/E"
           >
-            ✎ Edit
+            ✎
           </button>
         </span>
       )}
@@ -347,70 +354,182 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
     </td>
   );
 
+  // ---- Signal / Focus shared geometry ------------------------------------ //
+  // The IRR horizon used by the bullet bars + the IRR-sorted master list is
+  // YE+2 (y2) — the same horizon the heatmap and the decomposition use.
+  const irrVals = stocks
+    .map((c) => derived.get(c.ticker)?.irr[y2])
+    .filter((v): v is number => v != null && isFinite(v));
+  const irrMax = irrVals.length ? Math.max(...irrVals, 0.0001) : 1;
+  const irrMed = irrStats?.mid ?? 0;
+  const irrMedW = Math.max(0, Math.min(100, (irrMed / irrMax) * 100));
+  const pct0 = (v: number | null | undefined) =>
+    v == null ? na : `${(v * 100).toFixed(0)}%`;
+  const irrSorted = [...stocks].sort(
+    (a, b) => (derived.get(b.ticker)?.irr[y2] ?? -1e9) - (derived.get(a.ticker)?.irr[y2] ?? -1e9),
+  );
+
+  // Signal row: NTM P/E vs target (diverging), 3-yr IRR bullet vs book median,
+  // MoM, and 1/3/6M perf as sparkbars. Fewer numerals, more glance value.
+  const signalRow = (c: Company) => {
+    const d = derived.get(c.ticker)!;
+    const pf = perfOf(c);
+    const pe = d.mendoPe[y1];
+    const tgt = c.model.target_mult[String(y1)] ?? null;
+    const prem = pe != null && tgt ? pe / tgt - 1 : null;
+    const premW = prem == null ? 0 : Math.min(46, Math.abs(prem) * 150);
+    const irr = d.irr[y2];
+    const irrW = irr == null ? 0 : Math.max(0, Math.min(100, (irr / irrMax) * 100));
+    const perfMax = Math.max(
+      0.0001,
+      ...[pf.m1, pf.m3, pf.m6].map((v) => (v == null ? 0 : Math.abs(v))),
+    );
+    const bars = [pf.m1, pf.m3, pf.m6];
+    return (
+      <tr key={c.ticker} className="eq-row">
+        {tickCell(c)}
+        {num(fpx(d.price, c.currency), undefined, "px")}
+        <td className="eq-sep">
+          <div className="eq-prem">
+            <span className="eq-prem-val">{fx(pe)}</span>
+            <span className="eq-prem-track">
+              <span className="eq-prem-mid" />
+              {prem != null && (
+                <span
+                  className="eq-prem-fill"
+                  style={{
+                    left: `${prem < 0 ? 50 - premW : 50}%`,
+                    width: `${premW}%`,
+                    background: prem < 0 ? "var(--green)" : "var(--red)",
+                  }}
+                />
+              )}
+            </span>
+            <span
+              className="eq-prem-tag"
+              style={{ color: prem == null ? "var(--faint)" : prem < 0 ? "#15803d" : "#b91c1c" }}
+            >
+              {prem == null ? "—" : `${prem >= 0 ? "+" : "−"}${Math.abs(prem * 100).toFixed(0)}% tgt`}
+            </span>
+          </div>
+        </td>
+        <td className="eq-sep">
+          <div className="eq-bullet-wrap">
+            <span className="eq-bullet">
+              <span className="eq-bullet-fill" style={{ width: `${irrW}%` }} />
+              <span className="eq-bullet-tick" style={{ left: `${irrMedW}%` }} />
+            </span>
+            <span className="eq-bullet-val">{pct0(irr)}</span>
+          </div>
+        </td>
+        {num(fx(d.mom[y2]), undefined, "mom")}
+        <td className="eq-sep">
+          <div className="eq-spark">
+            {bars.map((v, i) => (
+              <span
+                key={i}
+                className="eq-sparkbar"
+                style={{
+                  height: `${(v == null ? 0 : Math.abs(v) / perfMax) * 17 + 3}px`,
+                  background: v == null ? "var(--line-2)" : v < 0 ? "var(--red)" : "var(--green)",
+                }}
+                title={`${["1M", "3M", "6M"][i]}: ${v == null ? "n/a" : (v * 100).toFixed(0) + "%"}`}
+              />
+            ))}
+          </div>
+        </td>
+      </tr>
+    );
+  };
+
+  // ---- Focus: detail panel for one name ---------------------------------- //
+  const focusSel =
+    (focusTicker && stocks.find((c) => c.ticker === focusTicker)) || irrSorted[0] || null;
+
+  const subtitle = (
+    <>
+      Detailed dashboard ·{" "}
+      <span className="mono">
+        {stocks.length} {stocks.length === 1 ? "name" : "names"}
+      </span>{" "}
+      ·{" "}
+      <span className="mono">
+        {dataDate
+          ? `prior close · ${new Date(`${dataDate}T12:00:00`).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}`
+          : "prior close"}
+      </span>
+    </>
+  );
+
+  const actions = (
+    <>
+      <HowItWorks title="How the Equities Dashboard works">
+        <p className="hiw-lead">
+          The team&apos;s detailed dashboard, live — recomputed on the fly from
+          shared model inputs and prior-day closing prices.
+        </p>
+        <ul className="hiw-list">
+          <li>
+            <b>Two screens</b> — <b>Summary</b> shows valuation, target
+            multiples, IRRs, and momentum; <b>IRR Decomp</b> breaks the
+            NTM–YE{String(y2).slice(2)} IRR into revenue, margin, yield, and
+            multiple.
+          </li>
+          <li>
+            <b>Edit model</b> — click <span className="mono">✎</span> on any row,
+            pick your name, and update the model. You can paste a whole block
+            straight from your Excel model. Changes are shared with the team
+            instantly.
+          </li>
+          <li>
+            <b>History</b> — every edit is logged per company; click{" "}
+            <span className="mono">↺</span> on a row to see who changed what,
+            when.
+          </li>
+          <li>
+            <b>Sort</b> — click any column header to rank across the whole book;
+            click again for ascending, then off.
+          </li>
+          <li>
+            <b>Prices</b> — prior-day closes from a Bloomberg terminal push
+            and/or Yahoo. <b>Refresh</b> re-fetches; <b>Export Excel</b> exports
+            the live workbook.
+          </li>
+        </ul>
+      </HowItWorks>
+      <button
+        type="button"
+        className="btn"
+        onClick={refreshPrices}
+        disabled={refreshing}
+        title="Re-fetch the latest prior-day closes"
+      >
+        <span className="glyph" aria-hidden="true">⟳</span>{" "}
+        {refreshing ? "Refreshing…" : "Refresh"}
+      </button>
+      <button type="button" className="btn" onClick={() => setAddOpen(true)}>
+        <span className="glyph" aria-hidden="true">＋</span> Add
+      </button>
+      <button type="button" className="btn" onClick={() => setRemovedOpen(true)}>
+        Removed{removedNames.length ? ` (${removedNames.length})` : ""}
+      </button>
+      <a className="btn-primary" href="/api/equities/export">
+        <span className="glyph" aria-hidden="true">↓</span> Export Excel
+      </a>
+    </>
+  );
+
   return (
-    <div className="solo eq-solo">
-      <Link href="/" className="back-link">
-        ← All views
-      </Link>
-
-      <div className="solo-header">
-        <div className="solo-title">
-          <h1>Equities Dashboard</h1>
-        </div>
-        <div className="eq-actions">
-          <HowItWorks title="How the Equities Dashboard works">
-            <p className="hiw-lead">
-              The team&apos;s detailed dashboard, live — recomputed on the fly
-              from shared model inputs and prior-day closing prices.
-            </p>
-            <ul className="hiw-list">
-              <li>
-                <b>Two screens</b> — <b>Summary</b> shows valuation, target
-                multiples, IRRs, and momentum; <b>IRR Decomp</b> breaks the
-                NTM–YE{String(y2).slice(2)} IRR into revenue, margin, yield, and
-                multiple.
-              </li>
-              <li>
-                <b>Edit</b> — click <b>Edit</b> on any row, pick your name, and
-                update the model. You can paste a whole block straight from your
-                Excel model. Changes are shared with the team instantly.
-              </li>
-              <li>
-                <b>Past Revisions</b> — every edit is logged per company; click{" "}
-                <b>Past Revisions</b> on a row to see who changed what, when.
-              </li>
-              <li>
-                <b>Sort</b> — click any column header to rank across the whole
-                book; click again for ascending, then off.
-              </li>
-              <li>
-                <b>Prices</b> — prior-day closes from a Bloomberg terminal push
-                and/or Yahoo. <b>Refresh prices</b> re-fetches; <b>Download
-                Excel</b> exports the live workbook.
-              </li>
-            </ul>
-          </HowItWorks>
-          <button
-            type="button"
-            className="eq-act"
-            onClick={refreshPrices}
-            disabled={refreshing}
-            title="Re-fetch the latest prior-day closes"
-          >
-            {refreshing ? "Refreshing…" : "⟳ Refresh prices"}
-          </button>
-          <button type="button" className="eq-act" onClick={() => setAddOpen(true)}>
-            + Add company
-          </button>
-          <button type="button" className="eq-act" onClick={() => setRemovedOpen(true)}>
-            Removed names{removedNames.length ? ` (${removedNames.length})` : ""}
-          </button>
-          <a className="eq-act eq-act-primary" href="/api/equities/export">
-            ⬇ Download Excel
-          </a>
-        </div>
-      </div>
-
+    <AppShell
+      tool="Equities Dashboard"
+      title="Equities Dashboard"
+      subtitle={subtitle}
+      actions={actions}
+      footerLeft={`Equities Dashboard · ${stocks.length} names · ${stocks.filter((c) => c.port === 1).length} owned`}
+    >
       <div className="eq-toolbar">
         <div className="eq-tabs" role="tablist">
           <button
@@ -432,6 +551,26 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
             }}
           >
             IRR Decomp
+          </button>
+          <button
+            type="button"
+            className={view === "signal" ? "on" : ""}
+            onClick={() => {
+              setView("signal");
+              setSort(NO_SORT);
+            }}
+          >
+            Signal
+          </button>
+          <button
+            type="button"
+            className={view === "focus" ? "on" : ""}
+            onClick={() => {
+              setView("focus");
+              setSort(NO_SORT);
+            }}
+          >
+            Focus
           </button>
         </div>
         <span className="eq-note">
@@ -460,7 +599,20 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         </span>
       </div>
 
-      {view === "val" ? (
+      {view === "signal" ? (
+        <div className="eq-legend">
+          <span className="eq-bullet-key" aria-hidden="true">
+            <span className="eq-bullet-key-fill" />
+            <span className="eq-bullet-key-tick" />
+          </span>{" "}
+          IRR (to YE+{String(y2).slice(2)}) vs book median · green ticker = portfolio
+        </div>
+      ) : view === "focus" ? (
+        <div className="eq-legend">
+          <span className="eq-legend-swatch" aria-hidden="true" /> Pick a name on
+          the left to open its valuation and IRR decomposition
+        </div>
+      ) : view === "val" ? (
         <div className="eq-legend">
           <span className="eq-legend-swatch" aria-hidden="true" /> Highlighted
           tickers (in green) indicate names in portfolio
@@ -486,8 +638,42 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         </div>
       )}
 
+      {view === "focus" ? (
+        <FocusLayout
+          stocks={irrSorted}
+          selected={focusSel}
+          onSelect={(t) => setFocusTicker(t)}
+          derived={derived}
+          perfOf={perfOf}
+          years={years}
+          irrMax={irrMax}
+          onEdit={(t) => setEditTicker(t)}
+          onHistory={(t) => setLogTicker(t)}
+          fpx={fpx}
+        />
+      ) : (
       <div className="eq-wrap">
-        {view === "val" ? (
+        {view === "signal" ? (
+          <table className="eq-table eq-signal">
+            <thead>
+              <tr className="eq-h2">
+                <th className="eq-tick">Company</th>
+                <th className="eq-num">Px</th>
+                <th className="eq-sep">NTM P/E vs target</th>
+                <th className="eq-sep">IRR vs median</th>
+                <th className="eq-num eq-sep">MoM</th>
+                <th className="eq-sep">1·3·6M</th>
+              </tr>
+            </thead>
+            <tbody>
+              {groups.map(([grp, rows]) => (
+                <GroupRows key={grp} label={grp} span={6}>
+                  {rows.map(signalRow)}
+                </GroupRows>
+              ))}
+            </tbody>
+          </table>
+        ) : view === "val" ? (
           <table className="eq-table">
             <thead>
               <tr className="eq-h1">
@@ -627,6 +813,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           </table>
         )}
       </div>
+      )}
 
       <p className="eq-foot-note">
         {enabled
@@ -635,14 +822,6 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
             ? "Read-only: showing the committed workbook snapshot."
             : ""}
       </p>
-
-      <footer className="view-foot">
-        <span>
-          Equities Dashboard · {stocks.length} names ·{" "}
-          {stocks.filter((c) => c.port === 1).length} owned
-        </span>
-        <span>MERITAGE · INTERNAL</span>
-      </footer>
 
       {editing && (
         <EditModal
@@ -669,6 +848,203 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           onAdded={onAdded}
         />
       )}
+    </AppShell>
+  );
+}
+
+// ---- Focus view (C · click-through detail) -------------------------------- //
+
+const MONO_PALETTE = [
+  "#1f2937", "#3730e6", "#0f766e", "#7c3aed", "#b45309", "#be123c", "#0e7490", "#4d7c0f",
+];
+function monoColor(ticker: string): string {
+  let h = 0;
+  for (let i = 0; i < ticker.length; i++) h = (h * 31 + ticker.charCodeAt(i)) >>> 0;
+  return MONO_PALETTE[h % MONO_PALETTE.length];
+}
+const fFx = (v: number | null | undefined) => (v == null ? "n/a" : `${v.toFixed(1)}x`);
+const fFp = (v: number | null | undefined) => (v == null ? "n/a" : `${(v * 100).toFixed(0)}%`);
+
+function FocusLayout({
+  stocks,
+  selected,
+  onSelect,
+  derived,
+  perfOf,
+  years,
+  irrMax,
+  onEdit,
+  onHistory,
+  fpx,
+}: {
+  stocks: Company[];
+  selected: Company | null;
+  onSelect: (ticker: string) => void;
+  derived: Map<string, Derived>;
+  perfOf: (c: Company) => { m1: number | null; m3: number | null; m6: number | null };
+  years: number[];
+  irrMax: number;
+  onEdit: (ticker: string) => void;
+  onHistory: (ticker: string) => void;
+  fpx: (v: number | null | undefined, ccy: string) => React.ReactNode;
+}) {
+  const [y0, y1, y2, y3] = years;
+  const d = selected ? derived.get(selected.ticker) ?? null : null;
+
+  // IRR decomposition bars, scaled to the largest-magnitude component.
+  const dc = d?.decomp;
+  const decompItems = dc
+    ? ([
+        ["Revenue", dc.revs, "var(--brand)"],
+        ["Margin", dc.margin, "#6d66ef"],
+        ["Yield", dc.yld, "var(--green)"],
+        ["Multiple", dc.multiple, "var(--amber)"],
+      ] as const)
+    : [];
+  const decompMax = Math.max(
+    0.0001,
+    ...decompItems.map(([, v]) => (v == null ? 0 : Math.abs(v))),
+  );
+
+  return (
+    <div className="eq-focus">
+      <div className="eq-focus-list">
+        <div className="eq-focus-list-head">Names · sorted by IRR</div>
+        {stocks.map((c) => {
+          const dr = derived.get(c.ticker);
+          const irr = dr?.irr[y2] ?? null;
+          const w = irr == null ? 0 : Math.max(0, Math.min(100, (irr / irrMax) * 100));
+          const active = selected?.ticker === c.ticker;
+          return (
+            <button
+              type="button"
+              key={c.ticker}
+              className={`eq-focus-item${active ? " eq-focus-item-on" : ""}`}
+              onClick={() => onSelect(c.ticker)}
+            >
+              <span className="eq-focus-item-main">
+                <span className="eq-focus-item-top">
+                  <span className={`eq-focus-tk${c.port === 1 ? " eq-focus-tk-own" : ""}`}>
+                    {c.ticker}
+                  </span>
+                  <span className="eq-focus-grp">{c.grp}</span>
+                </span>
+                <span className="eq-focus-bar">
+                  <span
+                    className="eq-focus-bar-fill"
+                    style={{ width: `${w}%`, background: active ? "var(--brand)" : "#c4c4df" }}
+                  />
+                </span>
+              </span>
+              <span className="eq-focus-irr">{fFp(irr)}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="eq-focus-detail">
+        {!selected || !d ? (
+          <p className="eq-note">Select a name to see its detail.</p>
+        ) : (
+          <>
+            <div className="eq-focus-detail-head">
+              <div className="eq-focus-id">
+                <span
+                  className="monotile eq-focus-tile"
+                  style={{ background: monoColor(selected.ticker) }}
+                >
+                  {selected.ticker.slice(0, 2)}
+                </span>
+                <div>
+                  <div className="eq-focus-name-row">
+                    <span className="eq-focus-name">{selected.ticker}</span>
+                    {selected.port === 1 && (
+                      <span className="eq-focus-tag">PORTFOLIO</span>
+                    )}
+                  </div>
+                  <div className="eq-focus-sub">{selected.grp}</div>
+                </div>
+              </div>
+              <div className="eq-focus-actions">
+                <div className="eq-focus-btns">
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={() => onEdit(selected.ticker)}
+                  >
+                    <span className="glyph" aria-hidden="true">✎</span> Edit model
+                  </button>
+                  <button type="button" className="btn" onClick={() => onHistory(selected.ticker)}>
+                    <span className="glyph" aria-hidden="true">↺</span> History
+                  </button>
+                </div>
+                <div className="eq-focus-px">
+                  <div className="eq-focus-px-val">{fpx(d.price, selected.currency)}</div>
+                  {perfOf(selected).m3 != null && (
+                    <div
+                      className="eq-focus-px-chg"
+                      style={{ color: (perfOf(selected).m3 ?? 0) >= 0 ? "#15803d" : "#b91c1c" }}
+                    >
+                      {fFp(perfOf(selected).m3)} · 3M
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="eq-val-grid">
+              {(
+                [
+                  ["EV/GP NTM", fFx(d.evGp[y0]), "var(--ink)"],
+                  ["EV/GP +1", fFx(d.evGp[y1]), "var(--ink)"],
+                  ["P/E NTM", fFx(d.mendoPe[y1]), "var(--ink)"],
+                  ["P/E +2", fFx(d.mendoPe[y3]), "var(--ink)"],
+                  ["Target mult", fFx(selected.model.target_mult[String(y1)] ?? null), "var(--brand)"],
+                  ["NTM IRR", fFp(d.irr[y1]), "var(--ink)"],
+                  ["+2y IRR", fFp(d.irr[y2]), "#15803d"],
+                  ["MoM +3y", fFx(d.mom[y3]), "var(--ink)"],
+                ] as const
+              ).map(([k, v, c]) => (
+                <div className="eq-val-cell" key={k}>
+                  <div className="eq-val-k">{k}</div>
+                  <div className="eq-val-v" style={{ color: c }}>
+                    {v}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="eq-decomp-block">
+              <div className="eq-decomp-head">
+                <span className="eq-decomp-title">IRR decomposition</span>
+                <span className="eq-note mono">NTM → YE+{String(y2).slice(2)} · approximate</span>
+              </div>
+              {decompItems.map(([label, v, color]) => (
+                <div className="eq-decomp-bar-row" key={label}>
+                  <span className="eq-decomp-label">{label}</span>
+                  <span className="eq-decomp-track">
+                    <span
+                      className="eq-decomp-fill"
+                      style={{
+                        width: `${(v == null ? 0 : Math.abs(v) / decompMax) * 100}%`,
+                        background: color,
+                      }}
+                    />
+                  </span>
+                  <span className="eq-decomp-val">{fFp(v)}</span>
+                </div>
+              ))}
+              <div className="eq-decomp-bar-row eq-decomp-total">
+                <span className="eq-decomp-label">Total IRR</span>
+                <span className="eq-decomp-track eq-decomp-track-total">
+                  <span className="eq-decomp-fill" style={{ width: "100%", background: "var(--brand)" }} />
+                </span>
+                <span className="eq-decomp-val">{fFp(dc?.ret)}</span>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

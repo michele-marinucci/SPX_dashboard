@@ -32,7 +32,8 @@ export function ExportPptButton() {
 
   return (
     <button className="export-ppt-btn" onClick={exportDeck} disabled={busy}>
-      {busy ? "Generating…" : "Export All to PPT"}
+      <span className="glyph" aria-hidden="true">↓</span>{" "}
+      {busy ? "Generating…" : "Export deck"}
     </button>
   );
 }

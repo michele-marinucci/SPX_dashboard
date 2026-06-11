@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
 import { cx } from "@/lib/format";
 import {
@@ -69,6 +70,7 @@ export function TwitterMonitor({
   const [removed, setRemoved] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
 
   useEffect(() => {
     setAdded(loadList(ADD_KEY));
@@ -246,126 +248,134 @@ export function TwitterMonitor({
   const daily = data.daily_summary;
   const hasContent = data.tweets.length > 0;
 
+  const actions = (
+    <>
+      <button
+        type="button"
+        className="btn"
+        onClick={() => setManageOpen(true)}
+        title="Add or remove followed accounts"
+      >
+        Manage accounts <span className="mono">{followedList.length}</span>
+      </button>
+      <HowItWorks title="How Twitter Themes works">
+        <p className="hiw-lead">
+          Every <strong>Monday, Wednesday and Friday</strong> morning the monitor
+          reads the latest posts from your followed accounts.
+        </p>
+        <ul className="hiw-list">
+          <li>
+            <b>Followed accounts</b> — edit the list with <b>Manage accounts</b>.
+            It&apos;s shared across the team, not saved per-browser.
+          </li>
+          <li>
+            <b>Summaries &amp; tags</b> — each tweet is summarized and tagged;
+            charts get a one-line description.
+          </li>
+          <li>
+            <b>Sentiment dots</b> — the colored dot by each author marks the
+            tweet&apos;s tone: <span className="tw-sent-dot tw-sent-positive" />{" "}
+            positive, <span className="tw-sent-dot tw-sent-negative" /> negative,{" "}
+            <span className="tw-sent-dot tw-sent-neutral" /> neutral.
+          </li>
+          <li>
+            <b>Digest</b> — organizes the substance by theme, flags{" "}
+            <strong>portfolio mentions</strong>, and tracks topics recurring over
+            the trailing month.
+          </li>
+        </ul>
+      </HowItWorks>
+    </>
+  );
+
   return (
-    <div className="shell">
-      <aside className="sidebar themes-sidebar">
-        <div className="sidebar-head">
-          <Link href="/" className="sidebar-brand" title="Back to all views">
-            <span className="sidebar-brand-text">Mendo Hub</span>
-          </Link>
-          <span className="sidebar-sys" aria-hidden="true">
-            TWITTER
+    <AppShell
+      tool="Twitter Themes"
+      title="Twitter Themes"
+      subtitle={
+        <>
+          Digest of followed accounts ·{" "}
+          <span className="mono">{asOf ? `as of ${asOf}` : "awaiting first run"}</span>{" "}
+          ·{" "}
+          <span className="mono">
+            {recentTweets.length} {recentTweets.length === 1 ? "tweet" : "tweets"}
+            {recentDays > 0 ? ` · last ${recentDays} ${recentDays === 1 ? "day" : "days"}` : ""}
           </span>
-        </div>
-        <Link href="/" className="rail-back">
-          ← All tools
-        </Link>
-
-        <div className="handles">
-          <div className="handles-head">
-            Followed accounts <span className="handles-count">{followedList.length}</span>
-          </div>
-          <form
-            className="handle-add"
-            onSubmit={(e) => {
-              e.preventDefault();
-              addHandle(draft);
-            }}
-          >
-            <input
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              placeholder="add @handle"
-              aria-label="Add a handle"
-            />
-            <button type="submit" disabled={busy || !draft.trim()}>
-              Add
-            </button>
-          </form>
-          <ul className="handle-list">
-            {followedList.map((h) => (
-              <li key={h} className="handle-row">
-                <a
-                  href={`https://x.com/${h}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="handle-name"
-                >
-                  @{h}
-                </a>
-                <button
-                  type="button"
-                  className="handle-x"
-                  onClick={() => removeHandle(h)}
-                  disabled={busy}
-                  aria-label={`Remove @${h}`}
-                  title="Remove"
-                >
-                  ×
+        </>
+      }
+      actions={actions}
+      footerLeft={`Twitter Themes as of ${asOf ?? "—"}`}
+    >
+      {manageOpen && (
+        <div className="tw-manage-overlay" onClick={() => setManageOpen(false)}>
+          <div className="tw-manage" onClick={(e) => e.stopPropagation()}>
+            <div className="tw-manage-head">
+              <h2>
+                Followed accounts{" "}
+                <span className="handles-count">{followedList.length}</span>
+              </h2>
+              <button
+                type="button"
+                className="eq-x"
+                onClick={() => setManageOpen(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="tw-manage-body handles">
+              <form
+                className="handle-add"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  addHandle(draft);
+                }}
+              >
+                <input
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  placeholder="add @handle"
+                  aria-label="Add a handle"
+                />
+                <button type="submit" disabled={busy || !draft.trim()}>
+                  Add
                 </button>
-              </li>
-            ))}
-          </ul>
-          <p className="handles-note">
-            {dbFollowed !== null
-              ? "Shared list — edits apply for everyone."
-              : "Saved in this browser."}
-          </p>
-        </div>
-      </aside>
-
-      <div className="content">
-        <header className="content-header">
-          <div>
-            <h1>Twitter Monitor</h1>
-            <p className="subtitle">
-              Digest of your followed accounts ·{" "}
-              <span className="mono">
-                {asOf ? `as of ${asOf}` : "awaiting first run"}
-              </span>{" "}
-              · {recentTweets.length} recent {recentTweets.length === 1 ? "tweet" : "tweets"}
-              {recentDays > 0 ? ` · last ${recentDays} ${recentDays === 1 ? "day" : "days"}` : ""}
-            </p>
-          </div>
-          <div className="header-actions">
-            <span className="crumb">
-              <Link href="/" className="crumb-home">
-                Mendo Hub
-              </Link>
-              <span className="crumb-sep">/</span>
-              <span className="crumb-here">Twitter Monitor</span>
-            </span>
-            <HowItWorks title="How the Twitter Monitor works">
-              <p className="hiw-lead">
-                Every <strong>Monday, Wednesday and Friday</strong> morning the
-                monitor reads the latest posts from your followed accounts.
-              </p>
-              <ul className="hiw-list">
-                <li>
-                  <b>Followed accounts</b> — edit the list in the sidebar. It&apos;s
-                  shared across the team, not saved per-browser.
-                </li>
-                <li>
-                  <b>Summaries &amp; tags</b> — each tweet is summarized and tagged;
-                  charts get a one-line description (<span aria-hidden="true">📎</span>).
-                </li>
-                <li>
-                  <b>Sentiment dots</b> — the colored dot by each author marks the
-                  tweet&apos;s tone: <span className="tw-sent-dot tw-sent-positive" />{" "}
-                  positive, <span className="tw-sent-dot tw-sent-negative" /> negative,{" "}
-                  <span className="tw-sent-dot tw-sent-neutral" /> neutral.
-                </li>
-                <li>
-                  <b>Digest</b> — organizes the substance by theme, flags{" "}
-                  <strong>portfolio mentions</strong>, and tracks topics recurring
-                  over the trailing month.
-                </li>
+              </form>
+              <ul className="handle-list">
+                {followedList.map((h) => (
+                  <li key={h} className="handle-row">
+                    <a
+                      href={`https://x.com/${h}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="handle-name"
+                    >
+                      @{h}
+                    </a>
+                    <button
+                      type="button"
+                      className="handle-x"
+                      onClick={() => removeHandle(h)}
+                      disabled={busy}
+                      aria-label={`Remove @${h}`}
+                      title="Remove"
+                    >
+                      ×
+                    </button>
+                  </li>
+                ))}
               </ul>
-            </HowItWorks>
+              <p className="handles-note">
+                {dbFollowed !== null
+                  ? "Shared list — edits apply for everyone."
+                  : "Saved in this browser."}
+              </p>
+            </div>
           </div>
-        </header>
+        </div>
+      )}
 
-        {!hasContent ? (
+      {!hasContent ? (
           <section className="section">
             <p className="muted">
               No tweets collected yet. The monitor runs Monday, Wednesday and
@@ -376,7 +386,7 @@ export function TwitterMonitor({
           <>
             <section className="section">
               <div className="section-head">
-                <span className="section-num">·</span>
+                <span className="section-num">01</span>
                 <h2 className="section-title">Summary of the day</h2>
                 {daily.date && <span className="section-note">{fmtDay(daily.date)}</span>}
               </div>
@@ -399,7 +409,7 @@ export function TwitterMonitor({
 
             <section className="section">
               <div className="section-head">
-                <span className="section-num">·</span>
+                <span className="section-num">02</span>
                 <h2 className="section-title">Portfolio mentions</h2>
                 <span className="section-note">
                   <Link href="/dashboard" className="tw-port-link">
@@ -449,7 +459,7 @@ export function TwitterMonitor({
             {data.recurring.length > 0 && (
               <section className="section">
                 <div className="section-head">
-                  <span className="section-num">·</span>
+                  <span className="section-num">03</span>
                   <h2 className="section-title">Recurring themes</h2>
                   <span className="section-note">topics seen on 3+ days in the past month</span>
                 </div>
@@ -463,7 +473,7 @@ export function TwitterMonitor({
 
             <section className="section">
               <div className="section-head">
-                <span className="section-num">·</span>
+                <span className="section-num">04</span>
                 <h2 className="section-title">Latest tweets</h2>
                 <span className="section-note">
                   {recentTweets.length} from the last {recentDays || 1}{" "}
@@ -501,13 +511,7 @@ export function TwitterMonitor({
             </section>
           </>
         )}
-
-        <footer className="view-foot">
-          <span>Twitter Monitor as of {asOf ?? "—"}</span>
-          <span>MERITAGE · INTERNAL</span>
-        </footer>
-      </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -607,7 +611,7 @@ function TweetRow({ t }: { t: Tweet }) {
             title={t.media_summary || "Contains a chart/image"}
             aria-label="Contains a chart or image"
           >
-            {" "}📎
+            {" "}· chart
           </span>
         )}
         {t.media_summary && <span className="tw-media-sum"> {t.media_summary}</span>}

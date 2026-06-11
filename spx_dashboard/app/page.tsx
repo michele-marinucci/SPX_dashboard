@@ -2,19 +2,23 @@ import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ExportPptButton } from "@/components/ExportPptButton";
 import { TodayDate } from "@/components/TodayDate";
-import { getGeneratedAtLabel, getTweetCount } from "@/lib/tweets";
+import { getTweetCount } from "@/lib/tweets";
 
 // The post-login launcher (Ledger "hub"): one ledger row per tool. Five are
-// live (Equities Dashboard, SPX Monitor, Morning News, Twitter Monitor,
-// Diligence Tracker); the rest are WIP.
+// live; the rest are WIP. Order is Equities-first per the team's preference;
+// naming follows the redesign spec (Twitter Themes, Morning Notes).
 export default function HomePage() {
   const tweets = getTweetCount();
-  const asOf = getGeneratedAtLabel();
 
   return (
     <div className="hub">
       <div className="hub-top">
-        <img src="/meritage-logo.png" alt="Meritage" className="hub-logo" />
+        <div className="hub-lockup">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/meritage-logo.png" alt="Meritage" className="hub-logo" />
+          <span className="hub-divider" aria-hidden="true" />
+          <span className="hub-internal">INTERNAL</span>
+        </div>
         <div className="hub-right">
           <ExportPptButton />
           <LogoutButton />
@@ -30,7 +34,7 @@ export default function HomePage() {
         <span>#</span>
         <span>TOOL</span>
         <span>DETAIL</span>
-        <span className="r">ACTION</span>
+        <span className="r">OPEN</span>
       </div>
 
       <Link href="/dashboard" className="hub-row live">
@@ -41,8 +45,8 @@ export default function HomePage() {
             Equities Dashboard
           </div>
           <p className="rdesc">
-            The detailed dashboard, live. Valuation, IRRs, and the IRR decomp
-            across the book, with shared analyst model updates.
+            The detailed dashboard, live. Valuation, IRRs, and the IRR
+            decomposition across the book, with shared model updates.
           </p>
         </div>
         <div className="stats">
@@ -72,7 +76,7 @@ export default function HomePage() {
           </div>
           <p className="rdesc">
             Track AI beneficiaries and software names in the S&amp;P 500. Sort
-            any column, toggle Compounders, and export the underlying data.
+            any column, toggle Compounders, and export the data.
           </p>
         </div>
         <div className="stats">
@@ -102,7 +106,7 @@ export default function HomePage() {
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
-            Morning News Summary
+            Morning Notes
           </div>
           <p className="rdesc">
             A pre-market digest of overnight headlines and the news that moves
@@ -116,7 +120,7 @@ export default function HomePage() {
           </div>
           <div className="stat">
             <span className="k">CADENCE</span>
-            <span className="v">PRE-MARKET</span>
+            <span className="v">PRE-MKT</span>
           </div>
           <div className="stat">
             <span className="k">UPDATED</span>
@@ -136,11 +140,11 @@ export default function HomePage() {
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
-            Twitter Monitor
+            Twitter Themes
           </div>
           <p className="rdesc">
-            A daily summary of tweets from your followed accounts, organized by
-            theme with portfolio mentions and recurring topics.
+            A daily digest of your followed accounts, organized by theme with
+            portfolio mentions and recurring topics.
           </p>
         </div>
         <div className="stats">
@@ -154,7 +158,7 @@ export default function HomePage() {
           </div>
           <div className="stat">
             <span className="k">UPDATED</span>
-            <span className="v">MON/WED/FRI</span>
+            <span className="v">M·W·F</span>
           </div>
         </div>
         <div className="cta">
@@ -174,7 +178,7 @@ export default function HomePage() {
           </div>
           <p className="rdesc">
             Every position&apos;s Microsoft List in one place. Open a name&apos;s
-            tracker, add or remove links, and share across the team.
+            tracker, add or remove links, share with the team.
           </p>
         </div>
         <div className="stats">
@@ -184,7 +188,7 @@ export default function HomePage() {
           </div>
           <div className="stat">
             <span className="k">SOURCE</span>
-            <span className="v">MICROSOFT LISTS</span>
+            <span className="v">MS LISTS</span>
           </div>
           <div className="stat">
             <span className="k">ACCESS</span>
@@ -209,7 +213,7 @@ export default function HomePage() {
           </p>
         </div>
         <div>
-          <span className="wiptag">Work in progress</span>
+          <span className="wiptag">WIP</span>
         </div>
         <div className="prev">Preview →</div>
       </Link>
@@ -224,14 +228,14 @@ export default function HomePage() {
           </p>
         </div>
         <div>
-          <span className="wiptag">Work in progress</span>
+          <span className="wiptag">WIP</span>
         </div>
         <div className="prev">Preview →</div>
       </Link>
 
       <div className="hub-foot">
-        <span>{asOf ? `TWITTER MONITOR AS OF ${asOf}` : "TWITTER MONITOR"}</span>
         <span>7 MODULES · 5 LIVE</span>
+        <span>MERITAGE · INTERNAL</span>
       </div>
     </div>
   );
