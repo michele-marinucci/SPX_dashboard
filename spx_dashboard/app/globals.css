@@ -1824,14 +1824,20 @@ thead .row-head {
 }
 .dil-open {
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--brand);
-  opacity: 0;
-  transition: opacity 0.12s;
+  color: var(--muted);
+  transition: color 0.12s;
+}
+.dil-ms {
+  flex: 0 0 auto;
+  border-radius: 4px;
 }
 .dil-link:hover .dil-open {
-  opacity: 1;
+  color: var(--brand);
 }
 .dil-remove {
   flex: 0 0 auto;
@@ -2984,4 +2990,162 @@ thead .row-head {
 @media (max-width: 760px) {
   .tw-sum { max-width: none; }
   .tw-tweets-table th:nth-child(4), .tw-tweets-table td:nth-child(4) { display: none; }
+}
+
+/* ---------- Breadcrumb (harmonized header top-right) ---------- */
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+.crumb-home {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.14s;
+}
+.crumb-home:hover {
+  color: var(--brand);
+}
+.crumb-sep {
+  color: var(--line-strong);
+}
+.crumb-here {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* ---------- "How it works" popup (shared across tools) ---------- */
+.hiw-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans, "Hanken Grotesk", sans-serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color 0.14s, background 0.14s;
+}
+.hiw-btn:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+.hiw-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(26, 26, 34, 0.42);
+  animation: hiw-fade 0.12s ease;
+}
+@keyframes hiw-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.hiw-modal {
+  width: 100%;
+  max-width: 520px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 60px rgba(26, 26, 34, 0.22);
+  overflow: hidden;
+}
+.hiw-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.hiw-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.hiw-close {
+  border: none;
+  background: transparent;
+  color: var(--faint);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  width: 28px;
+  height: 28px;
+  transition: color 0.12s, background 0.12s;
+}
+.hiw-close:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+.hiw-body {
+  padding: 18px 20px 22px;
+}
+.hiw-lead {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.hiw-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.hiw-list li {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.hiw-list b {
+  color: var(--ink);
+}
+
+/* ---------- Twitter sentiment legend ---------- */
+.tw-sent-dot.tw-sent-neutral { background: var(--faint); }
+.tw-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.tw-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.tw-legend .tw-sent-dot {
+  margin-left: 0;
+}
+
+/* ---------- Compact work-in-progress hub rows ---------- */
+.hub-row.wip {
+  padding: 11px 22px;
+  margin-top: 7px;
+}
+.hub-row.wip .rname {
+  font-size: 14px;
+  margin: 0;
+}
+.hub-row.wip .rdesc {
+  font-size: 12px;
+  margin-top: 2px;
 }

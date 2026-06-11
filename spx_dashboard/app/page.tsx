@@ -88,7 +88,7 @@ export default function HomePage() {
           </div>
           <div className="stat">
             <span className="k">UPDATED</span>
-            <span className="v">{asOf ?? "—"}</span>
+            <span className="v">MON/WED/FRI</span>
           </div>
         </div>
         <div className="cta">
@@ -118,7 +118,7 @@ export default function HomePage() {
           </div>
           <div className="stat">
             <span className="k">SOURCE</span>
-            <span className="v">MS LISTS</span>
+            <span className="v">MICROSOFT LISTS</span>
           </div>
           <div className="stat">
             <span className="k">ACCESS</span>

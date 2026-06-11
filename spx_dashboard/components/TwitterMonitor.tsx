@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { HowItWorks } from "@/components/HowItWorks";
 import { cx } from "@/lib/format";
 import {
   DailySummaryItem,
@@ -331,24 +332,38 @@ export function TwitterMonitor({
               <Link href="/" className="crumb-home">
                 Mendo Hub
               </Link>
-              <span className="crumb-sep">|</span> Twitter Monitor
+              <span className="crumb-sep">/</span>
+              <span className="crumb-here">Twitter Monitor</span>
             </span>
+            <HowItWorks title="How the Twitter Monitor works">
+              <p className="hiw-lead">
+                Every <strong>Monday, Wednesday and Friday</strong> morning the
+                monitor reads the latest posts from your followed accounts.
+              </p>
+              <ul className="hiw-list">
+                <li>
+                  <b>Followed accounts</b> — edit the list in the sidebar. It&apos;s
+                  shared across the team, not saved per-browser.
+                </li>
+                <li>
+                  <b>Summaries &amp; tags</b> — each tweet is summarized and tagged;
+                  charts get a one-line description (<span aria-hidden="true">📎</span>).
+                </li>
+                <li>
+                  <b>Sentiment dots</b> — the colored dot by each author marks the
+                  tweet&apos;s tone: <span className="tw-sent-dot tw-sent-positive" />{" "}
+                  positive, <span className="tw-sent-dot tw-sent-negative" /> negative,{" "}
+                  <span className="tw-sent-dot tw-sent-neutral" /> neutral.
+                </li>
+                <li>
+                  <b>Digest</b> — organizes the substance by theme, flags{" "}
+                  <strong>portfolio mentions</strong>, and tracks topics recurring
+                  over the trailing month.
+                </li>
+              </ul>
+            </HowItWorks>
           </div>
         </header>
-
-        <details className="tw-explain">
-          <summary>How this works</summary>
-          <p>
-            Every <strong>Monday, Wednesday and Friday</strong> morning the
-            monitor reads the latest posts from your followed accounts (edit the
-            list in the sidebar — it&apos;s shared, not per-browser). Each tweet
-            is summarized and tagged; charts get a one-line description
-            (<span aria-hidden="true">📎</span>). The digest below organizes the
-            substance by theme, flags <strong>portfolio mentions</strong>, and
-            tracks topics that keep recurring over the trailing month. Weekly
-            price moves are best-effort — non-US listings show “—” for now.
-          </p>
-        </details>
 
         {!hasContent ? (
           <section className="section">
@@ -453,6 +468,17 @@ export function TwitterMonitor({
                 <span className="section-note">
                   {recentTweets.length} from the last {recentDays || 1}{" "}
                   {recentDays === 1 ? "day" : "days"} · hover a summary for the full text
+                </span>
+                <span className="tw-legend" aria-label="Sentiment legend">
+                  <span className="tw-legend-item">
+                    <span className="tw-sent-dot tw-sent-positive" /> positive
+                  </span>
+                  <span className="tw-legend-item">
+                    <span className="tw-sent-dot tw-sent-negative" /> negative
+                  </span>
+                  <span className="tw-legend-item">
+                    <span className="tw-sent-dot tw-sent-neutral" /> neutral
+                  </span>
                 </span>
               </div>
               <table className="tw-table tw-tweets-table">
