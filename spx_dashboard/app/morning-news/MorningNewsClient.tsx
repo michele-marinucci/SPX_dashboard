@@ -3,37 +3,16 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
+import { logoUrl, normTicker } from "@/lib/diligence";
 import type { MorningNote, ThemeChart } from "./page";
 
-// Map ticker → Clearbit logo domain
-const TICKER_DOMAIN: Record<string, string> = {
-  MSFT: "microsoft.com",
-  AMZN: "amazon.com",
-  TRU: "transunion.com",
-  COF: "capitalone.com",
-  AON: "aon.com",
-  WDAY: "workday.com",
-  SPGI: "spglobal.com",
-  "LSEG LN": "lseg.com",
-  CSGP: "costargroup.com",
-  "DSV DC": "dsv.com",
-  MSCI: "msci.com",
-  META: "meta.com",
-  "SAP GY": "sap.com",
-  TOST: "toasttab.com",
-  EFX: "equifax.com",
-  VSAT: "viasat.com",
-};
-
 function TickerLogo({ ticker }: { ticker: string }) {
-  const domain = TICKER_DOMAIN[ticker];
   const [failed, setFailed] = useState(false);
 
-  if (!domain || failed) {
-    // Placeholder: first letter of the ticker on a neutral chip.
+  if (failed) {
     return (
       <span className="news-position-logo news-position-logo-ph" aria-hidden>
-        {ticker.charAt(0)}
+        {normTicker(ticker).charAt(0)}
       </span>
     );
   }
@@ -41,7 +20,7 @@ function TickerLogo({ ticker }: { ticker: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`https://logo.clearbit.com/${domain}`}
+      src={logoUrl(ticker)}
       alt=""
       width={20}
       height={20}
