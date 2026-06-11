@@ -50,10 +50,15 @@ import requests
 
 try:
     import blpapi
-except ImportError:
+except Exception as _blp_err:
     sys.exit(
-        "blpapi is not installed. Run:\n"
-        "  pip install --index-url=https://blpapi.bloomberg.com/repository/releases/python/simple/ blpapi"
+        f"Cannot import blpapi ({type(_blp_err).__name__}: {_blp_err})\n\n"
+        "If blpapi is not installed, run:\n"
+        "  pip install --index-url=https://blpapi.bloomberg.com/repository/releases/python/simple/ blpapi\n\n"
+        "If blpapi IS installed but you see a DLL error, you are likely using the\n"
+        "Windows Store Python, which cannot load native DLLs. Install Python from\n"
+        "https://www.python.org/downloads/ (tick 'Add python.exe to PATH'), then\n"
+        "re-run:  pip install requests  and  pip install blpapi  in the new Python."
     )
 
 # Slow-moving reference fields pulled once per run (a 3M trailing average
