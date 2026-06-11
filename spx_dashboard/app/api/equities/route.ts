@@ -8,6 +8,7 @@
 //        appended to the eq_edits log with old → new values.
 import { NextRequest, NextResponse } from "next/server";
 import {
+  dbGetAllEdits,
   dbGetCompanies,
   dbGetEdits,
   dbInsertCompany,
@@ -113,6 +114,18 @@ export async function POST(req: NextRequest) {
   const action = String(body.action ?? "");
   const analyst = String(body.analyst ?? "").trim();
   const ticker = String(body.ticker ?? "").trim();
+
+  // Aggregate activity log spans every company, so it has no ticker.
+  if (action === "logAll") {
+    try {
+      const edits = await dbGetAllEdits();
+      return NextResponse.json({ ok: true, edits });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Database error.";
+      return NextResponse.json({ error: msg }, { status: 502 });
+    }
+  }
+
   if (!ticker) return NextResponse.json({ error: "Ticker is required." }, { status: 400 });
 
   try {

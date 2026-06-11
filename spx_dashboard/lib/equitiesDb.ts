@@ -121,6 +121,16 @@ export async function dbGetEdits(ticker: string): Promise<EditRecord[]> {
   return (await res.json()) as EditRecord[];
 }
 
+// The whole dashboard's edit history, newest first — powers the aggregate
+// "Activity log" popup and the Edit-log tab of the Excel export.
+export async function dbGetAllEdits(limit = 2000): Promise<EditRecord[]> {
+  const res = await rest(
+    `eq_edits?select=id,ticker,analyst,created_at,changes&order=created_at.desc&limit=${limit}`,
+  );
+  if (!res.ok) throw new Error(`edit log read ${res.status}`);
+  return (await res.json()) as EditRecord[];
+}
+
 // ---- Cached market quotes -------------------------------------------------- //
 
 export async function dbGetQuotes(): Promise<Quote[]> {
