@@ -1,116 +1,113 @@
 [
   {
     "date": "2026-06-11",
-    "one_liner": "AI infrastructure spending is accelerating massively while power grid constraints loom, stocks sold off on inflation fears, and Anthropic's new flagship model launched at double the price of its predecessor.",
+    "one_liner": "Anthropic's Claude Fable 5 dominates the news cycle \u2014 strong capability reviews but cybersecurity data-retention concerns are slowing enterprise adoption, while an OpenAI price war looms and AI infrastructure capex keeps accelerating.",
     "top_themes": [
       {
-        "headline": "AI data center building boom hits power grid limits",
+        "headline": "Claude Fable 5: Capability leap, but adoption friction rising",
         "points": [
           {
-            "text": "Broadcom, Apollo, and Blackstone are launching a $35 billion platform to build AI computing infrastructure, targeting over 20 gigawatts of capacity by 2028.",
-            "jargon": [
-              {
-                "term": "gigawatts",
-                "definition": "a measure of electrical power; one gigawatt can power roughly 750,000 homes"
-              }
+            "text": "Fable 5 is widely reviewed as a step-change in coding and complex long-horizon tasks, scoring ~10-15% above prior frontier models on third-party evals.",
+            "details": [
+              "Stripe reportedly used Fable 5 to migrate a 50-million-line codebase in one day \u2014 a task that would have taken multiple engineers two months.",
+              "Reviewers note the improvement is most pronounced on hard, multi-step tasks; easy/medium tasks show little edge over prior models.",
+              "Model is priced at 2x Claude Opus ($10/M input, $50/M output tokens), though early testers say token efficiency may offset the headline price increase."
             ]
           },
           {
-            "text": "Anthropic has an internal roadmap targeting 80 gigawatts of computing power, and total data center leasing this year could reach 30 gigawatts globally.",
-            "jargon": []
-          },
-          {
-            "text": "The US electricity grid is forecast to run out of spare capacity by 2027, meaning it cannot meet the power needs of new data centers being built.",
-            "jargon": []
-          },
-          {
-            "text": "By 2028, over half of new data centers may need to generate their own power on-site using gas, bypassing the public grid entirely.",
-            "jargon": [
-              {
-                "term": "behind-the-meter",
-                "definition": "power generated on-site by the building itself, not drawn from the public electricity grid"
-              }
+            "text": "A new 30-day data-retention policy is creating a compliance blocker for enterprise customers, particularly in Europe.",
+            "details": [
+              "AWS warned customers that opting into data retention means data leaves AWS's own security boundary.",
+              "UiPath is evaluating GDPR implications before committing to Fable internally; likely not alone among EU-exposed enterprises.",
+              "Microsoft is among the named customers that have held off, per The Information."
             ]
           },
           {
-            "text": "Microsoft is close to leasing 1 gigawatt of data center space in the US in the current quarter alone, and is building a 2 gigawatt region in Europe driven by demand from OpenAI and Anthropic.",
-            "jargon": []
+            "text": "Anthropic is effectively ending the 'subsidy era' \u2014 after a 14-day free trial window, Fable 5 requires usage credits on top of subscription plans.",
+            "details": [
+              "Anthropic says it will restore standard-plan access 'when sufficient capacity allows,' with no firm date.",
+              "The pricing shift is pre-IPO; multiple sources note the pressure to show revenue growth ahead of a public listing."
+            ]
+          },
+          {
+            "text": "Guardrails on Fable 5 are drawing criticism for being overly broad, with entire question categories \u2014 including benign medical queries \u2014 routed to the weaker Opus 4.8.",
+            "details": [
+              "Stratechery's Thompson documented being kicked to Opus when asking about a GLP-1/breast cancer study.",
+              "Anthropic has also added guardrails against frontier LLM development assistance, citing concerns about accelerating rival AI labs."
+            ]
           }
         ],
         "sources": [
-          "SemiAnalysis",
-          "TLDR IT",
+          "The Information AI Agenda",
           "Axios AI+",
-          "TLDR AI",
-          "The Information AM"
-        ],
-        "chart": null
-      },
-      {
-        "headline": "Anthropic releases powerful new AI model at higher price",
-        "points": [
-          {
-            "text": "Anthropic launched Claude Fable 5, a public version of its most capable model, priced at double the cost of its previous top model.",
-            "jargon": []
-          },
-          {
-            "text": "The model performs significantly better on complex, long-running tasks \u2014 one example was Stripe using it to rewrite a 50-million-line codebase in a single day.",
-            "jargon": []
-          },
-          {
-            "text": "Fable 5 has strict content filters that block entire categories of questions, including cybersecurity topics, routing those queries to a weaker model instead.",
-            "jargon": []
-          },
-          {
-            "text": "After 14 days, subscribers must pay extra usage credits on top of their existing subscription to continue accessing the model.",
-            "jargon": [
-              {
-                "term": "usage credits",
-                "definition": "prepaid tokens or units you buy to pay for how much you use an AI model, on top of any subscription fee"
-              }
-            ]
-          },
-          {
-            "text": "OpenAI is reportedly preparing a similarly capable model, so it is too early to say Anthropic has a lasting performance advantage.",
-            "jargon": []
-          }
-        ],
-        "sources": [
           "Stratechery",
           "TLDR AI",
-          "Axios AI+",
-          "The Information AI Agenda",
+          "TLDR Data",
           "TLDR"
         ],
         "chart": null
       },
       {
-        "headline": "Stocks sold off as inflation fears and Iran war weigh",
+        "headline": "OpenAI vs. Anthropic token price war brewing",
         "points": [
           {
-            "text": "The S&P 500 fell 1.6% on Wednesday, with chip stocks hit hardest and oil prices rising on renewed US-Iran tensions.",
-            "jargon": []
-          },
+            "text": "OpenAI is considering drastic token price cuts, anticipating Anthropic will move similarly \u2014 setting up the first major pricing war between the two leading AI labs.",
+            "details": [
+              "OpenAI's cuts are expected to come first, per WSJ.",
+              "Both companies are already losing billions due to compute costs; a price war would stress unit economics ahead of their respective IPOs.",
+              "Enterprise customers have started to balk at current AI usage pricing, providing the demand-side push."
+            ]
+          }
+        ],
+        "sources": [
+          "Axios AI+",
+          "TLDR"
+        ],
+        "chart": null
+      },
+      {
+        "headline": "AI infrastructure capex: grid constraints and BTM power accelerating",
+        "points": [
           {
-            "text": "The market is now very sensitive to rising government bond yields \u2014 even a small rise in yields has been causing large stock market drops in recent months.",
-            "jargon": [
-              {
-                "term": "Treasury yields",
-                "definition": "the interest rate the US government pays on its debt; when yields rise, borrowing costs across the whole economy tend to go up"
-              }
+            "text": "SemiAnalysis models US grid headroom turning negative by 2027, forcing more than half of new datacenters to behind-the-meter (BTM) power by 2028.",
+            "details": [
+              "Only ~15GW of effective grid capacity added per year through 2027-28; datacenter load alone is >31GW/year in the US in 2027, growing ~50%/yr.",
+              "Utilities are routinely walking back power commitments \u2014 e.g., 500MW by 2027 becoming 200MW by 2029.",
+              "Bloom Energy and reciprocating engine manufacturers are the primary BTM beneficiaries; turbine makers constrained by near-term capacity limits."
             ]
           },
           {
-            "text": "A surprisingly strong jobs report last Friday pushed yields sharply higher, causing the Nasdaq 100 to fall 4.8% \u2014 its worst day since the April 2025 tariff panic.",
-            "jargon": []
+            "text": "Broadcom/Apollo/Blackstone are launching a $35B AI XPV Platform targeting 20GW+ of compute capacity through 2028 for frontier AI labs.",
+            "details": [
+              "Google is backstopping Anthropic's chip-lease payments across five datacenters as part of the financing structure.",
+              "SemiAnalysis notes total datacenter leasing in 2026 could reach 30GW, with 5GW+ sites being planned in Texas and one reported 20GW site."
+            ]
           },
           {
-            "text": "Headline inflation was expected to come in at 4.2% year-on-year for May; a number above that level risks triggering another sell-off.",
-            "jargon": []
-          },
+            "text": "Microsoft remains highly active \u2014 ~1GW leased in Q2 in the US, on par with Q1 \u2014 and is pursuing a 2GW European region driven by OpenAI and Anthropic demand.",
+            "details": [
+              "~1GW of that European build was signed in Q2 with leading datacenter operators, per SemiAnalysis."
+            ]
+          }
+        ],
+        "sources": [
+          "SemiAnalysis",
+          "TLDR IT",
+          "TLDR AI",
+          "Axios Pro Rata"
+        ],
+        "chart": null
+      },
+      {
+        "headline": "Macro: rates sensitivity still elevated after jobs shock",
+        "points": [
           {
-            "text": "Oracle shares fell 6% after hours after it reported higher-than-expected spending on data centers, which weighed on its profits.",
-            "jargon": []
+            "text": "Stocks remain on edge heading into today's May CPI print, with the S&P 500 down 3% and Nasdaq 100 down 5%+ from their June 2 highs.",
+            "details": [
+              "The Nasdaq 100's Friday sell-off was its worst single day since the April 2025 tariff panic (-4.8%), triggered by a strong jobs report reigniting rate-hike fears.",
+              "Consensus May CPI expectation is +4.2% YoY headline; a beat would likely extend the sell-off.",
+              "Morgan Stanley's Wilson draws a parallel to 2021, noting the new Fed chair may lean accommodative through the midterms \u2014 until inflation becomes impossible to ignore."
+            ]
           }
         ],
         "sources": [
@@ -119,94 +116,39 @@
         ],
         "chart": {
           "type": "bar",
-          "title": "Recent index declines from June 2 record highs",
+          "title": "Equity drawdown from June 2 highs",
           "unit": "%",
           "series": [
             {
-              "label": "S&P 500 (Jun 10 daily)",
-              "value": -1.6
-            },
-            {
-              "label": "S&P 500 (from Jun 2 high)",
+              "label": "S&P 500",
               "value": -3.0
             },
             {
-              "label": "Nasdaq 100 (from Jun 2 high)",
+              "label": "Nasdaq 100",
               "value": -5.0
             },
             {
-              "label": "Nasdaq 100 (Fri Jun 6 daily)",
-              "value": -4.8
+              "label": "S&P 500 (Wed close)",
+              "value": -1.6
             }
           ]
         }
       },
       {
-        "headline": "SpaceX IPO massively oversubscribed, set to price today",
+        "headline": "Prometheus raises $12B Series B at $41B valuation",
         "points": [
           {
-            "text": "Demand for SpaceX shares is more than four times the number available, making it the most anticipated stock market listing in recent memory.",
-            "jargon": [
-              {
-                "term": "oversubscribed",
-                "definition": "when investors want to buy more shares in a new listing than are actually being sold"
-              }
+            "text": "Jeff Bezos's industrial AI startup Prometheus closed a $12B Series B at a $41B valuation, targeting a 10x compression in the product-to-manufacturing cycle for physical goods.",
+            "details": [
+              "Investors include JPMorgan, BlackRock, Goldman Sachs, DST Global, and Arch Venture Partners; Bezos was the largest Series A backer ($6.2B round).",
+              "Prometheus has ~150 employees and is building what it calls an 'artificial general engineer' \u2014 focused on pre-production optimization and prototyping, not factory automation per se.",
+              "No corporate ties to Amazon or Blue Origin; Blue Origin described as a future 'case study customer.' A reported $100B affiliated holding company structure was not discussed."
             ]
-          },
-          {
-            "text": "SpaceX is offering 555.6 million shares at $135 each, which would make this the largest IPO ever.",
-            "jargon": [
-              {
-                "term": "IPO",
-                "definition": "initial public offering \u2014 the first time a company sells its shares to the general public on a stock exchange"
-              }
-            ]
-          },
-          {
-            "text": "The sheer size of the deal could stress behind-the-scenes market plumbing because index funds may need to buy roughly 30% of the shares available.",
-            "jargon": [
-              {
-                "term": "index funds",
-                "definition": "funds that automatically buy shares in every company that belongs to a market index like the S&P 500; they must buy SpaceX shares if it qualifies for inclusion"
-              }
-            ]
-          },
-          {
-            "text": "SpaceX's Starlink internet service faces a regulatory delay in India due to national security concerns related to the Iran war.",
-            "jargon": []
           }
         ],
         "sources": [
-          "TLDR",
-          "Axios Markets",
-          "The Information AM"
-        ],
-        "chart": null
-      },
-      {
-        "headline": "AI model price war brewing between OpenAI and Anthropic",
-        "points": [
-          {
-            "text": "OpenAI is considering steep price cuts to its AI services, anticipating that Anthropic will do the same to win business customers.",
-            "jargon": []
-          },
-          {
-            "text": "Both companies are already losing billions of dollars because computing costs are so high, so a price war would put further pressure on their finances.",
-            "jargon": []
-          },
-          {
-            "text": "The tension is heightened because both companies are preparing to go public and need to demonstrate strong revenue growth to attract investors.",
-            "jargon": []
-          },
-          {
-            "text": "Anthropic's Fable 5 includes a restriction that prevents other AI developers from using it to help build competing AI models \u2014 a move that could limit rivals.",
-            "jargon": []
-          }
-        ],
-        "sources": [
-          "TLDR",
           "Axios AI+",
-          "The Information AI Agenda"
+          "Axios Pro Rata"
         ],
         "chart": null
       }
@@ -215,17 +157,20 @@
       {
         "ticker": "MSFT",
         "name": "Microsoft",
-        "notes": "SemiAnalysis reports Microsoft has leased nearly 1 gigawatt of data center space in the US so far in the current quarter, matching its first-quarter pace. It is also building a 2 gigawatt data center region in Europe to support demand from OpenAI and Anthropic, with roughly 1 gigawatt already signed with leading operators in Q2."
-      },
-      {
-        "ticker": "META",
-        "name": "Meta Platforms",
-        "notes": "SemiAnalysis believes Meta is actively leasing gigawatts of data center capacity. It is suspected to be the customer behind 810 megawatts of deals signed with Applied Digital in Q2, and has likely leased a 900 megawatt behind-the-meter site near Columbus, Ohio, which would expand its AI computing cluster to 3 gigawatts total."
+        "notes": "Microsoft has held off on adopting Fable 5 due to the data-retention/security boundary concern flagged by AWS. Separately, SemiAnalysis identifies MSFT as still leasing ~1GW in the US in Q2 and pursuing a 2GW European region tied to OpenAI and Anthropic demand.",
+        "claude_take": "The Fable adoption pause is a compliance friction issue, not a structural rejection of Anthropic \u2014 MSFT will likely resolve this via contractual or technical workarounds. More important is the infrastructure signal: MSFT's sustained GW-scale leasing into 2026 reflects durable hyperscaler capex commitment that underpins Azure growth and the OpenAI partnership thesis. The BTM power constraint is a risk to delivery timelines but not to demand."
       },
       {
         "ticker": "AMZN",
         "name": "Amazon",
-        "notes": "Amazon has strengthened its advertising business by combining its shopping data with premium streaming TV inventory. Advertisers can now use Amazon purchase signals to target Netflix viewers, and Amazon has integrated LinkedIn's member data into its advertising platform, giving business-to-business marketers detailed audience targeting on streaming TV."
+        "notes": "AWS issued an explicit warning to customers that Fable 5's data-retention opt-in causes data to leave AWS's security boundary \u2014 a notable friction for AWS's role as Anthropic's primary cloud host and reseller. On the advertising side, Amazon expanded its CTV advantage by integrating LinkedIn's 1B+ member dataset into its DSP and linking Amazon shopping signals to Netflix inventory.",
+        "claude_take": "The AWS security-boundary disclosure is a two-edged issue: it demonstrates AWS's integrity in flagging compliance risks, but it also highlights a structural tension in distributing a third-party model that requires data to leave AWS infrastructure. Long-term, this is an incentive for AWS to push its own Bedrock-native models harder. The CTV/LinkedIn DSP move is an incremental moat extension \u2014 closing the B2B targeting gap against Google and strengthening the retail media flywheel."
+      },
+      {
+        "ticker": "META",
+        "name": "Meta Platforms",
+        "notes": "SemiAnalysis identifies Meta as actively leasing GWs of datacenter capacity, likely the customer behind 810MW of Applied Digital deals in Q2 and the Vantage Millersport 900MW BTM site near Columbus, OH \u2014 expanding Meta's 'Prometheus' compute cluster to ~3GW.",
+        "claude_take": "3GW of dedicated AI compute capacity signals Meta is building serious AI infrastructure independence, supporting the long-term thesis on internal model development and ad-targeting superiority. The BTM power strategy also partially insulates Meta from the grid-capacity constraints that could delay competitors' inference buildout."
       }
     ]
   }
