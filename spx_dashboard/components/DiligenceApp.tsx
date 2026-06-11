@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
-import { DiligenceLink, logoCandidates, normTicker } from "@/lib/diligence";
+import { DiligenceLink, logoCandidates, normTicker, rootTicker } from "@/lib/diligence";
 
 // The Microsoft Lists app glyph: a teal rounded tile with list rows and a
 // check. Inlined so the "open" affordance reads clearly instead of a faint ↗.
@@ -226,7 +226,7 @@ export function DiligenceApp({
   // user has already typed a name themselves).
   const onTickerChange = (raw: string) => {
     setTicker(raw);
-    const known = names[normTicker(raw)];
+    const known = names[rootTicker(raw)];
     if (known && !name.trim()) setName(known);
   };
 
@@ -239,7 +239,7 @@ export function DiligenceApp({
       if (!t) return setError("Enter a ticker.");
       if (!u) return setError("Paste the Microsoft List link.");
       if (!/^https?:\/\//i.test(u)) return setError("Link must start with http(s)://");
-      const entry: DiligenceLink = { ticker: t, name: name.trim() || names[t] || "", url: u };
+      const entry: DiligenceLink = { ticker: t, name: name.trim() || names[rootTicker(t)] || "", url: u };
 
       if (dbEnabled) {
         setBusy(true);
@@ -417,7 +417,7 @@ export function DiligenceApp({
                 >
                   <LogoMark ticker={l.ticker} />
                   <span className="dil-ticker">{l.ticker}</span>
-                  <span className="dil-name">{l.name || names[l.ticker] || ""}</span>
+                  <span className="dil-name">{names[rootTicker(l.ticker)] || l.name || ""}</span>
                   <span className="dil-open">
                     <MsListsIcon />
                     Open list

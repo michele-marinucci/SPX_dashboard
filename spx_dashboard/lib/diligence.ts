@@ -4,7 +4,7 @@ import diligenceFile from "@/data/diligence.json";
 // Client-safe (types + committed-JSON fallback only). The server-only Supabase
 // access lives in lib/diligenceDb.ts, mirroring lib/themes.ts ↔ lib/supabase.ts.
 export interface DiligenceLink {
-  ticker: string; // uppercased symbol, e.g. "MSFT"
+  ticker: string; // Bloomberg-style ticker, e.g. "AMZN US" or "SAP GY" (without trailing "Equity")
   name: string; // company name (may be empty)
   url: string; // Microsoft List URL
 }
@@ -13,10 +13,21 @@ export interface DiligenceData {
   links: DiligenceLink[];
 }
 
-// Symbol only, uppercased — drops anything after the first space so a
-// Bloomberg-style "MSFT US Equity" collapses to "MSFT".
+// Normalise a raw Bloomberg ticker input:
+//   "AMZN US Equity"  →  "AMZN US"
+//   "SAP GY Equity"   →  "SAP GY"
+//   "MSFT"            →  "MSFT"      (bare root preserved as-is)
+// Strips only the trailing word "Equity" (case-insensitive), then uppercases
+// and trims, so the exchange code is preserved. This keeps SAP GY and SAP US
+// as distinct identifiers.
 export const normTicker = (t: string): string =>
-  t.trim().toUpperCase().split(/\s+/)[0] ?? "";
+  t.trim().toUpperCase().replace(/\bEQUITY\b\s*$/i, "").trim();
+
+// The root symbol — the first word of the Bloomberg ticker. Used for CDN
+// logo lookups and the dashboard name map, both of which are keyed by the
+// bare symbol (e.g. "SAP" from "SAP GY").
+export const rootTicker = (t: string): string =>
+  normTicker(t).split(/\s+/)[0] ?? "";
 
 export function getDiligenceData(): DiligenceData {
   return diligenceFile as DiligenceData;
@@ -152,10 +163,10 @@ function domainLogo(domain: string): string {
 }
 
 // The symbol-keyed CDN. Good quality for most US symbols; ambiguous/blank for
-// the cases handled by TICKER_DOMAIN above.
+// the cases handled by TICKER_DOMAIN above. Uses the root symbol only.
 function symbolLogo(ticker: string): string {
   return `https://assets.parqet.com/logos/symbol/${encodeURIComponent(
-    normTicker(ticker),
+    rootTicker(ticker),
   )}?format=png&size=64`;
 }
 
@@ -165,7 +176,7 @@ function symbolLogo(ticker: string): string {
 // that still loads (so onError never fires), which is exactly the META→MetLife
 // bug; the domain source is unambiguous and wins.
 export function logoCandidates(ticker: string): string[] {
-  const domain = TICKER_DOMAIN[normTicker(ticker)];
+  const domain = TICKER_DOMAIN[rootTicker(ticker)];
   return domain ? [domainLogo(domain), symbolLogo(ticker)] : [symbolLogo(ticker)];
 }
 
