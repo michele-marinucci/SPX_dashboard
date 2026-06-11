@@ -2,7 +2,7 @@ import { Column, DataTable, TableRow } from "@/components/DataTable";
 import { NtmPeTable } from "@/components/NtmPeTable";
 import { DashboardFrame } from "@/components/DashboardFrame";
 import { ViewHeading } from "@/components/ViewHeading";
-import { bloombergDateLabelOf, GrowthTable, ThreeDateTable } from "@/lib/data";
+import { bloombergDateLabelOf, getNavModel, GrowthTable, ThreeDateTable } from "@/lib/data";
 import { loadSpxDashboard } from "@/lib/spxLive";
 
 // The tables overlay the daily Bloomberg push (when newer than the committed
@@ -126,15 +126,26 @@ export default async function SpxMonitorPage() {
   const t = d.tables;
   const tc = d.tables_compounders ?? null;
   const asOf = bloombergDateLabelOf(d);
+  const nav = getNavModel();
+  const totalStocks = nav.reduce(
+    (a, g) => a + g.items.reduce((b, i) => b + i.count, 0),
+    0,
+  );
+  const totalCompounders = nav.reduce(
+    (a, g) => a + g.items.reduce((b, i) => b + i.compounderCount, 0),
+    0,
+  );
 
   return (
     <DashboardFrame
       asOf={asOf}
       heading={
         <ViewHeading
-          title="Aggregate SPX"
+          title="SPX Monitor"
           meta="AI beneficiary & software tracker"
-          trailing={`Bloomberg data as of ${asOf}`}
+          stockCount={totalStocks}
+          compounderCount={totalCompounders}
+          trailing={`Bloomberg as of ${asOf}`}
         />
       }
     >

@@ -25,15 +25,17 @@ export function DashboardFrame({
       <Sidebar nav={nav} />
       <div className="content">
         <header className="content-header">
-          {heading}
-          <div className="header-actions">
-            <span className="crumb">
+          <div className="header-lead">
+            <div className="crumb">
               <Link href="/" className="crumb-home">
                 Mendo Hub
               </Link>
               <span className="crumb-sep">/</span>
               <span className="crumb-here">SPX Monitor</span>
-            </span>
+            </div>
+            {heading}
+          </div>
+          <div className="header-actions">
             <HowItWorks title="How the SPX Monitor works">
               <p className="hiw-lead">
                 An AI-beneficiary &amp; software tracker for the S&amp;P 500.

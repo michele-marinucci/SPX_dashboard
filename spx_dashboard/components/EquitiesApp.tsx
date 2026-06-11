@@ -6,7 +6,7 @@
 // an analyst edit updates the whole row for everyone immediately.
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { ANALYSTS } from "@/lib/equities/config";
@@ -313,17 +313,21 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         <span className="eq-btns">
           <button
             type="button"
+            className="eq-actbtn"
             onClick={() => setEditTicker(c.ticker)}
-            title={`Update the ${c.ticker} model inputs`}
+            title={`Edit the ${c.ticker} model`}
+            aria-label={`Edit the ${c.ticker} model`}
           >
-            ✎ Edit
+            ✎
           </button>
           <button
             type="button"
+            className="eq-actbtn"
             onClick={() => setLogTicker(c.ticker)}
-            title={`See every past change to ${c.ticker}`}
+            title={`View ${c.ticker} edit history`}
+            aria-label={`View ${c.ticker} edit history`}
           >
-            ☰ Past Revisions
+            ↺
           </button>
         </span>
       )}
@@ -331,10 +335,12 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         <span className="eq-btns">
           <button
             type="button"
+            className="eq-actbtn"
             onClick={() => setEditTicker(c.ticker)}
-            title="Update index P/E"
+            title="Edit index P/E"
+            aria-label="Edit index P/E"
           >
-            ✎ Edit
+            ✎
           </button>
         </span>
       )}
@@ -347,70 +353,90 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
     </td>
   );
 
+  const subtitle = (
+    <>
+      Detailed dashboard ·{" "}
+      <span className="mono">
+        {stocks.length} {stocks.length === 1 ? "name" : "names"}
+      </span>{" "}
+      ·{" "}
+      <span className="mono">
+        {dataDate
+          ? `prior close · ${new Date(`${dataDate}T12:00:00`).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}`
+          : "prior close"}
+      </span>
+    </>
+  );
+
+  const actions = (
+    <>
+      <HowItWorks title="How the Equities Dashboard works">
+        <p className="hiw-lead">
+          The team&apos;s detailed dashboard, live — recomputed on the fly from
+          shared model inputs and prior-day closing prices.
+        </p>
+        <ul className="hiw-list">
+          <li>
+            <b>Two screens</b> — <b>Summary</b> shows valuation, target
+            multiples, IRRs, and momentum; <b>IRR Decomp</b> breaks the
+            NTM–YE{String(y2).slice(2)} IRR into revenue, margin, yield, and
+            multiple.
+          </li>
+          <li>
+            <b>Edit model</b> — click <span className="mono">✎</span> on any row,
+            pick your name, and update the model. You can paste a whole block
+            straight from your Excel model. Changes are shared with the team
+            instantly.
+          </li>
+          <li>
+            <b>History</b> — every edit is logged per company; click{" "}
+            <span className="mono">↺</span> on a row to see who changed what,
+            when.
+          </li>
+          <li>
+            <b>Sort</b> — click any column header to rank across the whole book;
+            click again for ascending, then off.
+          </li>
+          <li>
+            <b>Prices</b> — prior-day closes from a Bloomberg terminal push
+            and/or Yahoo. <b>Refresh</b> re-fetches; <b>Export Excel</b> exports
+            the live workbook.
+          </li>
+        </ul>
+      </HowItWorks>
+      <button
+        type="button"
+        className="btn"
+        onClick={refreshPrices}
+        disabled={refreshing}
+        title="Re-fetch the latest prior-day closes"
+      >
+        <span className="glyph" aria-hidden="true">⟳</span>{" "}
+        {refreshing ? "Refreshing…" : "Refresh"}
+      </button>
+      <button type="button" className="btn" onClick={() => setAddOpen(true)}>
+        <span className="glyph" aria-hidden="true">＋</span> Add
+      </button>
+      <button type="button" className="btn" onClick={() => setRemovedOpen(true)}>
+        Removed{removedNames.length ? ` (${removedNames.length})` : ""}
+      </button>
+      <a className="btn-primary" href="/api/equities/export">
+        <span className="glyph" aria-hidden="true">↓</span> Export Excel
+      </a>
+    </>
+  );
+
   return (
-    <div className="solo eq-solo">
-      <Link href="/" className="back-link">
-        ← All views
-      </Link>
-
-      <div className="solo-header">
-        <div className="solo-title">
-          <h1>Equities Dashboard</h1>
-        </div>
-        <div className="eq-actions">
-          <HowItWorks title="How the Equities Dashboard works">
-            <p className="hiw-lead">
-              The team&apos;s detailed dashboard, live — recomputed on the fly
-              from shared model inputs and prior-day closing prices.
-            </p>
-            <ul className="hiw-list">
-              <li>
-                <b>Two screens</b> — <b>Summary</b> shows valuation, target
-                multiples, IRRs, and momentum; <b>IRR Decomp</b> breaks the
-                NTM–YE{String(y2).slice(2)} IRR into revenue, margin, yield, and
-                multiple.
-              </li>
-              <li>
-                <b>Edit</b> — click <b>Edit</b> on any row, pick your name, and
-                update the model. You can paste a whole block straight from your
-                Excel model. Changes are shared with the team instantly.
-              </li>
-              <li>
-                <b>Past Revisions</b> — every edit is logged per company; click{" "}
-                <b>Past Revisions</b> on a row to see who changed what, when.
-              </li>
-              <li>
-                <b>Sort</b> — click any column header to rank across the whole
-                book; click again for ascending, then off.
-              </li>
-              <li>
-                <b>Prices</b> — prior-day closes from a Bloomberg terminal push
-                and/or Yahoo. <b>Refresh prices</b> re-fetches; <b>Download
-                Excel</b> exports the live workbook.
-              </li>
-            </ul>
-          </HowItWorks>
-          <button
-            type="button"
-            className="eq-act"
-            onClick={refreshPrices}
-            disabled={refreshing}
-            title="Re-fetch the latest prior-day closes"
-          >
-            {refreshing ? "Refreshing…" : "⟳ Refresh prices"}
-          </button>
-          <button type="button" className="eq-act" onClick={() => setAddOpen(true)}>
-            + Add company
-          </button>
-          <button type="button" className="eq-act" onClick={() => setRemovedOpen(true)}>
-            Removed names{removedNames.length ? ` (${removedNames.length})` : ""}
-          </button>
-          <a className="eq-act eq-act-primary" href="/api/equities/export">
-            ⬇ Download Excel
-          </a>
-        </div>
-      </div>
-
+    <AppShell
+      tool="Equities Dashboard"
+      title="Equities Dashboard"
+      subtitle={subtitle}
+      actions={actions}
+      footerLeft={`Equities Dashboard · ${stocks.length} names · ${stocks.filter((c) => c.port === 1).length} owned`}
+    >
       <div className="eq-toolbar">
         <div className="eq-tabs" role="tablist">
           <button
@@ -636,14 +662,6 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
             : ""}
       </p>
 
-      <footer className="view-foot">
-        <span>
-          Equities Dashboard · {stocks.length} names ·{" "}
-          {stocks.filter((c) => c.port === 1).length} owned
-        </span>
-        <span>MERITAGE · INTERNAL</span>
-      </footer>
-
       {editing && (
         <EditModal
           company={editing}
@@ -669,7 +687,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           onAdded={onAdded}
         />
       )}
-    </div>
+    </AppShell>
   );
 }
 

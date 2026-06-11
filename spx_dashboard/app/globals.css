@@ -3227,3 +3227,331 @@ thead .row-head {
   font-size: 12px;
   margin-top: 2px;
 }
+
+/* ============================================================================
+   UNIFIED REDESIGN — global rail, one header anatomy, one button system
+   (Mendo Hub redesign · chrome only). Appended last so it wins on conflicts.
+   ========================================================================== */
+
+/* ---- Rail: brand lockup ---- */
+.rail-logo {
+  height: 14px;
+  width: auto;
+  display: block;
+}
+.sidebar-head .sidebar-brand {
+  flex: 1;
+}
+
+/* ---- Rail: Tools (global navigation) ---- */
+.rail-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 14px 12px 8px;
+}
+.rail-tools-title {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 600;
+  padding: 0 8px 8px;
+}
+.rail-tool {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 9px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.12s, color 0.12s;
+}
+.rail-tool:hover {
+  background: var(--surface-2);
+}
+.rail-tool-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+.rail-tool-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rail-tool-active {
+  background: var(--brand-050);
+}
+.rail-tool-active .rail-tool-dot {
+  background: var(--brand);
+}
+.rail-tool-active .rail-tool-name {
+  color: var(--brand-700);
+  font-weight: 700;
+}
+
+/* ---- Rail: SPX categories block ---- */
+.rail-cats {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+.rail-cats .rail-tools-title {
+  padding: 0 12px 8px;
+}
+.rail-cats .seg-count {
+  background: var(--surface-3);
+}
+
+/* Collapsed rail hides everything but the toggle. */
+.sidebar-collapsed .rail-tools,
+.sidebar-collapsed .rail-cats,
+.sidebar-collapsed .sidebar-sys {
+  display: none;
+}
+
+/* ---- Header anatomy (breadcrumb · H1 · subtitle) ---- */
+.header-lead {
+  min-width: 0;
+}
+.header-lead .crumb {
+  display: flex;
+  margin-bottom: 6px;
+}
+.header-lead h1 {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0;
+  white-space: nowrap;
+}
+.header-lead .subtitle {
+  margin-top: 6px;
+}
+
+/* ---- Section markers (numbered, brand-colored) ---- */
+.section-num {
+  color: var(--brand);
+}
+.section-note {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* ---- One button system ---- */
+.btn,
+.btn-primary,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-sans, "Hanken Grotesk", sans-serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink-soft);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s, border-color 0.14s, color 0.14s;
+}
+.btn:hover,
+.btn-ghost:hover {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+}
+.btn-primary {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--brand-700);
+  border-color: var(--brand-700);
+}
+.btn:disabled,
+.btn-primary:disabled,
+.btn-ghost:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.btn .glyph,
+.btn-primary .glyph,
+.btn-ghost .glyph {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-weight: 500;
+}
+
+/* ---- Content toolbar (per-tool secondary controls) ---- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.toolbar-spacer {
+  margin-left: auto;
+}
+
+/* ---- Monogram tile (Diligence / Morning Notes fallback) ---- */
+.monotile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+  color: #fff;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ---- Sentiment dots ---- */
+.sent-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.sent-positive { background: var(--green); }
+.sent-negative { background: var(--red); }
+.sent-neutral { background: #c4c4cf; }
+
+/* ---- Homepage: INTERNAL tag in the top lockup ---- */
+.hub-internal {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  letter-spacing: 1.2px;
+  color: var(--faint);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 2px 7px;
+  background: var(--surface);
+}
+.hub-lockup {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.hub-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--line-2);
+}
+
+/* ---- Morning Notes date control glyph (replaces the calendar emoji) ---- */
+.cal-glyph {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--brand);
+  border-radius: 3px;
+  display: inline-block;
+}
+.news-date-picker-wrap {
+  position: relative;
+}
+
+/* ---- Twitter Themes: Manage-accounts modal ---- */
+.tw-manage-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 34, 0.32);
+  display: grid;
+  place-items: start center;
+  padding: 80px 20px;
+  z-index: 200;
+}
+.tw-manage {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(26, 26, 34, 0.18);
+  overflow: hidden;
+}
+.tw-manage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.tw-manage-head h2 {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.tw-manage-body {
+  padding: 14px 18px 18px;
+}
+
+/* ---- Equities: inline row-action glyph buttons (✎ edit · ↺ history) ---- */
+.eq-actbtn {
+  width: 19px;
+  height: 19px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+  color: #c0c0cc;
+  border: 1px solid #ececf2;
+  border-radius: 5px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.eq-row:hover .eq-actbtn {
+  color: var(--muted);
+  border-color: var(--brand-100);
+}
+.eq-actbtn:hover {
+  color: var(--brand-700) !important;
+  border-color: var(--brand-100) !important;
+  background: var(--brand-050) !important;
+}
+
+/* ---- Equities: segmented Summary / IRR Decomp tabs (spec control) ---- */
+.eq-tabs {
+  display: inline-flex;
+  background: #ececf0;
+  border: 0;
+  border-radius: 9px;
+  padding: 3px;
+  overflow: visible;
+}
+.eq-tabs button {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+}
+.eq-tabs button.on {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* Header: align the action cluster to the top of the lead (breadcrumb line). */
+.content-header {
+  align-items: flex-start;
+}
+.content-header .header-actions {
+  align-items: flex-start;
+}
