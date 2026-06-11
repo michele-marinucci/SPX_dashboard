@@ -128,6 +128,7 @@ export async function dbGetTwitterFeed(): Promise<TwitterData | null> {
       views: (r.views as number | null) ?? null,
       has_media: (r.has_media as boolean) ?? false,
       media_summary: (r.media_summary as string) ?? "",
+      media_urls: (r.media_urls as string[]) ?? [],
       first_seen: (r.first_seen as string) ?? "",
       last_seen: (r.last_seen as string) ?? "",
       seen_count: (r.seen_count as number) ?? 1,

@@ -192,16 +192,32 @@ export function TwitterMonitor({
     return m;
   }, [data.tweets]);
 
-  // The tweet table shows the most recent batch (the digest window), newest
-  // first; the rest of the store only feeds recurring-topic detection.
+  // The tweet table shows the 80 most recent posts, newest first — PLUS any
+  // tweet referenced by the daily summary or recurring topics, so every
+  // "See post" anchor below always resolves to a rendered row.
   const recentTweets = useMemo(() => {
-    const sorted = [...data.tweets].sort((a, b) =>
-      (b.posted_at || b.first_seen || "").localeCompare(a.posted_at || a.first_seen || ""),
+    const byTime = (a: Tweet, b: Tweet) =>
+      (b.posted_at || b.first_seen || "").localeCompare(a.posted_at || a.first_seen || "");
+    const sorted = [...data.tweets].sort(byTime);
+
+    const referenced = new Set<string>();
+    (data.daily_summary.items || []).forEach((it) =>
+      (it.tweet_ids || []).forEach((id) => referenced.add(id)),
     );
-    const lastSeen = sorted[0]?.last_seen;
-    const batch = lastSeen ? sorted.filter((t) => t.last_seen === lastSeen) : sorted;
-    return (batch.length ? batch : sorted).slice(0, 80);
-  }, [data.tweets]);
+    (data.recurring || []).forEach((r) =>
+      (r.tweet_ids || []).forEach((id) => referenced.add(id)),
+    );
+
+    const top = sorted.slice(0, 80);
+    const shown = new Set(top.map((t) => t.id));
+    const extras = sorted.filter((t) => referenced.has(t.id) && !shown.has(t.id));
+    return [...top, ...extras].sort(byTime);
+  }, [data.tweets, data.daily_summary, data.recurring]);
+
+  const renderedIds = useMemo(
+    () => new Set(recentTweets.map((t) => t.id)),
+    [recentTweets],
+  );
 
   // Portfolio names mentioned in the recent batch, in portfolio order.
   const portfolioHits = useMemo(() => {
@@ -344,8 +360,8 @@ export function TwitterMonitor({
                     <DailyItem
                       key={it.theme}
                       item={it}
-                      moves={data.ticker_moves}
                       tweetById={tweetById}
+                      renderedIds={renderedIds}
                     />
                   ))}
                 </div>
@@ -390,8 +406,8 @@ export function TwitterMonitor({
                               <a
                                 key={t.id}
                                 href={`#tw-${t.id}`}
-                                className={cx("tw-mention", `tw-sent-${t.sentiment}`)}
-                                title={t.summary}
+                                className="tw-see-post"
+                                title={t.summary || `Jump to @${t.handle}'s post`}
                               >
                                 @{t.handle} ↓
                               </a>
@@ -417,7 +433,7 @@ export function TwitterMonitor({
                 </div>
                 <div className="tw-recur-grid">
                   {data.recurring.map((r) => (
-                    <RecurCard key={r.topic} r={r} moves={data.ticker_moves} />
+                    <RecurCard key={r.topic} r={r} />
                   ))}
                 </div>
               </section>
@@ -444,7 +460,7 @@ export function TwitterMonitor({
                 </thead>
                 <tbody>
                   {recentTweets.map((t) => (
-                    <TweetRow key={t.id} t={t} moves={data.ticker_moves} />
+                    <TweetRow key={t.id} t={t} />
                   ))}
                 </tbody>
               </table>
@@ -461,42 +477,61 @@ export function TwitterMonitor({
   );
 }
 
-function TickerChip({
-  ticker,
-  move,
-}: {
-  ticker: string;
-  move: number | null | undefined;
-}) {
-  return (
-    <span className="tw-chip">
-      {ticker}
-      <span className={cx("tw-chip-move", moveClass(move))}>{fmtMove(move)}</span>
-    </span>
-  );
+function TickerChip({ ticker }: { ticker: string }) {
+  return <span className="tw-chip">{ticker}</span>;
 }
 
 function DailyItem({
   item,
-  moves,
   tweetById,
+  renderedIds,
 }: {
   item: DailySummaryItem;
-  moves: Record<string, number | null>;
   tweetById: Map<string, Tweet>;
+  renderedIds: Set<string>;
 }) {
-  const linked = item.tweet_ids.filter((id) => tweetById.has(id));
+  const linkedTweets = item.tweet_ids
+    .map((id) => tweetById.get(id))
+    .filter((t): t is Tweet => !!t);
+  // Charts from the tweets behind this theme (if any carry an image URL).
+  const charts = linkedTweets
+    .flatMap((t) => (t.media_urls || []).map((url) => ({ url, tweet: t })))
+    .slice(0, 4);
+  const jumpable = item.tweet_ids.filter((id) => renderedIds.has(id));
+
   return (
     <div className="tw-daily-item">
       <div className="tw-daily-label">{item.label}</div>
       <p className="tw-daily-text">{item.summary}</p>
+      {charts.length > 0 && (
+        <div className="tw-daily-charts">
+          {charts.map(({ url, tweet }) => (
+            <a
+              key={url}
+              href={tweet.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tw-chart"
+              title={tweet.media_summary || `Chart from @${tweet.handle}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={url} alt={tweet.media_summary || "Chart from a tweet"} loading="lazy" />
+            </a>
+          ))}
+        </div>
+      )}
       <div className="tw-daily-meta">
         {item.tickers.map((tk) => (
-          <TickerChip key={tk} ticker={tk} move={moves[tk]} />
+          <TickerChip key={tk} ticker={tk} />
         ))}
-        {linked.map((id, i) => (
-          <a key={id} href={`#tw-${id}`} className="tw-jump" title="Go to tweet">
-            tweet {i + 1} ↓
+        {jumpable.map((id, i) => (
+          <a
+            key={id}
+            href={`#tw-${id}`}
+            className="tw-see-post"
+            title="Jump to the post below"
+          >
+            See post{jumpable.length > 1 ? ` ${i + 1}` : ""}
           </a>
         ))}
       </div>
@@ -504,13 +539,7 @@ function DailyItem({
   );
 }
 
-function RecurCard({
-  r,
-  moves,
-}: {
-  r: RecurringTopic;
-  moves: Record<string, number | null>;
-}) {
+function RecurCard({ r }: { r: RecurringTopic }) {
   return (
     <article className="tw-recur-card">
       <div className="tw-recur-head">
@@ -520,20 +549,14 @@ function RecurCard({
       <p className="tw-recur-sum">{r.summary}</p>
       <div className="tw-daily-meta">
         {r.tickers.map((tk) => (
-          <TickerChip key={tk} ticker={tk} move={moves[tk]} />
+          <TickerChip key={tk} ticker={tk} />
         ))}
       </div>
     </article>
   );
 }
 
-function TweetRow({
-  t,
-  moves,
-}: {
-  t: Tweet;
-  moves: Record<string, number | null>;
-}) {
+function TweetRow({ t }: { t: Tweet }) {
   return (
     <tr id={`tw-${t.id}`} className={cx(t.portfolio.length > 0 && "tw-row-port")}>
       <td className="tw-author">
@@ -557,20 +580,20 @@ function TweetRow({
       </td>
       <td className="tw-tickers">
         {t.tickers.map((tk) => (
-          <TickerChip key={tk} ticker={tk} move={moves[tk]} />
+          <TickerChip key={tk} ticker={tk} />
         ))}
       </td>
       <td className="r mono">{fmtViews(t.views)}</td>
       <td className="r mono">{fmtDay(t.posted_at || t.first_seen)}</td>
       <td className="r">
         <a
-          className="tw-open"
+          className="tw-see-post"
           href={t.url}
           target="_blank"
           rel="noopener noreferrer"
           title="Open the tweet on X"
         >
-          ↗
+          See post ↗
         </a>
       </td>
     </tr>

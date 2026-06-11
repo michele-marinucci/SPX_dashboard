@@ -48,6 +48,7 @@ create table if not exists tweets (
   views         bigint,
   has_media     boolean not null default false,
   media_summary text,                      -- vision description of chart/image
+  media_urls    jsonb not null default '[]'::jsonb,    -- chart/image URLs
   first_seen    date,
   last_seen     date,
   seen_count    int not null default 1,
@@ -56,6 +57,8 @@ create table if not exists tweets (
 );
 create index if not exists tweets_posted_at_idx on tweets (posted_at desc);
 create index if not exists tweets_handle_idx on tweets (handle);
+-- If the table predates media_urls, add it once:
+--   alter table tweets add column if not exists media_urls jsonb not null default '[]'::jsonb;
 
 -- One row per run: the LLM "summary of the day", organized by theme.
 create table if not exists daily_summary (

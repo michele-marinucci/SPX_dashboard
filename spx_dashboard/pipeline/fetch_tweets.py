@@ -460,7 +460,10 @@ def merge_store(
         cur = by_id.get(t["id"])
         if cur is None:
             t = dict(t)
-            t.pop("media_urls", None)  # transient; not worth persisting
+            # Keep only image URLs worth rendering as chart thumbnails.
+            t["media_urls"] = [
+                u for u in (t.get("media_urls") or []) if _IMAGE_URL_RE.search(u)
+            ]
             t["first_seen"] = iso
             t["last_seen"] = iso
             t["seen_count"] = 1
@@ -474,6 +477,11 @@ def merge_store(
                       "portfolio", "media_summary", "text"):
                 if t.get(k) not in (None, "", []):
                     cur[k] = t[k]
+            img_urls = [
+                u for u in (t.get("media_urls") or []) if _IMAGE_URL_RE.search(u)
+            ]
+            if img_urls:
+                cur["media_urls"] = img_urls
 
     # Prune: posted_at when parseable, else first_seen, governs retention.
     cutoff = today - dt.timedelta(days=cfg.RETENTION_DAYS)

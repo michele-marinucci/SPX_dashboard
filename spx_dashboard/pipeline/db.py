@@ -133,6 +133,7 @@ def _upsert_tweets(tweets: list[dict], retention_cutoff: str) -> None:
             "views": t.get("views"),
             "has_media": bool(t.get("has_media")),
             "media_summary": t.get("media_summary"),
+            "media_urls": t.get("media_urls", []),
             "first_seen": t.get("first_seen"),
             "last_seen": t.get("last_seen"),
             "seen_count": t.get("seen_count", 1),
@@ -141,12 +142,25 @@ def _upsert_tweets(tweets: list[dict], retention_cutoff: str) -> None:
         if t.get("id")
     ]
     if rows:
-        requests.post(
+        resp = requests.post(
             f"{URL}/rest/v1/tweets",
             headers=_headers({"Prefer": "resolution=merge-duplicates,return=minimal"}),
             json=rows,
             timeout=TIMEOUT,
-        ).raise_for_status()
+        )
+        # Tolerate a table that predates the media_urls column: retry without it
+        # rather than failing the whole publish. (Run the ALTER in schema.sql.)
+        if resp.status_code == 400 and "media_urls" in (resp.text or ""):
+            _log("db: tweets table missing media_urls column; upserting without it")
+            for r in rows:
+                r.pop("media_urls", None)
+            resp = requests.post(
+                f"{URL}/rest/v1/tweets",
+                headers=_headers({"Prefer": "resolution=merge-duplicates,return=minimal"}),
+                json=rows,
+                timeout=TIMEOUT,
+            )
+        resp.raise_for_status()
     requests.delete(
         f"{URL}/rest/v1/tweets?first_seen=lt.{retention_cutoff}",
         headers=_headers({"Prefer": "return=minimal"}),

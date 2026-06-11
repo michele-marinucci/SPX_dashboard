@@ -24,6 +24,8 @@ export interface Tweet {
   views: number | null;
   has_media: boolean;
   media_summary?: string;
+  // Direct chart/image URLs (pbs.twimg.com / *.png|jpg|webp), for thumbnails.
+  media_urls?: string[];
   first_seen: string;
   last_seen: string;
   seen_count: number;
