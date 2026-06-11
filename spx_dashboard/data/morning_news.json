@@ -1,39 +1,71 @@
 [
   {
     "date": "2026-06-11",
-    "one_liner": "Anthropic's Claude Fable 5 dominates the news cycle \u2014 strong capability reviews but cybersecurity data-retention concerns are slowing enterprise adoption, while an OpenAI price war looms and AI infrastructure capex keeps accelerating.",
+    "one_liner": "Hot CPI and a rate-sensitive tape dominate the macro picture, while Anthropic's Fable 5 launch reshapes the enterprise AI cost and data-security debate that touches our software names.",
     "top_themes": [
       {
-        "headline": "Claude Fable 5: Capability leap, but adoption friction rising",
+        "headline": "Hot CPI and rate-sensitive equities",
         "points": [
           {
-            "text": "Fable 5 is widely reviewed as a step-change in coding and complex long-horizon tasks, scoring ~10-15% above prior frontier models on third-party evals.",
+            "text": "May CPI rose 4.2% year-on-year, the fastest since April 2023, driven by energy from the Iran war.",
             "details": [
-              "Stripe reportedly used Fable 5 to migrate a 50-million-line codebase in one day \u2014 a task that would have taken multiple engineers two months.",
-              "Reviewers note the improvement is most pronounced on hard, multi-step tasks; easy/medium tasks show little edge over prior models.",
-              "Model is priced at 2x Claude Opus ($10/M input, $50/M output tokens), though early testers say token efficiency may offset the headline price increase."
+              "Real wages for production workers are up just 0.1% since January 2025.",
+              "ECB raised rates 0.25pt but signalled no further summer hikes."
             ]
           },
           {
-            "text": "A new 30-day data-retention policy is creating a compliance blocker for enterprise customers, particularly in Europe.",
+            "text": "Stocks have become acutely sensitive to rising Treasury yields.",
             "details": [
-              "AWS warned customers that opting into data retention means data leaves AWS's own security boundary.",
-              "UiPath is evaluating GDPR implications before committing to Fable internally; likely not alone among EU-exposed enterprises.",
-              "Microsoft is among the named customers that have held off, per The Information."
+              "Nasdaq 100's 4.8% drop last Friday was its worst day since the April 2025 tariff panic.",
+              "S&P 500 down 3% and Nasdaq 100 down over 5% from June 2 highs.",
+              "Morgan Stanley's Wilson sees the Fed staying accommodative through the midterms."
+            ]
+          }
+        ],
+        "sources": [
+          "Axios Macro",
+          "Axios Markets",
+          "Axios Closer"
+        ],
+        "chart": {
+          "type": "bar",
+          "title": "Index moves from June 2 high",
+          "unit": "%",
+          "series": [
+            {
+              "label": "S&P 500",
+              "value": -3.0
+            },
+            {
+              "label": "Nasdaq 100",
+              "value": -5.0
+            }
+          ]
+        }
+      },
+      {
+        "headline": "Anthropic Fable 5 launch and AI price war",
+        "points": [
+          {
+            "text": "Anthropic released Claude Fable 5, a Mythos-class model, with strong coding gains but stricter guardrails.",
+            "details": [
+              "Priced at $10/M input and $50/M output tokens, double the Opus models.",
+              "Stripe migrated a 50-million-line codebase in a day using Fable.",
+              "Cybersecurity and biology queries are routed down to weaker Opus 4.8."
             ]
           },
           {
-            "text": "Anthropic is effectively ending the 'subsidy era' \u2014 after a 14-day free trial window, Fable 5 requires usage credits on top of subscription plans.",
+            "text": "A new 30-day data retention policy is giving enterprise customers pause.",
             "details": [
-              "Anthropic says it will restore standard-plan access 'when sufficient capacity allows,' with no firm date.",
-              "The pricing shift is pre-IPO; multiple sources note the pressure to show revenue growth ahead of a public listing."
+              "AWS warned data leaves its security boundary once retention is enabled.",
+              "UiPath is reviewing GDPR exposure before adopting Fable internally."
             ]
           },
           {
-            "text": "Guardrails on Fable 5 are drawing criticism for being overly broad, with entire question categories \u2014 including benign medical queries \u2014 routed to the weaker Opus 4.8.",
+            "text": "OpenAI is weighing drastic token price cuts to take share from Anthropic.",
             "details": [
-              "Stratechery's Thompson documented being kicked to Opus when asking about a GLP-1/breast cancer study.",
-              "Anthropic has also added guardrails against frontier LLM development assistance, citing concerns about accelerating rival AI labs."
+              "A price war would test both labs' margins ahead of anticipated IPOs.",
+              "Anthropic filed IPO paperwork; the 'subsidy era' is widely seen as ending."
             ]
           }
         ],
@@ -44,133 +76,81 @@
           "TLDR AI",
           "TLDR Data",
           "TLDR"
-        ],
-        "chart": null
+        ]
       },
       {
-        "headline": "OpenAI vs. Anthropic token price war brewing",
+        "headline": "AI power and datacenter capacity crunch",
         "points": [
           {
-            "text": "OpenAI is considering drastic token price cuts, anticipating Anthropic will move similarly \u2014 setting up the first major pricing war between the two leading AI labs.",
+            "text": "US grid headroom turns negative by 2027, pushing datacenters behind-the-meter.",
             "details": [
-              "OpenAI's cuts are expected to come first, per WSJ.",
-              "Both companies are already losing billions due to compute costs; a price war would stress unit economics ahead of their respective IPOs.",
-              "Enterprise customers have started to balk at current AI usage pricing, providing the demand-side push."
-            ]
-          }
-        ],
-        "sources": [
-          "Axios AI+",
-          "TLDR"
-        ],
-        "chart": null
-      },
-      {
-        "headline": "AI infrastructure capex: grid constraints and BTM power accelerating",
-        "points": [
-          {
-            "text": "SemiAnalysis models US grid headroom turning negative by 2027, forcing more than half of new datacenters to behind-the-meter (BTM) power by 2028.",
-            "details": [
-              "Only ~15GW of effective grid capacity added per year through 2027-28; datacenter load alone is >31GW/year in the US in 2027, growing ~50%/yr.",
-              "Utilities are routinely walking back power commitments \u2014 e.g., 500MW by 2027 becoming 200MW by 2029.",
-              "Bloom Energy and reciprocating engine manufacturers are the primary BTM beneficiaries; turbine makers constrained by near-term capacity limits."
+              "SemiAnalysis sees over half of new datacenters powered by onsite gas in 2028.",
+              "Bloom Energy and reciprocating engines flagged as key beneficiaries."
             ]
           },
           {
-            "text": "Broadcom/Apollo/Blackstone are launching a $35B AI XPV Platform targeting 20GW+ of compute capacity through 2028 for frontier AI labs.",
+            "text": "Hyperscaler leasing remains very strong; 2026 datacenter leasing could reach 30GW.",
             "details": [
-              "Google is backstopping Anthropic's chip-lease payments across five datacenters as part of the financing structure.",
-              "SemiAnalysis notes total datacenter leasing in 2026 could reach 30GW, with 5GW+ sites being planned in Texas and one reported 20GW site."
-            ]
-          },
-          {
-            "text": "Microsoft remains highly active \u2014 ~1GW leased in Q2 in the US, on par with Q1 \u2014 and is pursuing a 2GW European region driven by OpenAI and Anthropic demand.",
-            "details": [
-              "~1GW of that European build was signed in Q2 with leading datacenter operators, per SemiAnalysis."
+              "Microsoft leased nearly 1GW in Q2 in the US and is building a 2GW European region for OpenAI and Anthropic.",
+              "Meta expanding its Prometheus cluster to 3GW.",
+              "Broadcom, Apollo and Blackstone launching a $35bn AI infrastructure platform."
             ]
           }
         ],
         "sources": [
           "SemiAnalysis",
           "TLDR IT",
-          "TLDR AI",
-          "Axios Pro Rata"
-        ],
-        "chart": null
+          "TLDR AI"
+        ]
       },
       {
-        "headline": "Macro: rates sensitivity still elevated after jobs shock",
+        "headline": "SpaceX IPO prices",
         "points": [
           {
-            "text": "Stocks remain on edge heading into today's May CPI print, with the S&P 500 down 3% and Nasdaq 100 down 5%+ from their June 2 highs.",
+            "text": "SpaceX IPO is more than four times oversubscribed and prices tonight, trading tomorrow.",
             "details": [
-              "The Nasdaq 100's Friday sell-off was its worst single day since the April 2025 tariff panic (-4.8%), triggered by a strong jobs report reigniting rate-hike fears.",
-              "Consensus May CPI expectation is +4.2% YoY headline; a beat would likely extend the sell-off.",
-              "Morgan Stanley's Wilson draws a parallel to 2021, noting the new Fed chair may lean accommodative through the midterms \u2014 until inflation becomes impossible to ignore."
+              "555.6m shares at $135 each; set to be the largest IPO ever.",
+              "Index funds may eye up to 30% of the float, stressing passive mechanisms."
             ]
           }
         ],
         "sources": [
-          "Axios Markets",
-          "Axios Closer"
-        ],
-        "chart": {
-          "type": "bar",
-          "title": "Equity drawdown from June 2 highs",
-          "unit": "%",
-          "series": [
-            {
-              "label": "S&P 500",
-              "value": -3.0
-            },
-            {
-              "label": "Nasdaq 100",
-              "value": -5.0
-            },
-            {
-              "label": "S&P 500 (Wed close)",
-              "value": -1.6
-            }
-          ]
-        }
-      },
-      {
-        "headline": "Prometheus raises $12B Series B at $41B valuation",
-        "points": [
-          {
-            "text": "Jeff Bezos's industrial AI startup Prometheus closed a $12B Series B at a $41B valuation, targeting a 10x compression in the product-to-manufacturing cycle for physical goods.",
-            "details": [
-              "Investors include JPMorgan, BlackRock, Goldman Sachs, DST Global, and Arch Venture Partners; Bezos was the largest Series A backer ($6.2B round).",
-              "Prometheus has ~150 employees and is building what it calls an 'artificial general engineer' \u2014 focused on pre-production optimization and prototyping, not factory automation per se.",
-              "No corporate ties to Amazon or Blue Origin; Blue Origin described as a future 'case study customer.' A reported $100B affiliated holding company structure was not discussed."
-            ]
-          }
-        ],
-        "sources": [
-          "Axios AI+",
-          "Axios Pro Rata"
-        ],
-        "chart": null
+          "TLDR",
+          "Axios Pro Rata",
+          "Axios Markets"
+        ]
       }
     ],
     "positions": [
       {
         "ticker": "MSFT",
         "name": "Microsoft",
-        "notes": "Microsoft has held off on adopting Fable 5 due to the data-retention/security boundary concern flagged by AWS. Separately, SemiAnalysis identifies MSFT as still leasing ~1GW in the US in Q2 and pursuing a 2GW European region tied to OpenAI and Anthropic demand.",
-        "claude_take": "The Fable adoption pause is a compliance friction issue, not a structural rejection of Anthropic \u2014 MSFT will likely resolve this via contractual or technical workarounds. More important is the infrastructure signal: MSFT's sustained GW-scale leasing into 2026 reflects durable hyperscaler capex commitment that underpins Azure growth and the OpenAI partnership thesis. The BTM power constraint is a risk to delivery timelines but not to demand."
+        "notes": "Microsoft is among Anthropic customers holding off on Fable 5 over the 30-day data retention policy. Separately, The Information reports Xbox is planning layoffs as revenue and margins decline.",
+        "claude_take": "The Fable data-residency friction is a reminder that Microsoft's enterprise trust and compliance posture is itself a moat; customers default to its boundaries. Xbox weakness is immaterial to the thesis, which rests on Azure and Copilot monetization, not gaming."
       },
       {
         "ticker": "AMZN",
         "name": "Amazon",
-        "notes": "AWS issued an explicit warning to customers that Fable 5's data-retention opt-in causes data to leave AWS's security boundary \u2014 a notable friction for AWS's role as Anthropic's primary cloud host and reseller. On the advertising side, Amazon expanded its CTV advantage by integrating LinkedIn's 1B+ member dataset into its DSP and linking Amazon shopping signals to Netflix inventory.",
-        "claude_take": "The AWS security-boundary disclosure is a two-edged issue: it demonstrates AWS's integrity in flagging compliance risks, but it also highlights a structural tension in distributing a third-party model that requires data to leave AWS infrastructure. Long-term, this is an incentive for AWS to push its own Bedrock-native models harder. The CTV/LinkedIn DSP move is an incremental moat extension \u2014 closing the B2B targeting gap against Google and strengthening the retail media flywheel."
+        "notes": "AWS told customers their data leaves its security boundary once Anthropic's Fable retention is enabled. Amazon also expanded its CTV ad advantage, adding LinkedIn data and commerce-based targeting for Netflix inventory.",
+        "claude_take": "AWS sits at the center of the Anthropic stack, which is a structural tailwind even as data-governance questions surface. The advertising data loop is the more underappreciated earnings driver; tying impressions to purchases deepens a high-margin, defensible business."
       },
       {
-        "ticker": "META",
-        "name": "Meta Platforms",
-        "notes": "SemiAnalysis identifies Meta as actively leasing GWs of datacenter capacity, likely the customer behind 810MW of Applied Digital deals in Q2 and the Vantage Millersport 900MW BTM site near Columbus, OH \u2014 expanding Meta's 'Prometheus' compute cluster to ~3GW.",
-        "claude_take": "3GW of dedicated AI compute capacity signals Meta is building serious AI infrastructure independence, supporting the long-term thesis on internal model development and ad-targeting superiority. The BTM power strategy also partially insulates Meta from the grid-capacity constraints that could delay competitors' inference buildout."
+        "ticker": "WDAY",
+        "name": "Workday",
+        "notes": "No direct news, but the Fable 5 launch and the broader enterprise-AI cost and coding-automation wave bear directly on application software.",
+        "claude_take": "Rapidly improving coding models raise the long-run question of whether large suite vendors capture or cede AI value. Workday's moat is its system-of-record data and compliance depth, not code, so near-term risk is limited, but pricing power must be watched."
+      },
+      {
+        "ticker": "SAP",
+        "name": "SAP",
+        "notes": "Implicated by the same enterprise-AI shift; coding agents like Fable migrated a 50-million-line codebase in a day.",
+        "claude_take": "Faster code migration could cut switching costs that protect SAP's installed base over time. For now the ERP data gravity and regulatory entrenchment keep the moat intact, and AI more likely accelerates RISE migrations than displaces them."
+      },
+      {
+        "ticker": "TOST",
+        "name": "Toast",
+        "notes": "No company-specific news, but a hot CPI print and squeezed real wages pressure consumer-facing restaurant spend.",
+        "claude_take": "Stalled real wages and energy-driven inflation are a demand headwind for restaurant volumes and Toast's payment-linked revenue. The fintech attach and software stickiness should cushion this, but watch same-store sales and net location adds."
       }
     ]
   }
