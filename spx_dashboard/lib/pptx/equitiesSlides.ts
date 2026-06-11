@@ -3,12 +3,17 @@ import pptxgen from "pptxgenjs";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { loadCompanies, loadQuotes, latestDataDate } from "@/lib/equities/load";
 import { Company, Quote } from "@/lib/equities/types";
-import { BRAND, CONTENT_W, INK, MARGIN, MUTED, PAGE_H } from "./common";
+import { CONTENT_W, FONT, FOOTER_Y, INK, MARGIN, MASTER_CONTENT, MUTED, NAVY } from "./common";
 
 // Faithful PowerPoint of the Equities Dashboard — the two screens the web page
 // shows (Valuation/IRR "Summary" and the "IRR Decomp"), same columns, same
 // Excel-style heatmaps and owned-name shading, ordered by the 2028 IRR within
 // each sector, priced off the prior-day closes the page itself uses.
+//
+// Deck-only deviations on the IRR Decomp (per the template spec): every
+// percentage prints in black with no decimals (the web shows some columns in
+// blue at 1dp), and the Return column carries the same yellow→green heat the
+// Summary applies to its IRR column.
 //
 // Geometry note: every row gets an explicit height sized so the whole table
 // fits the 7.5" slide — PowerPoint only honors row heights as minimums, so the
@@ -21,7 +26,6 @@ const YELLOW: RGB = [255, 235, 132];
 const GREEN: RGB = [99, 190, 123];
 const WHITE: RGB = [255, 255, 255];
 const OWNED = "D9EFDC"; // .eq-tick-own
-const BLUE = "1D4ED8"; // .eq-blue
 const NA = "A6A6B2"; // .eq-na faint
 const GRP_FILL = "F2F2F6";
 
@@ -52,6 +56,9 @@ function fx(v: number | null | undefined): string {
 function fp(v: number | null | undefined): string {
   return v == null ? "n/a" : `${(v * 100).toFixed(1)}%`;
 }
+function fp0(v: number | null | undefined): string {
+  return v == null ? "n/a" : `${(v * 100).toFixed(0)}%`;
+}
 function fpx(v: number | null | undefined, ccy: string): string {
   if (v == null) return "n/a";
   const s = v.toLocaleString("en-US", {
@@ -63,32 +70,23 @@ function fpx(v: number | null | undefined, ccy: string): string {
 
 // A very compact slide header, leaving maximum room for the table.
 function eqSlide(pptx: pptxgen, title: string, subtitle: string): pptxgen.Slide {
-  const slide = pptx.addSlide();
-  slide.background = { color: "FFFFFF" };
-  slide.addShape(pptx.ShapeType.rect, {
-    x: 0,
-    y: 0,
-    w: 0.18,
-    h: PAGE_H,
-    fill: { color: BRAND },
-    line: { type: "none" },
-  });
+  const slide = pptx.addSlide({ masterName: MASTER_CONTENT });
   slide.addText(title, {
     x: MARGIN,
     y: 0.1,
     w: 7.5,
     h: 0.34,
-    fontFace: "Arial",
+    fontFace: FONT,
     fontSize: 16,
     bold: true,
-    color: INK,
+    color: NAVY,
   });
   slide.addText(subtitle, {
     x: 8.1,
     y: 0.14,
     w: PAGE_W_SAFE - 8.1,
     h: 0.3,
-    fontFace: "Arial",
+    fontFace: FONT,
     fontSize: 8.5,
     color: MUTED,
     align: "right",
@@ -161,6 +159,9 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     v != null && peStats ? scale3(v, peStats.lo, peStats.mid, peStats.hi, [GREEN, YELLOW, RED]) : undefined;
   const heatIrr = (v: number | null) =>
     v != null && irrStats ? scale3(v, irrStats.lo, irrStats.mid, irrStats.hi, [YELLOW, YELLOW, GREEN]) : undefined;
+  const retStats = stats(stocks.map((c) => derived.get(c.ticker)?.decomp.ret ?? null));
+  const heatRet = (v: number | null) =>
+    v != null && retStats ? scale3(v, retStats.lo, retStats.mid, retStats.hi, [YELLOW, YELLOW, GREEN]) : undefined;
   const heatPerf = (v: number | null) =>
     v == null ? undefined : scale3(v, -0.3, 0, 0.3, [RED, WHITE, GREEN]);
 
@@ -191,7 +192,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const h1Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
-      fill: { color: BRAND },
+      fill: { color: NAVY },
       align: "center",
       valign: "middle",
       fontSize: 6.5,
@@ -209,7 +210,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const h2Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
-      fill: { color: BRAND },
+      fill: { color: NAVY },
       align: "right",
       valign: "middle",
       fontSize: 6.5,
@@ -302,10 +303,10 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       });
     }
 
-    // Fit: title strip is 0.52" tall; size every row so the table ends inside
-    // the slide. 46 rows → ~0.149" each; 6.5pt text + 1pt margins fits.
+    // Fit: title strip is 0.52" tall; size every row so the table ends above
+    // the footer band. 46 rows → ~0.14" each; 6.5pt text + 1pt margins fits.
     const tableTop = 0.52;
-    const rowH = Math.floor(((PAGE_H - tableTop - 0.08) / rows.length) * 1000) / 1000;
+    const rowH = Math.floor(((FOOTER_Y - tableTop - 0.05) / rows.length) * 1000) / 1000;
     const numW = (CONTENT_W - 1.0 - 0.62) / 20;
     slide.addTable(rows, {
       x: MARGIN,
@@ -313,7 +314,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       w: CONTENT_W,
       colW: [1.0, 0.62, ...Array(20).fill(numW)],
       rowH,
-      fontFace: "Arial",
+      fontFace: FONT,
       fontSize: 6.5,
       color: INK,
       align: "right",
@@ -335,7 +336,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const h1Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
-      fill: { color: BRAND },
+      fill: { color: NAVY },
       align: "center",
       valign: "middle",
       fontSize: 8,
@@ -349,7 +350,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const h2Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
-      fill: { color: BRAND },
+      fill: { color: NAVY },
       align: "right",
       valign: "middle",
       fontSize: 8,
@@ -362,8 +363,6 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     ];
 
     const rows: pptxgen.TableRow[] = [h1, h2];
-    const blueIf = (s: string): pptxgen.TableCellProps =>
-      s === "n/a" ? { color: NA } : { color: BLUE };
 
     const grpRow = (label: string): TCell[] => [
       cell(label, { colspan: 11, bold: true, color: INK, align: "left", fill: { color: GRP_FILL }, fontSize: 8 }),
@@ -373,6 +372,9 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       const d = derived.get(c.ticker)!;
       const dc: Decomp = d.decomp;
       const px = fpx(d.price, c.currency);
+      const pct = (v: number | null, opts: pptxgen.TableCellProps = {}): TCell =>
+        cell(fp0(v), naIf(fp0(v), opts));
+      const retBg = heatRet(dc.ret);
       return [
         cell(c.ticker, {
           align: "left",
@@ -380,15 +382,15 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
           fill: c.port === 1 ? { color: OWNED } : undefined,
         }),
         cell(px, naIf(px, {})),
-        cell(fp(dc.revs), blueIf(fp(dc.revs))),
-        cell(fp(dc.margin), naIf(fp(dc.margin), {})),
-        cell(fp(dc.ni), blueIf(fp(dc.ni))),
-        cell(fp(dc.yld), naIf(fp(dc.yld), {})),
-        cell(fp(dc.epsDivs), blueIf(fp(dc.epsDivs))),
-        cell(fp(dc.multiple), naIf(fp(dc.multiple), {})),
-        cell(fp(dc.ret), naIf(fp(dc.ret), {})),
-        cell(fp(d.gpCagr), naIf(fp(d.gpCagr), {})),
-        cell(fp(d.mepsCagr), naIf(fp(d.mepsCagr), {})),
+        pct(dc.revs),
+        pct(dc.margin),
+        pct(dc.ni),
+        pct(dc.yld),
+        pct(dc.epsDivs),
+        pct(dc.multiple),
+        pct(dc.ret, retBg ? { fill: { color: retBg } } : {}),
+        pct(d.gpCagr),
+        pct(d.mepsCagr),
       ];
     };
 
@@ -398,7 +400,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     });
 
     const tableTop = 0.52;
-    const rowH = Math.floor(((PAGE_H - tableTop - 0.08) / rows.length) * 1000) / 1000;
+    const rowH = Math.floor(((FOOTER_Y - tableTop - 0.05) / rows.length) * 1000) / 1000;
     const numW = (CONTENT_W - 1.5 - 0.85) / 9;
     slide.addTable(rows, {
       x: MARGIN,
@@ -406,7 +408,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       w: CONTENT_W,
       colW: [1.5, 0.85, ...Array(9).fill(numW)],
       rowH,
-      fontFace: "Arial",
+      fontFace: FONT,
       fontSize: 8,
       color: INK,
       align: "right",

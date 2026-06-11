@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
-import { logoUrl } from "@/lib/diligence";
+import { logoUrl, normTicker } from "@/lib/diligence";
+import { TOOL_NAMES } from "@/lib/toolMeta";
 import type { MorningNote, ThemeChart } from "./page";
 
 // Non-US listings keep their full Bloomberg ticker (exchange suffix and all —
@@ -249,7 +250,7 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
           />
         )}
       </div>
-      <HowItWorks title="How Morning Notes works">
+      <HowItWorks title={`How ${TOOL_NAMES.morningNews} works`}>
         <p className="hiw-lead">
           A pre-market digest of overnight headlines, summarized fresh each
           morning.
@@ -275,15 +276,15 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
 
   return (
     <AppShell
-      tool="Morning Notes"
-      title="Morning Notes"
+      tool={TOOL_NAMES.morningNews}
+      title={TOOL_NAMES.morningNews}
       subtitle={
         <>
           Daily newsletter digest · <span className="mono">AI-generated</span>
         </>
       }
       actions={actions}
-      footerLeft={selectedDate ? `Morning Notes · ${formattedDate}` : "Morning Notes"}
+      footerLeft={selectedDate ? `${TOOL_NAMES.morningNews} · ${formattedDate}` : TOOL_NAMES.morningNews}
     >
       {!selected ? (
         <div className="news-empty">
