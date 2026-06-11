@@ -5,7 +5,7 @@
 // valuation/IRR column is recomputed on the fly (lib/equities/calc.ts), so
 // an analyst edit updates the whole row for everyone immediately.
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
 import { ModelGrid } from "@/components/ModelGrid";
@@ -1189,16 +1189,55 @@ function EditModal({
   }, [company, years]);
   const [draft, setDraft] = useState(initialDraft);
 
-  const set = (k: string, v: string) => setDraft((p) => ({ ...p, [k]: v }));
+  // Undo/redo history of whole-draft snapshots. Every mutation (grid edit,
+  // paste, delete, admin select) snapshots the prior draft first, so Ctrl/Cmd+Z
+  // steps back and Ctrl/Cmd+Y (or Shift+Z) steps forward.
+  const undoStack = useRef<Record<string, string>[]>([]);
+  const redoStack = useRef<Record<string, string>[]>([]);
+  const snapshot = (prev: Record<string, string>) => {
+    undoStack.current.push(prev);
+    if (undoStack.current.length > 200) undoStack.current.shift();
+    redoStack.current = [];
+  };
+
+  const set = (k: string, v: string) => {
+    snapshot(draft);
+    setDraft((p) => ({ ...p, [k]: v }));
+  };
 
   // Batch writes from the spreadsheet grid (paste, delete, per-cell edits).
-  const applyCells = useCallback((ups: { key: string; value: string }[]) => {
+  const applyCells = (ups: { key: string; value: string }[]) => {
+    snapshot(draft);
     setDraft((p) => {
       const next = { ...p };
       for (const u of ups) next[u.key] = u.value;
       return next;
     });
-  }, []);
+  };
+
+  const undo = () => {
+    if (!undoStack.current.length) return;
+    const prev = undoStack.current.pop() as Record<string, string>;
+    redoStack.current.push(draft);
+    setDraft(prev);
+  };
+  const redo = () => {
+    if (!redoStack.current.length) return;
+    const next = redoStack.current.pop() as Record<string, string>;
+    undoStack.current.push(draft);
+    setDraft(next);
+  };
+  const onModalKeyDown = (e: React.KeyboardEvent) => {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    const k = e.key.toLowerCase();
+    if (k === "z" && !e.shiftKey) {
+      e.preventDefault();
+      undo();
+    } else if (k === "y" || (k === "z" && e.shiftKey)) {
+      e.preventDefault();
+      redo();
+    }
+  };
 
   const save = async () => {
     setError("");
@@ -1268,7 +1307,7 @@ function EditModal({
 
   return (
     <div className="eq-overlay" onClick={onClose}>
-      <div className="eq-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="eq-modal" onClick={(e) => e.stopPropagation()} onKeyDown={onModalKeyDown}>
         <div className="eq-modal-head">
           <h2>
             Update {company.ticker}
@@ -1287,34 +1326,37 @@ function EditModal({
 
         {company.is_index ? (
           <ModelGrid
-            rows={[{ key: "best_pe", label: "BEst P/E" }]}
-            cols={years}
+            columns={years}
+            rows={[{ label: "BEst P/E", keys: years.map((y) => `best_pe.${y}`) }]}
             values={draft}
             onCommit={applyCells}
             cleanCell={cleanCell}
+            ariaLabel="Index P/E inputs"
           />
         ) : (
           <>
             <ModelGrid
-              rows={SERIES_FIELDS.map((f) => ({ key: f.key, label: f.label }))}
-              cols={years}
+              columns={years}
+              rows={SERIES_FIELDS.map((f) => ({
+                label: f.label,
+                keys: years.map((y) => `${f.key}.${y}`),
+              }))}
               values={draft}
               onCommit={applyCells}
               cleanCell={cleanCell}
+              ariaLabel="Model inputs"
             />
 
-            <div className="eq-scalars">
-              {SCALAR_FIELDS.map((f) => (
-                <label key={f.key}>
-                  {f.label}
-                  <input
-                    value={draft[f.key]}
-                    onChange={(e) => set(f.key, e.target.value)}
-                    inputMode="decimal"
-                    placeholder="—"
-                  />
-                </label>
-              ))}
+            <div className="eq-scalars-block">
+              <div className="eq-scalars-cap">Balance sheet</div>
+              <ModelGrid
+                columns={SCALAR_FIELDS.map((f) => f.label)}
+                rows={[{ label: "", keys: SCALAR_FIELDS.map((f) => f.key) }]}
+                values={draft}
+                onCommit={applyCells}
+                cleanCell={cleanCell}
+                ariaLabel="Balance sheet inputs"
+              />
             </div>
 
             <button type="button" className="eq-admin-toggle" onClick={() => setAdminOpen(!adminOpen)}>
