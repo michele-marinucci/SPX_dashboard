@@ -93,7 +93,7 @@ export function Sidebar({ nav }: { nav: NavGroup[] }) {
           }}
           title="Back to all views"
         >
-          <span className="sidebar-brand-text">Mendo Monitor</span>
+          <span className="sidebar-brand-text">Mendo Hub</span>
         </Link>
         <span className="sidebar-sys" aria-hidden="true">
           SPX
