@@ -117,17 +117,29 @@ export async function dbGetEdits(ticker: string): Promise<EditRecord[]> {
 // ---- Cached market quotes -------------------------------------------------- //
 
 export async function dbGetQuotes(): Promise<Quote[]> {
-  const res = await rest("eq_market?select=symbol,price,m1,m3,m6,as_of");
+  let res = await rest("eq_market?select=symbol,price,m1,m3,m6,source,as_of");
+  if (res.status === 400) {
+    // Table created before the `source` column existed (equities.sql upgrades it).
+    res = await rest("eq_market?select=symbol,price,m1,m3,m6,as_of");
+  }
   if (!res.ok) throw new Error(`quotes read ${res.status}`);
   return (await res.json()) as Quote[];
 }
 
 export async function dbUpsertQuotes(quotes: Quote[]): Promise<void> {
   if (!quotes.length) return;
-  const res = await rest("eq_market", {
+  let res = await rest("eq_market", {
     method: "POST",
     headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
     body: JSON.stringify(quotes),
   });
+  if (res.status === 400) {
+    // Legacy table without `source` — retry without it (equities.sql upgrades).
+    res = await rest("eq_market", {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify(quotes.map(({ source: _source, ...q }) => q)),
+    });
+  }
   if (!res.ok) throw new Error(`quotes upsert ${res.status}`);
 }

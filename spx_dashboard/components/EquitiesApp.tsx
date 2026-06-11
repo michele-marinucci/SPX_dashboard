@@ -139,6 +139,13 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
     [companies],
   );
 
+  // Which feed(s) the displayed prices came from (Bloomberg push vs Yahoo).
+  const priceSource = useMemo(() => {
+    const s = new Set<string>();
+    for (const q of Object.values(quotes)) if (q.source) s.add(q.source);
+    return s.size ? Array.from(s).sort().join(" + ") : "Yahoo Finance";
+  }, [quotes]);
+
   // Column-wide color scales, computed across all (non-index) names.
   const peStats = useMemo(
     () => stats(stocks.map((c) => derived.get(c.ticker)?.mendoPe[y1] ?? null)),
@@ -382,7 +389,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         </div>
         <span className="eq-note">
           {asOf
-            ? `Prices as of ${new Date(asOf).toLocaleString()} · Yahoo Finance`
+            ? `Prices as of ${new Date(asOf).toLocaleString()} · ${priceSource}`
             : "Loading prices…"}
           {asOf && Date.now() - Date.parse(asOf) > 20 * 3_600_000 && (
             <strong className="eq-stale">

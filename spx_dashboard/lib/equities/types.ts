@@ -67,6 +67,7 @@ export interface Quote {
   m1: number | null;
   m3: number | null;
   m6: number | null;
+  source?: string | null; // "Yahoo" | "Bloomberg" — freshest write wins
   as_of: string;
 }
 

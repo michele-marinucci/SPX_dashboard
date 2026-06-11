@@ -56,8 +56,10 @@ create table if not exists eq_edits (
 create index if not exists eq_edits_ticker_idx on eq_edits (ticker, created_at desc);
 
 -- ---------------------------------------------------------------------------
--- Cached Yahoo quotes (price + 1M/3M/6M performance), refreshed by the app
--- whenever they are older than 4 hours.
+-- Cached market quotes (price + 1M/3M/6M performance). Refreshed by the app
+-- from Yahoo when older than 4 hours, and/or pushed from a Bloomberg terminal
+-- by pipeline/bloomberg_push.py — `source` records which feed wrote the row,
+-- and the freshest write wins.
 -- ---------------------------------------------------------------------------
 create table if not exists eq_market (
   symbol  text primary key,
@@ -65,8 +67,10 @@ create table if not exists eq_market (
   m1      float8,
   m3      float8,
   m6      float8,
+  source  text,
   as_of   timestamptz not null default now()
 );
+alter table eq_market add column if not exists source text;
 
 alter table eq_companies enable row level security;
 alter table eq_edits     enable row level security;

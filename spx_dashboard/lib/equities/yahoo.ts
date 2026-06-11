@@ -51,6 +51,7 @@ async function fetchOne(symbol: string): Promise<Quote | null> {
     m1: perf(30),
     m3: perf(91),
     m6: perf(182),
+    source: "Yahoo",
     as_of: new Date().toISOString(),
   };
 }
