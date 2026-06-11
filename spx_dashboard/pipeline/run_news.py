@@ -130,7 +130,9 @@ def _summarize(newsletters: list[dict], positions: list[str]) -> dict:
 
     response = client.messages.create(
         model="claude-fable-5",
-        max_tokens=2048,
+        # Generous budget: the model may emit a thinking block that also draws
+        # from max_tokens, and a truncated response yields invalid JSON.
+        max_tokens=8192,
         system=_SYSTEM,
         messages=[{"role": "user", "content": user_content}],
     )
