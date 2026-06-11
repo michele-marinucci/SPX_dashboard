@@ -9,27 +9,33 @@ import { getBloombergDateLabel, getNavModel } from "@/lib/data";
 export function DashboardFrame({
   heading,
   children,
+  asOf: asOfProp,
 }: {
   heading: React.ReactNode;
   children: React.ReactNode;
+  // Pages that overlay live Bloomberg data pass their own as-of date;
+  // default is the committed workbook snapshot's date.
+  asOf?: string;
 }) {
   const nav = getNavModel();
-  const asOf = getBloombergDateLabel();
+  const asOf = asOfProp ?? getBloombergDateLabel();
 
   return (
     <div className="shell">
       <Sidebar nav={nav} />
       <div className="content">
         <header className="content-header">
-          {heading}
-          <div className="header-actions">
-            <span className="crumb">
+          <div className="header-lead">
+            <div className="crumb">
               <Link href="/" className="crumb-home">
                 Mendo Hub
               </Link>
               <span className="crumb-sep">/</span>
               <span className="crumb-here">SPX Monitor</span>
-            </span>
+            </div>
+            {heading}
+          </div>
+          <div className="header-actions">
             <HowItWorks title="How the SPX Monitor works">
               <p className="hiw-lead">
                 An AI-beneficiary &amp; software tracker for the S&amp;P 500.

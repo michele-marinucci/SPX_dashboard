@@ -55,3 +55,19 @@ analyst edits and the per-company edits log:
 
 Without these tables the page still works read-only from the committed snapshot
 (prior-day closes, but no shared edits).
+
+---
+
+# SPX Monitor daily refresh table
+
+The SPX Monitor (`/spx` and the per-category pages) renders the committed
+workbook snapshot (`data/dashboard.json`), overlaid with a daily Bloomberg
+push when one exists. Same project, same env vars:
+
+1. Open **SQL** in Supabase → paste the contents of `supabase/spx.sql` → **Run**.
+2. The Bloomberg push script (`pipeline/bloomberg_push.py`) then refreshes
+   `spx_market` daily: prior-day market caps and consensus net income for the
+   full S&P 500. The site recomputes every aggregate row from them; the
+   historical anchor columns and P/E history stay from the workbook.
+
+Without this table the pages simply keep showing the workbook snapshot.

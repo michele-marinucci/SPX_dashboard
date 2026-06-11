@@ -165,13 +165,16 @@ export function getCategorySlugs(): string[] {
 // The "data as of" date shown once at the top of every view: the latest
 // Bloomberg data date (Data!AC10), formatted M/D/YYYY with no time.
 // Falls back to latest_date for older data without the field.
-export function getBloombergDateLabel(): string {
-  const { bloomberg_date, latest_date } = getDashboard();
-  if (bloomberg_date) {
-    const [y, m, d] = bloomberg_date.split("-").map(Number);
-    if (y && m && d) return `${m}/${d}/${y}`;
+export function bloombergDateLabelOf(d: DashboardData): string {
+  if (d.bloomberg_date) {
+    const [y, m, day] = d.bloomberg_date.split("-").map(Number);
+    if (y && m && day) return `${m}/${day}/${y}`;
   }
-  return latest_date;
+  return d.latest_date;
+}
+
+export function getBloombergDateLabel(): string {
+  return bloombergDateLabelOf(getDashboard());
 }
 
 // ---- Sidebar navigation model -------------------------------------------- //

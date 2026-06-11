@@ -3,18 +3,13 @@ import { Column, DataTable } from "@/components/DataTable";
 import { DashboardFrame } from "@/components/DashboardFrame";
 import { ViewHeading } from "@/components/ViewHeading";
 import { StockPeTable } from "@/components/StockPeTable";
-import {
-  CategoryStock,
-  getBloombergDateLabel,
-  getCategoryBySlug,
-  getCategorySlugs,
-  getDashboard,
-  StockMetric,
-} from "@/lib/data";
+import { bloombergDateLabelOf, CategoryStock, StockMetric } from "@/lib/data";
+import { loadSpxDashboard } from "@/lib/spxLive";
 
-export function generateStaticParams() {
-  return getCategorySlugs().map((slug) => ({ slug }));
-}
+// Per-stock tables overlay the daily Bloomberg push (when newer than the
+// committed workbook snapshot), so these pages must render per-request —
+// no generateStaticParams, or Next would freeze them at build time.
+export const dynamic = "force-dynamic";
 
 // --- column builders (mirror the aggregate view, but with stocks as rows) --- //
 function perfColumns(dates: string[]): Column[] {
@@ -77,12 +72,17 @@ function metricRows(stocks: CategoryStock[], pick: (s: CategoryStock) => StockMe
   });
 }
 
-export default function CategoryPage({ params }: { params: { slug: string } }) {
-  const resolved = getCategoryBySlug(params.slug);
+export default async function CategoryPage({ params }: { params: { slug: string } }) {
+  const d = await loadSpxDashboard();
+  let resolved: { group: string; category: (typeof d.tables.categories.groups)[0]["categories"][0] } | null =
+    null;
+  for (const g of d.tables.categories.groups)
+    for (const c of g.categories)
+      if (c.slug === params.slug) resolved = { group: g.group, category: c };
   if (!resolved || (resolved.category.stocks?.length ?? 0) === 0) notFound();
 
   const { group, category } = resolved;
-  const d = getDashboard();
+  const asOf = bloombergDateLabelOf(d);
   const t = d.tables;
   const stocks = category.stocks;
   // Compounder-only subset for the "Compounders only" filter (per-stock pages
@@ -93,13 +93,14 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
 
   return (
     <DashboardFrame
+      asOf={asOf}
       heading={
         <ViewHeading
           title={category.category}
           meta={group}
           stockCount={stocks.length}
           compounderCount={comp.length}
-          trailing={`Bloomberg data as of ${getBloombergDateLabel()}`}
+          trailing={`Bloomberg data as of ${asOf}`}
         />
       }
     >

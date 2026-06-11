@@ -2180,39 +2180,56 @@ thead .row-head {
 }
 .eq-grid {
   border-collapse: collapse;
-  width: 100%;
+  width: auto;
   font-size: 12px;
 }
 .eq-grid th {
   text-align: left;
   font-size: 11px;
   color: var(--ink-soft);
-  padding: 4px 6px;
+  padding: 5px 8px;
   white-space: nowrap;
 }
+/* Excel-style header band over the year columns. */
 .eq-grid thead th {
-  text-align: right;
-  border-bottom: 1px solid var(--line-strong);
+  text-align: center;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
 }
 .eq-grid thead th:first-child {
   text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line-strong);
 }
+/* Row-header (field name) — like Excel's left gutter. */
+.eq-grid tbody th {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  font-weight: 600;
+}
+/* The year cells butt up against each other to read as one pasteable block. */
 .eq-grid td {
-  padding: 2px 3px;
+  padding: 0;
+  border: 1px solid var(--line);
 }
 .eq-grid input {
-  width: 104px;
-  padding: 5px 7px;
-  border: 1px solid var(--line-2);
-  border-radius: 6px;
+  width: 92px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   font-size: 12px;
   text-align: right;
   font-family: var(--font-mono, ui-monospace, monospace);
 }
 .eq-grid input:focus {
-  outline: none;
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--brand-050);
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+  background: var(--brand-050);
 }
 .eq-scalars {
   display: flex;
@@ -3226,4 +3243,813 @@ thead .row-head {
 .hub-row.wip .rdesc {
   font-size: 12px;
   margin-top: 2px;
+}
+
+/* ============================================================================
+   UNIFIED REDESIGN — global rail, one header anatomy, one button system
+   (Mendo Hub redesign · chrome only). Appended last so it wins on conflicts.
+   ========================================================================== */
+
+/* ---- Rail: brand lockup ---- */
+.rail-logo {
+  height: 14px;
+  width: auto;
+  display: block;
+}
+.sidebar-head .sidebar-brand {
+  flex: 1;
+}
+
+/* ---- Rail: Tools (global navigation) ---- */
+.rail-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 14px 12px 8px;
+}
+.rail-tools-title {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-weight: 600;
+  padding: 0 8px 8px;
+}
+.rail-tool {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 9px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.12s, color 0.12s;
+}
+.rail-tool:hover {
+  background: var(--surface-2);
+}
+.rail-tool-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+.rail-tool-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rail-tool-active {
+  background: var(--brand-050);
+}
+.rail-tool-active .rail-tool-dot {
+  background: var(--brand);
+}
+.rail-tool-active .rail-tool-name {
+  color: var(--brand-700);
+  font-weight: 700;
+}
+
+/* ---- Rail: SPX categories block ---- */
+.rail-cats {
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+.rail-cats .rail-tools-title {
+  padding: 0 12px 8px;
+}
+.rail-cats .seg-count {
+  background: var(--surface-3);
+}
+
+/* Collapsed rail hides everything but the toggle. */
+.sidebar-collapsed .rail-tools,
+.sidebar-collapsed .rail-cats,
+.sidebar-collapsed .sidebar-sys {
+  display: none;
+}
+
+/* ---- Header anatomy (breadcrumb · H1 · subtitle) ---- */
+.header-lead {
+  min-width: 0;
+}
+.header-lead .crumb {
+  display: flex;
+  margin-bottom: 6px;
+}
+.header-lead h1 {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0;
+  white-space: nowrap;
+}
+.header-lead .subtitle {
+  margin-top: 6px;
+}
+
+/* ---- Section markers (numbered, brand-colored) ---- */
+.section-num {
+  color: var(--brand);
+}
+.section-note {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* ---- One button system ---- */
+.btn,
+.btn-primary,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-sans, "Hanken Grotesk", sans-serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink-soft);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s, border-color 0.14s, color 0.14s;
+}
+.btn:hover,
+.btn-ghost:hover {
+  background: var(--surface-2);
+  border-color: var(--line-strong);
+}
+.btn-primary {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--brand-700);
+  border-color: var(--brand-700);
+}
+.btn:disabled,
+.btn-primary:disabled,
+.btn-ghost:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.btn .glyph,
+.btn-primary .glyph,
+.btn-ghost .glyph {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-weight: 500;
+}
+
+/* ---- Content toolbar (per-tool secondary controls) ---- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.toolbar-spacer {
+  margin-left: auto;
+}
+
+/* ---- Monogram tile (Diligence / Morning Notes fallback) ---- */
+.monotile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+  color: #fff;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ---- Sentiment dots ---- */
+.sent-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.sent-positive { background: var(--green); }
+.sent-negative { background: var(--red); }
+.sent-neutral { background: #c4c4cf; }
+
+/* ---- Homepage: INTERNAL tag in the top lockup ---- */
+.hub-internal {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  letter-spacing: 1.2px;
+  color: var(--faint);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 2px 7px;
+  background: var(--surface);
+}
+.hub-lockup {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.hub-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--line-2);
+}
+
+/* ---- Morning Notes date control glyph (replaces the calendar emoji) ---- */
+.cal-glyph {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--brand);
+  border-radius: 3px;
+  display: inline-block;
+}
+.news-date-picker-wrap {
+  position: relative;
+}
+
+/* ---- Twitter Themes: Manage-accounts modal ---- */
+.tw-manage-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 34, 0.32);
+  display: grid;
+  place-items: start center;
+  padding: 80px 20px;
+  z-index: 200;
+}
+.tw-manage {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(26, 26, 34, 0.18);
+  overflow: hidden;
+}
+.tw-manage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.tw-manage-head h2 {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.tw-manage-body {
+  padding: 14px 18px 18px;
+}
+
+/* ---- Equities: inline row-action glyph buttons (✎ edit · ↺ history) ---- */
+.eq-actbtn {
+  width: 19px;
+  height: 19px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+  color: #c0c0cc;
+  border: 1px solid #ececf2;
+  border-radius: 5px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.eq-row:hover .eq-actbtn {
+  color: var(--muted);
+  border-color: var(--brand-100);
+}
+.eq-actbtn:hover {
+  color: var(--brand-700) !important;
+  border-color: var(--brand-100) !important;
+  background: var(--brand-050) !important;
+}
+
+/* ---- Equities: segmented Summary / IRR Decomp tabs (spec control) ---- */
+.eq-tabs {
+  display: inline-flex;
+  background: #ececf0;
+  border: 0;
+  border-radius: 9px;
+  padding: 3px;
+  overflow: visible;
+}
+.eq-tabs button {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+}
+.eq-tabs button.on {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* Header: align the action cluster to the top of the lead (breadcrumb line). */
+.content-header {
+  align-items: flex-start;
+}
+.content-header .header-actions {
+  align-items: flex-start;
+}
+
+/* ============================================================================
+   EQUITIES — Signal (B) & Focus (C) views
+   ========================================================================== */
+
+/* ---- Signal: compact bullet/diverging/spark cells ---- */
+.eq-signal thead th {
+  text-align: left;
+  font-weight: 600;
+  padding: 9px 10px;
+}
+.eq-signal td {
+  padding: 8px 10px;
+  vertical-align: middle;
+}
+.eq-prem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.eq-prem-val {
+  width: 38px;
+  text-align: right;
+  color: var(--ink);
+}
+.eq-prem-track {
+  position: relative;
+  flex: 1;
+  max-width: 120px;
+  height: 8px;
+  background: var(--line-soft);
+  border-radius: 4px;
+}
+.eq-prem-mid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: #c4c4cf;
+}
+.eq-prem-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+}
+.eq-prem-tag {
+  width: 58px;
+  font-size: 10.5px;
+}
+.eq-bullet-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.eq-bullet {
+  position: relative;
+  flex: 1;
+  max-width: 150px;
+  height: 8px;
+  background: var(--line-soft);
+  border-radius: 4px;
+}
+.eq-bullet-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--brand);
+  border-radius: 4px;
+}
+.eq-bullet-tick {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: var(--ink);
+}
+.eq-bullet-val {
+  width: 36px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.eq-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 22px;
+}
+.eq-sparkbar {
+  width: 6px;
+  border-radius: 2px;
+}
+.eq-bullet-key {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 8px;
+  vertical-align: middle;
+  background: var(--line-soft);
+  border-radius: 4px;
+}
+.eq-bullet-key-fill {
+  position: absolute;
+  inset: 0 40% 0 0;
+  background: var(--brand);
+  border-radius: 4px;
+}
+.eq-bullet-key-tick {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: 60%;
+  width: 2px;
+  background: var(--ink);
+}
+
+/* ---- Focus: master list + detail panel ---- */
+.eq-focus {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin-top: 4px;
+}
+.eq-focus-list {
+  width: 288px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.eq-focus-list-head {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.eq-focus-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--line-soft);
+  border-left: 3px solid transparent;
+  background: var(--surface);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.eq-focus-item:hover {
+  background: var(--surface-2);
+}
+.eq-focus-item-on {
+  background: #f4f3ff;
+  border-left-color: var(--brand);
+}
+.eq-focus-item-main {
+  flex: 1;
+  min-width: 0;
+}
+.eq-focus-item-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.eq-focus-tk {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.eq-focus-tk-own {
+  color: #15803d;
+}
+.eq-focus-grp {
+  font-size: 11.5px;
+  color: var(--faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.eq-focus-bar {
+  display: block;
+  height: 5px;
+  margin-top: 6px;
+  background: var(--line-soft);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.eq-focus-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+}
+.eq-focus-irr {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  width: 38px;
+  text-align: right;
+}
+.eq-focus-detail {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+}
+.eq-focus-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.eq-focus-id {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.eq-focus-tile {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.eq-focus-name-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.eq-focus-name {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.eq-focus-tag {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 10px;
+  color: #15803d;
+  background: #e7f6ec;
+  border: 1px solid #c7ebd3;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+.eq-focus-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.eq-focus-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.eq-focus-btns {
+  display: flex;
+  gap: 8px;
+}
+.eq-focus-px {
+  text-align: right;
+}
+.eq-focus-px-val {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 19px;
+  font-weight: 700;
+}
+.eq-focus-px-chg {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  margin-top: 2px;
+}
+.eq-val-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line-soft);
+  border: 1px solid var(--line-soft);
+  border-radius: 9px;
+  overflow: hidden;
+  margin-top: 18px;
+}
+.eq-val-cell {
+  background: var(--surface);
+  padding: 12px 14px;
+}
+.eq-val-k {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 5px;
+}
+.eq-val-v {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 15px;
+  font-weight: 600;
+}
+.eq-decomp-block {
+  margin-top: 22px;
+}
+.eq-decomp-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.eq-decomp-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.eq-decomp-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 11px;
+}
+.eq-decomp-label {
+  width: 96px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.eq-decomp-track {
+  flex: 1;
+  height: 14px;
+  background: var(--bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.eq-decomp-fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+}
+.eq-decomp-val {
+  width: 46px;
+  text-align: right;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.eq-decomp-total {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+}
+.eq-decomp-total .eq-decomp-label {
+  font-weight: 800;
+}
+.eq-decomp-track-total {
+  background: var(--brand-050);
+  height: 16px;
+}
+.eq-decomp-total .eq-decomp-val {
+  color: var(--brand);
+  font-weight: 800;
+}
+
+@media (max-width: 820px) {
+  .eq-focus {
+    flex-direction: column;
+  }
+  .eq-focus-list {
+    width: 100%;
+  }
+  .eq-val-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---- Equities Edit-model: Excel-like spreadsheet grid ---- */
+.eq-grid-wrap {
+  display: inline-block;
+  outline: none;
+  max-width: 100%;
+  overflow-x: auto;
+}
+/* The grid cells own their borders; values sit inside a padded block so empty
+   cells keep a uniform height (like an Excel range). */
+.eq-grid td.eq-cell {
+  padding: 0;
+  border: 1px solid var(--line);
+  position: relative;
+  cursor: cell;
+  background: var(--surface);
+}
+.eq-cell-val {
+  display: block;
+  min-width: 92px;
+  min-height: 17px;
+  padding: 6px 8px;
+  text-align: right;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 17px;
+}
+.eq-cell-input {
+  width: 92px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: right;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 17px;
+}
+.eq-cell-input:focus {
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+}
+.eq-cell.is-sel {
+  background: var(--brand-050);
+}
+.eq-cell.is-active {
+  background: var(--surface);
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+  z-index: 2;
+}
+.eq-grid-wrap:focus-within .eq-cell.is-active {
+  outline-color: var(--brand);
+}
+/* Marching-ants border on the copied range (Ctrl/Cmd+C). */
+.eq-cell.is-copied::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    linear-gradient(90deg, var(--brand) 50%, transparent 0) repeat-x,
+    linear-gradient(90deg, var(--brand) 50%, transparent 0) repeat-x,
+    linear-gradient(0deg, var(--brand) 50%, transparent 0) repeat-y,
+    linear-gradient(0deg, var(--brand) 50%, transparent 0) repeat-y;
+  background-size: 6px 1px, 6px 1px, 1px 6px, 1px 6px;
+  background-position: 0 0, 0 100%, 0 0, 100% 0;
+  animation: eq-ants 0.5s linear infinite;
+}
+@keyframes eq-ants {
+  to {
+    background-position: 6px 0, -6px 100%, 0 -6px, 100% 6px;
+  }
+}
+
+/* ---- Edit-model: balance-sheet scalars as an adjacent Excel block ---- */
+.eq-scalars-block {
+  margin-top: 16px;
+}
+.eq-scalars-cap {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 6px;
+}
+/* A grid with no row-label gutter (the scalar block): header sits over the
+   first data column, so left-align the header cells flush with the values. */
+.eq-grid-nolabels thead th:first-child {
+  border: 1px solid var(--line-strong);
+  text-align: center;
 }

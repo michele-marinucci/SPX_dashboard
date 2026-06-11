@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { LogoutButton } from "@/components/LogoutButton";
+import { AppShell } from "@/components/AppShell";
+import { HowItWorks } from "@/components/HowItWorks";
 import type { MorningNote, ThemeChart } from "./page";
 
 // Map ticker → Clearbit logo domain
@@ -235,39 +235,63 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
 
   const closeCal = useCallback(() => setCalOpen(false), []);
 
-  return (
-    <div className="news-page">
-      <header className="news-page-header">
-        <div>
-          <h1>Morning Notes</h1>
-          <p className="subtitle">Daily newsletter digest · AI-generated</p>
-        </div>
-        <div className="news-page-actions">
-          <Link href="/" className="btn-back" title="Back to all views">
-            ← All views
-          </Link>
-          <LogoutButton />
-        </div>
-      </header>
-
-      <div className="news-toolbar">
-        <div className="news-date-picker-wrap">
-          <button className="news-date-btn" onClick={() => setCalOpen((o) => !o)}>
-            <span>📅</span>
-            <span>{formattedDate}</span>
-            <span style={{ color: "var(--muted)", fontSize: 11 }}>▾</span>
-          </button>
-          {calOpen && (
-            <CalendarPopup
-              availableDates={availableDates}
-              selectedDate={selectedDate}
-              onSelect={setSelectedDate}
-              onClose={closeCal}
-            />
-          )}
-        </div>
+  const actions = (
+    <>
+      <div className="news-date-picker-wrap">
+        <button
+          type="button"
+          className="btn"
+          onClick={() => setCalOpen((o) => !o)}
+          title="Pick a date"
+        >
+          <span className="cal-glyph" aria-hidden="true" />
+          {formattedDate}
+          <span className="glyph" aria-hidden="true">▾</span>
+        </button>
+        {calOpen && (
+          <CalendarPopup
+            availableDates={availableDates}
+            selectedDate={selectedDate}
+            onSelect={setSelectedDate}
+            onClose={closeCal}
+          />
+        )}
       </div>
+      <HowItWorks title="How Morning Notes works">
+        <p className="hiw-lead">
+          A pre-market digest of overnight headlines, summarized fresh each
+          morning.
+        </p>
+        <ul className="hiw-list">
+          <li>
+            <b>Pick a date</b> — the date control opens a calendar; only days
+            with a note are selectable.
+          </li>
+          <li>
+            <b>Portfolio mentions</b> — the names in the book that moved
+            overnight, with a one-line read.
+          </li>
+          <li>
+            <b>Top themes</b> — the day&apos;s big stories, with a quick chart
+            and the sources behind them.
+          </li>
+        </ul>
+      </HowItWorks>
+    </>
+  );
 
+  return (
+    <AppShell
+      tool="Morning Notes"
+      title="Morning Notes"
+      subtitle={
+        <>
+          Daily newsletter digest · <span className="mono">AI-generated</span>
+        </>
+      }
+      actions={actions}
+      footerLeft={selectedDate ? `Morning Notes · ${formattedDate}` : "Morning Notes"}
+    >
       {!selected ? (
         <div className="news-empty">
           {notes.length === 0
@@ -281,8 +305,11 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
           )}
 
           {selected.positions.length > 0 && (
-            <>
-              <p className="news-section-title">Portfolio Mentions</p>
+            <section className="section">
+              <div className="section-head">
+                <span className="section-num">01</span>
+                <h2 className="section-title">Portfolio mentions</h2>
+              </div>
               <div className="news-positions">
                 {selected.positions.map((p, i) => (
                   <div key={i} className="news-position-row">
@@ -294,12 +321,15 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
                   </div>
                 ))}
               </div>
-            </>
+            </section>
           )}
 
           {selected.top_themes.length > 0 && (
-            <>
-              <p className="news-section-title">Top Themes</p>
+            <section className="section">
+              <div className="section-head">
+                <span className="section-num">02</span>
+                <h2 className="section-title">Top themes</h2>
+              </div>
               <div className="news-themes">
                 {selected.top_themes.map((theme, i) => {
                   // Support both the new points[] shape and legacy detail string.
@@ -348,12 +378,10 @@ export function MorningNewsClient({ notes }: { notes: MorningNote[] }) {
                   );
                 })}
               </div>
-            </>
+            </section>
           )}
         </>
       )}
-
-      <footer className="news-page-foot">MERITAGE · INTERNAL</footer>
-    </div>
+    </AppShell>
   );
 }
