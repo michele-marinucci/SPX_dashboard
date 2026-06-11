@@ -25,6 +25,7 @@ import re
 import sys
 from datetime import datetime, timezone, timedelta
 from email.message import Message
+from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 
 IMAP_HOST = "imap.gmail.com"
@@ -140,12 +141,30 @@ def fetch_recent_newsletters(lookback_hours: int = 24) -> list[dict]:
                 continue
 
             msg = email.message_from_bytes(raw)
+
+            # Prefer the server's INTERNALDATE; fall back to the message's own
+            # Date header, and finally to "now" so a message is never silently
+            # dropped just because its receive time couldn't be parsed.
+            msg_dt = None
             internal_tuple = imaplib.Internaldate2tuple(msg_data[0][0])
-            if internal_tuple is None:
-                continue
-            import time
-            epoch = time.mktime(internal_tuple)
-            msg_dt = datetime.fromtimestamp(epoch, tz=timezone.utc)
+            if internal_tuple is not None:
+                import time
+                msg_dt = datetime.fromtimestamp(
+                    time.mktime(internal_tuple), tz=timezone.utc
+                )
+            if msg_dt is None and msg.get("Date"):
+                try:
+                    parsed = parsedate_to_datetime(msg["Date"])
+                    if parsed is not None:
+                        msg_dt = (
+                            parsed
+                            if parsed.tzinfo
+                            else parsed.replace(tzinfo=timezone.utc)
+                        ).astimezone(timezone.utc)
+                except (TypeError, ValueError):
+                    msg_dt = None
+            if msg_dt is None:
+                msg_dt = datetime.now(timezone.utc)
 
             sender_raw = msg.get("From", "")
             subject = msg.get("Subject", "(no subject)")
