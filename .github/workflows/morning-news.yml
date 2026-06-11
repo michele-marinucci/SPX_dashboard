@@ -6,7 +6,12 @@ on:
     # Run at both so it fires at 9am regardless of DST.
     - cron: "0 13 * 11,12,1,2,3 *"   # Nov–Mar (EST, UTC-5)
     - cron: "0 14 * 4,5,6,7,8,9,10 *" # Apr–Oct (EDT, UTC-4)
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      lookback_hours:
+        description: "How many hours of inbox mail to pull (manual runs only)"
+        required: false
+        default: "24"
 
 concurrency:
   group: morning-news
@@ -34,7 +39,7 @@ jobs:
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          NEWS_LOOKBACK_HOURS: "24"
+          NEWS_LOOKBACK_HOURS: ${{ github.event.inputs.lookback_hours || '24' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           MORNING_NEWS_RECIPIENTS: ${{ secrets.MORNING_NEWS_RECIPIENTS }}
           MORNING_NEWS_FROM: ${{ secrets.GMAIL_ADDRESS }}
