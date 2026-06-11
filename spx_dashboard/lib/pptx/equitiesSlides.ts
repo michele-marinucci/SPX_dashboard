@@ -165,9 +165,17 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     v == null ? undefined : scale3(v, -0.3, 0, 0.3, [RED, WHITE, GREEN]);
 
   const dataDate = latestDataDate(quotes);
-  const priceNote = dataDate
-    ? `Prices as of prior close ${dataDate}`
-    : "Prices as of prior close";
+  const sources = Array.from(
+    new Set(
+      Object.values(quotes)
+        .map((q) => q.source)
+        .filter((s): s is string => !!s),
+    ),
+  ).sort();
+  const srcLabel = sources.length ? sources.join(" + ") : "";
+  const priceNote = `${srcLabel ? `${srcLabel} · ` : ""}${
+    dataDate ? `prices as of prior close ${dataDate}` : "prices as of prior close"
+  }`;
 
   buildValSlide();
   buildDecompSlide();

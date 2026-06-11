@@ -62,16 +62,31 @@ export async function loadQuotes(
   // the latest), and a Bloomberg push that already ran is left untouched.
   const todayUtc = new Date().toISOString().slice(0, 10);
   const expected = lastWeekdayBefore(todayUtc);
+
+  // Bloomberg closes are authoritative: a day-old Bloomberg close beats a
+  // fresher Yahoo pull, so those rows are never refetched (not even with
+  // force) while the push is current-ish. The one-week cutoff is a safety
+  // valve: if the terminal-side push stops running, Yahoo takes back over
+  // rather than the site freezing on ancient prices.
+  const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
+  const isBloombergCurrent = (q: Quote | undefined): boolean => {
+    if (!q || q.source !== "Bloomberg") return false;
+    const dataDay = q.data_date ?? (q.as_of ?? "").slice(0, 10);
+    return dataDay >= weekAgo;
+  };
+
   const stale = symbols.filter((s) => {
     const q = by[s];
     if (!q) return true;
+    if (isBloombergCurrent(q)) return false;
     const dataDay = q.data_date ?? (q.as_of ?? "").slice(0, 10);
     if (dataDay >= expected) return false; // latest close already cached
     return (q.as_of ?? "").slice(0, 10) !== todayUtc; // retry at most once a day
   });
 
   if (force || stale.length) {
-    const fresh = await fetchYahooQuotes(force ? symbols : stale);
+    const targets = force ? symbols.filter((s) => !isBloombergCurrent(by[s])) : stale;
+    const fresh = await fetchYahooQuotes(targets);
     for (const q of fresh) by[q.symbol] = q;
     if (enabled && fresh.length) {
       try {
