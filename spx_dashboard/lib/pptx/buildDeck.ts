@@ -8,12 +8,15 @@ import type { MorningNote } from "@/app/morning-news/page";
 import morningNewsRaw from "@/data/morning_news.json";
 import { addEquitiesSlides } from "./equitiesSlides";
 import {
-  BRAND,
+  ACCENT,
+  CONFIDENTIAL,
   CONTENT_W,
+  FONT,
   FOOTER_Y,
   INK,
   MARGIN,
   MUTED,
+  NAVY,
   PAGE_H,
   PAGE_W,
   Row,
@@ -63,7 +66,7 @@ function bullets(slide: pptxgen.Slide, items: { title?: string; body: string }[]
     y: 1.3,
     w: CONTENT_W,
     h: 5.6,
-    fontFace: "Arial",
+    fontFace: FONT,
     fontSize: 11,
     valign: "top",
   });
@@ -140,7 +143,7 @@ function spxTable(
         options: {
           align: "left",
           bold: r.isTotal,
-          fill: r.isTotal ? { color: "EFEFF3" } : undefined,
+          fill: r.isTotal ? { color: "F7F7F7" } : undefined,
         },
       },
     ];
@@ -148,7 +151,7 @@ function spxTable(
       const col = cols[ci];
       const text = col.fmt(v);
       if (r.isTotal) {
-        out.push({ text, options: { bold: true, fill: { color: "EFEFF3" } } });
+        out.push({ text, options: { bold: true, fill: { color: "F7F7F7" } } });
         return;
       }
       if (col.heat === "blue" && ri < blueCutoff) {
@@ -297,7 +300,7 @@ function aiCategoriesSlide(pptx: pptxgen, d: DashboardData) {
     const runs: pptxgen.TextProps[] = [
       {
         text: c.category,
-        options: { bold: true, color: BRAND, fontSize: 10.5, paraSpaceAfter: 4, breakLine: true },
+        options: { bold: true, color: NAVY, fontSize: 10.5, paraSpaceAfter: 4, breakLine: true },
       },
       ...c.members.map((m) => ({
         text: m,
@@ -309,7 +312,7 @@ function aiCategoriesSlide(pptx: pptxgen, d: DashboardData) {
       y: top + Math.floor(i / nCols) * cellH,
       w: cellW - 0.2,
       h: cellH,
-      fontFace: "Arial",
+      fontFace: FONT,
       valign: "top",
     });
   });
@@ -393,7 +396,7 @@ function morningNewsSection(pptx: pptxgen) {
     y: 1.3,
     w: CONTENT_W,
     h: 5.6,
-    fontFace: "Arial",
+    fontFace: FONT,
     fontSize: 11,
     valign: "top",
   });
@@ -403,55 +406,52 @@ function morningNewsSection(pptx: pptxgen) {
 function titleSlide(pptx: pptxgen, dateLabel: string) {
   const slide = pptx.addSlide();
   slide.background = { color: "FFFFFF" };
-  // Brand lockup, mirroring the hub header: logo · divider · INTERNAL.
   const logo = logoFile("meritage-logo.png");
   if (logo) {
     slide.addImage({ path: logo, x: MARGIN, y: 0.6, w: 3.6, h: 0.586 });
-    slide.addShape(pptx.ShapeType.rect, {
-      x: MARGIN + 3.85,
-      y: 0.66,
-      w: 0.014,
-      h: 0.46,
-      fill: { color: "D6D6DE" },
-      line: { type: "none" },
-    });
-    slide.addText("INTERNAL", {
-      x: MARGIN + 4.0,
-      y: 0.66,
-      w: 1.6,
-      h: 0.46,
-      fontFace: "Arial",
-      fontSize: 11,
-      color: MUTED,
-      charSpacing: 3,
-      valign: "middle",
-    });
   }
+  slide.addText(
+    [
+      { text: CONFIDENTIAL, options: { breakLine: true } },
+      { text: `As of ${dateLabel}`, options: {} },
+    ],
+    {
+      x: PAGE_W - MARGIN - 3.4,
+      y: 0.6,
+      w: 3.4,
+      h: 0.5,
+      fontFace: FONT,
+      fontSize: 10,
+      color: MUTED,
+      align: "right",
+      valign: "top",
+    },
+  );
   slide.addText(TOOL_NAMES.hub, {
     x: MARGIN,
     y: 2.6,
     w: CONTENT_W,
     h: 1,
-    fontFace: "Arial",
+    fontFace: FONT,
     fontSize: 44,
     bold: true,
-    color: INK,
+    color: NAVY,
   });
   slide.addText(dateLabel, {
     x: MARGIN,
     y: 3.7,
     w: CONTENT_W,
     h: 0.5,
-    fontFace: "Arial",
+    fontFace: FONT,
     fontSize: 16,
     color: MUTED,
   });
   slide.addShape(pptx.ShapeType.rect, {
-    x: MARGIN,
+    x: MARGIN + 0.02,
     y: 4.4,
-    w: 2.2,
-    h: 0.06,
-    fill: { color: BRAND },
+    w: 1.1,
+    h: 0.05,
+    fill: { color: ACCENT },
     line: { type: "none" },
   });
   slide.addShape(pptx.ShapeType.rect, {
@@ -459,7 +459,7 @@ function titleSlide(pptx: pptxgen, dateLabel: string) {
     y: PAGE_H - 0.18,
     w: PAGE_W,
     h: 0.18,
-    fill: { color: BRAND },
+    fill: { color: NAVY },
     line: { type: "none" },
   });
 }

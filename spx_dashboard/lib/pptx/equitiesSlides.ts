@@ -3,7 +3,7 @@ import pptxgen from "pptxgenjs";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { loadCompanies, loadQuotes, latestDataDate } from "@/lib/equities/load";
 import { Company, Quote } from "@/lib/equities/types";
-import { BRAND, CONTENT_W, FOOTER_Y, INK, MARGIN, MASTER_CONTENT, MUTED } from "./common";
+import { CONTENT_W, FONT, FOOTER_Y, INK, MARGIN, MASTER_CONTENT, MUTED, NAVY } from "./common";
 
 // Faithful PowerPoint of the Equities Dashboard — the two screens the web page
 // shows (Valuation/IRR "Summary" and the "IRR Decomp"), same columns, same
@@ -76,17 +76,17 @@ function eqSlide(pptx: pptxgen, title: string, subtitle: string): pptxgen.Slide 
     y: 0.1,
     w: 7.5,
     h: 0.34,
-    fontFace: "Arial",
+    fontFace: FONT,
     fontSize: 16,
     bold: true,
-    color: INK,
+    color: NAVY,
   });
   slide.addText(subtitle, {
     x: 8.1,
     y: 0.14,
     w: PAGE_W_SAFE - 8.1,
     h: 0.3,
-    fontFace: "Arial",
+    fontFace: FONT,
     fontSize: 8.5,
     color: MUTED,
     align: "right",
@@ -192,7 +192,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const h1Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
-      fill: { color: BRAND },
+      fill: { color: NAVY },
       align: "center",
       valign: "middle",
       fontSize: 6.5,
@@ -210,7 +210,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const h2Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
-      fill: { color: BRAND },
+      fill: { color: NAVY },
       align: "right",
       valign: "middle",
       fontSize: 6.5,
@@ -314,7 +314,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       w: CONTENT_W,
       colW: [1.0, 0.62, ...Array(20).fill(numW)],
       rowH,
-      fontFace: "Arial",
+      fontFace: FONT,
       fontSize: 6.5,
       color: INK,
       align: "right",
@@ -336,7 +336,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const h1Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
-      fill: { color: BRAND },
+      fill: { color: NAVY },
       align: "center",
       valign: "middle",
       fontSize: 8,
@@ -350,7 +350,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const h2Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
-      fill: { color: BRAND },
+      fill: { color: NAVY },
       align: "right",
       valign: "middle",
       fontSize: 8,
@@ -408,7 +408,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       w: CONTENT_W,
       colW: [1.5, 0.85, ...Array(9).fill(numW)],
       rowH,
-      fontFace: "Arial",
+      fontFace: FONT,
       fontSize: 8,
       color: INK,
       align: "right",
