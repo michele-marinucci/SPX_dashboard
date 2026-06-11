@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
-import { DiligenceLink, logoUrl, normTicker } from "@/lib/diligence";
+import { DiligenceLink, logoCandidates, normTicker } from "@/lib/diligence";
 
 // The Microsoft Lists app glyph: a teal rounded tile with list rows and a
 // check. Inlined so the "open" affordance reads clearly instead of a faint ↗.
@@ -34,9 +34,44 @@ function MsListsIcon() {
 }
 
 const STORE_KEY = "diligence:links";
+// The team's content (which lists exist) is shared via the DB, but each user's
+// preferred ordering is kept locally — there's no order column on the shared
+// table — as an array of tickers in display order.
+const ORDER_KEY = "diligence:order";
 
-function sortLinks(list: DiligenceLink[]): DiligenceLink[] {
-  return [...list].sort((a, b) => a.ticker.localeCompare(b.ticker));
+// Arrange links by the saved manual order: tickers present in `order` come
+// first in that order; anything new (added since the order was saved) falls to
+// the end, alphabetically. With no saved order we sort alphabetically by ticker.
+function arrangeLinks(list: DiligenceLink[], order: string[] | null): DiligenceLink[] {
+  if (!order || order.length === 0) {
+    return [...list].sort((a, b) => a.ticker.localeCompare(b.ticker));
+  }
+  const rank = new Map(order.map((t, i) => [t, i] as const));
+  return [...list].sort((a, b) => {
+    const ra = rank.has(a.ticker) ? rank.get(a.ticker)! : Infinity;
+    const rb = rank.has(b.ticker) ? rank.get(b.ticker)! : Infinity;
+    if (ra !== rb) return ra - rb;
+    return a.ticker.localeCompare(b.ticker);
+  });
+}
+
+function loadOrder(): string[] | null {
+  try {
+    const raw = window.localStorage.getItem(ORDER_KEY);
+    if (!raw) return null;
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? (arr as string[]) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveOrder(tickers: string[]) {
+  try {
+    window.localStorage.setItem(ORDER_KEY, JSON.stringify(tickers));
+  } catch {
+    /* ignore */
+  }
 }
 
 function loadLocal(): DiligenceLink[] | null {
@@ -50,13 +85,36 @@ function loadLocal(): DiligenceLink[] | null {
   }
 }
 
-// A square stock logo with a graceful monogram fallback: if the CDN can't
-// resolve the ticker (or is blocked), we show the symbol's initials instead, so
-// a missing image never leaves a broken-image icon in the table.
+// A burger handle (three horizontal lines) shown at the left of each row. It's
+// the drag affordance: users grab it to reorder positions above/below others.
+function DragHandle() {
+  return (
+    <svg
+      className="dil-grip-icon"
+      viewBox="0 0 16 16"
+      width="14"
+      height="14"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="2" y="3.5" width="12" height="1.6" rx="0.8" />
+      <rect x="2" y="7.2" width="12" height="1.6" rx="0.8" />
+      <rect x="2" y="10.9" width="12" height="1.6" rx="0.8" />
+    </svg>
+  );
+}
+
+// A square stock logo with a graceful monogram fallback. We walk a list of
+// logo sources (domain-keyed first for symbols a CDN gets wrong, then the
+// symbol CDN); only after every source errors do we show the symbol's
+// initials, so a missing logo never leaves a broken-image icon in the table.
 function LogoMark({ ticker }: { ticker: string }) {
-  const [failed, setFailed] = useState(false);
+  const candidates = useMemo(() => logoCandidates(ticker), [ticker]);
+  const [idx, setIdx] = useState(0);
   const mono = ticker.slice(0, 2);
-  if (failed) {
+  // Reset to the first source if the ticker changes (row reused across renders).
+  useEffect(() => setIdx(0), [ticker]);
+  if (idx >= candidates.length) {
     return (
       <span className="dil-logo dil-logo-mono" aria-hidden="true">
         {mono}
@@ -67,12 +125,12 @@ function LogoMark({ ticker }: { ticker: string }) {
     // eslint-disable-next-line @next/next/no-img-element
     <img
       className="dil-logo"
-      src={logoUrl(ticker)}
+      src={candidates[idx]}
       alt=""
       width={28}
       height={28}
       loading="lazy"
-      onError={() => setFailed(true)}
+      onError={() => setIdx((i) => i + 1)}
     />
   );
 }
@@ -94,32 +152,67 @@ export function DiligenceApp({
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  // The user's saved manual ordering (tickers in display order), or null for the
+  // default alphabetical sort. Held in a ref so the async add/remove callbacks
+  // always arrange against the latest order without re-binding.
+  const orderRef = useRef<string[] | null>(null);
+  // Index of the row currently being dragged, for the drop-target styling.
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const arrange = useCallback(
+    (list: DiligenceLink[]) => arrangeLinks(list, orderRef.current),
+    [],
+  );
 
   useEffect(() => {
     let active = true;
+    orderRef.current = loadOrder();
     fetch("/api/diligence")
       .then((r) => r.json())
       .then((d) => {
         if (!active) return;
         if (d?.enabled && Array.isArray(d.links)) {
           setDbEnabled(true);
-          setLinks(sortLinks(d.links));
+          setLinks(arrange(d.links));
         } else {
           setDbEnabled(false);
           const local = loadLocal();
-          if (local) setLinks(sortLinks(local));
+          if (local) setLinks(arrange(local));
         }
       })
       .catch(() => {
         if (!active) return;
         setDbEnabled(false);
         const local = loadLocal();
-        if (local) setLinks(sortLinks(local));
+        if (local) setLinks(arrange(local));
       });
     return () => {
       active = false;
     };
+  }, [arrange]);
+
+  // Persist the current sequence as the manual order, and remember it so future
+  // arranges (after add/remove or a reload) keep what the user dragged into place.
+  const commitOrder = useCallback((list: DiligenceLink[]) => {
+    const tickers = list.map((l) => l.ticker);
+    orderRef.current = tickers;
+    saveOrder(tickers);
   }, []);
+
+  // Move the dragged row to where it was dropped and persist the new order.
+  const reorder = useCallback(
+    (from: number, to: number) => {
+      if (from === to) return;
+      setLinks((prev) => {
+        if (from < 0 || from >= prev.length || to < 0 || to >= prev.length) return prev;
+        const next = [...prev];
+        const [moved] = next.splice(from, 1);
+        next.splice(to, 0, moved);
+        commitOrder(next);
+        return next;
+      });
+    },
+    [commitOrder],
+  );
 
   const persistLocal = (list: DiligenceLink[]) => {
     try {
@@ -157,7 +250,7 @@ export function DiligenceApp({
             body: JSON.stringify({ action: "add", ...entry }),
           });
           const d = await res.json();
-          if (d?.links) setLinks(sortLinks(d.links));
+          if (d?.links) setLinks(arrange(d.links));
           else setError(d?.error || "Could not save.");
         } catch {
           setError("Network error.");
@@ -165,7 +258,7 @@ export function DiligenceApp({
           setBusy(false);
         }
       } else {
-        const next = sortLinks([...links.filter((l) => l.ticker !== t), entry]);
+        const next = arrange([...links.filter((l) => l.ticker !== t), entry]);
         setLinks(next);
         persistLocal(next);
       }
@@ -173,7 +266,7 @@ export function DiligenceApp({
       setUrl("");
       setName("");
     },
-    [ticker, url, name, dbEnabled, links, names],
+    [ticker, url, name, dbEnabled, links, names, arrange],
   );
 
   const remove = useCallback(
@@ -187,7 +280,7 @@ export function DiligenceApp({
             body: JSON.stringify({ action: "remove", ticker: t }),
           });
           const d = await res.json();
-          if (d?.links) setLinks(sortLinks(d.links));
+          if (d?.links) setLinks(arrange(d.links));
         } finally {
           setBusy(false);
         }
@@ -197,7 +290,7 @@ export function DiligenceApp({
         persistLocal(next);
       }
     },
-    [dbEnabled, links],
+    [dbEnabled, links, arrange],
   );
 
   const note = useMemo(() => {
@@ -284,8 +377,37 @@ export function DiligenceApp({
           </div>
         ) : (
           <ul className="dil-list">
-            {links.map((l) => (
-              <li key={l.ticker} className="dil-row">
+            {links.map((l, i) => (
+              <li
+                key={l.ticker}
+                className={`dil-row${dragIdx === i ? " dil-row-dragging" : ""}`}
+                onDragOver={(e) => {
+                  if (dragIdx === null) return;
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (dragIdx !== null) reorder(dragIdx, i);
+                  setDragIdx(null);
+                }}
+                onDragEnd={() => setDragIdx(null)}
+              >
+                <button
+                  type="button"
+                  className="dil-grip"
+                  draggable
+                  onDragStart={(e) => {
+                    setDragIdx(i);
+                    e.dataTransfer.effectAllowed = "move";
+                    // Firefox requires data to be set for a drag to start.
+                    e.dataTransfer.setData("text/plain", l.ticker);
+                  }}
+                  aria-label={`Drag to reorder ${l.ticker}`}
+                  title="Drag to reorder"
+                >
+                  <DragHandle />
+                </button>
                 <a
                   className="dil-link"
                   href={l.url}

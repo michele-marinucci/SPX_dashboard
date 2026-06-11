@@ -1811,6 +1811,37 @@ thead .row-head {
 .dil-row:not(:last-child) {
   border-bottom: 1px solid var(--line-soft);
 }
+.dil-row-dragging {
+  opacity: 0.5;
+  background: var(--surface-2);
+}
+.dil-grip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 32px;
+  margin-left: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--faint);
+  cursor: grab;
+  border-radius: var(--radius-sm);
+  transition: color 0.12s, background 0.12s;
+  touch-action: none;
+}
+.dil-grip:hover {
+  color: var(--muted);
+  background: var(--surface-2);
+}
+.dil-grip:active {
+  cursor: grabbing;
+}
+.dil-grip-icon {
+  fill: currentColor;
+}
 .dil-link {
   flex: 1;
   display: flex;
