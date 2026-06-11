@@ -81,6 +81,37 @@ REF_FIELDS = ["AVG_DAILY_VALUE_TRADED_3M"]
 # Calendar-day lookbacks for the 1M/3M/6M performance windows.
 PERF_DAYS = {"m1": 30, "m3": 91, "m6": 182}
 
+DEBUG = "--debug" in sys.argv
+
+# Diagnostics gathered during a run: request-level and per-security errors
+# from Bloomberg, printed when the run produces nothing so failures are never
+# silent (entitlement problems, service issues, bad tickers, ...).
+ERRORS: list[str] = []
+
+
+def _note_errors(msg, context: str) -> None:
+    """Record responseError / securityError details from a Bloomberg message."""
+    try:
+        if msg.hasElement("responseError"):
+            ERRORS.append(f"{context}: responseError: {msg.getElement('responseError')}")
+        if msg.hasElement("securityData"):
+            sds = msg.getElement("securityData")
+            # HistoricalDataResponse: one securityData per message;
+            # ReferenceDataResponse: an array of them.
+            items = sds.values() if sds.isArray() else [sds]
+            for sd in items:
+                name = sd.getElementAsString("security") if sd.hasElement("security") else "?"
+                if sd.hasElement("securityError"):
+                    ERRORS.append(f"{context}: {name}: {sd.getElement('securityError')}")
+                if sd.hasElement("fieldExceptions"):
+                    fe = sd.getElement("fieldExceptions")
+                    if fe.numValues():
+                        ERRORS.append(f"{context}: {name}: fieldExceptions: {fe}")
+    except Exception:
+        pass
+    if DEBUG:
+        print(f"--- raw message ({context}) ---\n{msg}\n", file=sys.stderr)
+
 
 def last_weekday_before(day: dt.date) -> dt.date:
     d = day - dt.timedelta(days=1)
@@ -127,7 +158,11 @@ def reference_data(
     done = False
     while not done:
         ev = session.nextEvent(30_000)
+        if ev.eventType() == blpapi.Event.TIMEOUT:
+            ERRORS.append("reference: timed out waiting for Bloomberg response")
+            break
         for msg in ev:
+            _note_errors(msg, "reference")
             if not msg.hasElement("securityData"):
                 continue
             for sd in msg.getElement("securityData").values():
@@ -180,6 +215,7 @@ def bql_anchor_closes(
     back to a batched historical request)."""
     try:
         if not session.openService("//blp/bqlsvc"):
+            ERRORS.append("bql: //blp/bqlsvc service not available on this terminal")
             return None
         items = ", ".join(
             f"px_last(dates='{day.isoformat()}', fill='prev') as #{key}"
@@ -197,7 +233,12 @@ def bql_anchor_closes(
         done = False
         while not done:
             ev = session.nextEvent(60_000)
+            if ev.eventType() == blpapi.Event.TIMEOUT:
+                ERRORS.append("bql: timed out waiting for response")
+                break
             for msg in ev:
+                if DEBUG:
+                    print(f"--- raw message (bql) ---\n{msg}\n", file=sys.stderr)
                 for item in _bql_results(msg):
                     name = str(item.get("name", "")).lstrip("#")
                     if name not in anchors:
@@ -221,8 +262,12 @@ def bql_anchor_closes(
         # Sanity: the query must have produced a prior close for at least
         # half the universe, otherwise treat it as failed and fall back.
         good = sum(1 for r in out.values() if "px" in r)
-        return out if good >= max(1, len(securities) // 2) else None
-    except Exception:
+        if good < max(1, len(securities) // 2):
+            ERRORS.append(f"bql: only {good}/{len(securities)} securities returned a close")
+            return None
+        return out
+    except Exception as e:
+        ERRORS.append(f"bql: {type(e).__name__}: {e}")
         return None
 
 
@@ -251,7 +296,11 @@ def historical_closes(
     done = False
     while not done:
         ev = session.nextEvent(60_000)
+        if ev.eventType() == blpapi.Event.TIMEOUT:
+            ERRORS.append("historical: timed out waiting for Bloomberg response")
+            break
         for msg in ev:
+            _note_errors(msg, "historical")
             if not msg.hasElement("securityData"):
                 continue
             sd = msg.getElement("securityData")
@@ -317,6 +366,19 @@ def gather_prices(
             base = close_on_or_before(past, close_date - dt.timedelta(days=days))
             entry[key] = (close_px / base - 1) if base else None
         out[sec] = entry
+
+    if not out:
+        detail = "\n".join(f"  - {e}" for e in ERRORS) or "  (no error details captured)"
+        sys.exit(
+            "Bloomberg returned no data for any security — nothing pushed.\n"
+            f"Errors seen:\n{detail}\n\n"
+            "Common causes:\n"
+            "  * First API use needs a one-time consent: in the Terminal run API<GO>\n"
+            "    and accept, or just retry — a popup may have appeared in the Terminal.\n"
+            "  * Desktop API entitlement missing: ask your Bloomberg rep about\n"
+            "    'Desktop API' access for your login.\n"
+            "Re-run with --debug to dump the raw Bloomberg responses."
+        )
     return out, "historical fallback (BQL service unavailable)"
 
 
@@ -429,6 +491,10 @@ def main() -> None:
         f"Pushed {d.get('quotes', 0)} quotes and patched {d.get('companies', 0)} names — "
         f"closes as of {data_date}, via {method} (run {dt.datetime.now():%Y-%m-%d %H:%M})."
     )
+    if ERRORS:
+        print("Warnings (some securities/fields had issues):")
+        for e in ERRORS[:20]:
+            print(f"  - {e}")
 
 
 if __name__ == "__main__":
