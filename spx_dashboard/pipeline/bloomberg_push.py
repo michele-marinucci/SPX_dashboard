@@ -48,6 +48,19 @@ import sys
 
 import requests
 
+# Corporate networks often run TLS inspection (Zscaler/Palo Alto-type), which
+# re-signs HTTPS with a company root CA that the browser trusts but Python's
+# bundled certificates don't — yielding CERTIFICATE_VERIFY_FAILED. If the
+# `truststore` package is available, route SSL through the OS trust store
+# (which has that corporate root), so the site connection just works. Harmless
+# on normal networks; falls back silently if truststore isn't installed.
+try:
+    import truststore
+
+    truststore.inject_into_ssl()
+except Exception:
+    pass
+
 try:
     import blpapi
 except Exception as _blp_err:

@@ -36,9 +36,16 @@ dashboard toolbar shows the close date and which source it came from.
 ## One-time setup (on the terminal PC)
 
 ```bat
-pip install requests
+pip install requests truststore
 pip install --index-url=https://blpapi.bloomberg.com/repository/releases/python/simple/ blpapi
 ```
+
+`truststore` lets Python use the Windows certificate store. On a corporate
+network with TLS inspection (Zscaler/Palo Alto-type), the connection to the
+dashboard would otherwise fail with `CERTIFICATE_VERIFY_FAILED`; with
+`truststore` installed the script picks up the company root CA automatically.
+(If you can't install it, `pip install pip-system-certs` is an equivalent
+fix.)
 
 Test it manually first:
 
