@@ -1,20 +1,19 @@
 {
   "positions": [
-    { "ticker": "MSFT", "name": "Microsoft" },
-    { "ticker": "AMZN", "name": "Amazon" },
-    { "ticker": "TRU", "name": "TransUnion" },
-    { "ticker": "COF", "name": "Capital One" },
-    { "ticker": "AON", "name": "Aon" },
-    { "ticker": "WDAY", "name": "Workday" },
-    { "ticker": "SPGI", "name": "S&P Global" },
-    { "ticker": "LSEG LN", "name": "London Stock Exchange Group" },
-    { "ticker": "CSGP", "name": "CoStar Group" },
-    { "ticker": "DSV DC", "name": "DSV" },
-    { "ticker": "MSCI", "name": "MSCI" },
-    { "ticker": "META", "name": "Meta Platforms" },
-    { "ticker": "SAP GY", "name": "SAP" },
-    { "ticker": "TOST", "name": "Toast" },
-    { "ticker": "EFX", "name": "Equifax" },
-    { "ticker": "VSAT", "name": "Viasat" }
+    { "ticker": "MSFT",    "name": "Microsoft",                     "domain": "microsoft.com" },
+    { "ticker": "AMZN",    "name": "Amazon",                        "domain": "amazon.com" },
+    { "ticker": "TRU",     "name": "TransUnion",                    "domain": "transunion.com" },
+    { "ticker": "COF",     "name": "Capital One",                   "domain": "capitalone.com" },
+    { "ticker": "AON",     "name": "Aon",                           "domain": "aon.com" },
+    { "ticker": "WDAY",    "name": "Workday",                       "domain": "workday.com" },
+    { "ticker": "SPGI",    "name": "S&P Global",                    "domain": "spglobal.com" },
+    { "ticker": "LSEG LN", "name": "London Stock Exchange Group",   "domain": "lseg.com" },
+    { "ticker": "CSGP",    "name": "CoStar Group",                  "domain": "costargroup.com" },
+    { "ticker": "DSV DC",  "name": "DSV",                           "domain": "dsv.com" },
+    { "ticker": "MSCI",    "name": "MSCI",                          "domain": "msci.com" },
+    { "ticker": "META",    "name": "Meta Platforms",                "domain": "meta.com" },
+    { "ticker": "SAP GY",  "name": "SAP",                           "domain": "sap.com" },
+    { "ticker": "TOST",    "name": "Toast",                         "domain": "toasttab.com" },
+    { "ticker": "EFX",     "name": "Equifax",                       "domain": "equifax.com" }
   ]
 }

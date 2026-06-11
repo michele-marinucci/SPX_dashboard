@@ -1,5 +1,6 @@
 import { MorningNewsClient } from "./MorningNewsClient";
 import morningNewsRaw from "@/data/morning_news.json";
+import { getPortfolioPositions } from "@/lib/portfolio";
 
 export interface JargonNote {
   term: string;
@@ -8,9 +9,6 @@ export interface JargonNote {
 
 export interface ThemePoint {
   text: string;
-  // Lettered supporting sub-bullets under the key takeaway.
-  details?: string[];
-  // Legacy: older notes carried term/definition pairs here instead.
   jargon?: JargonNote[];
 }
 
@@ -39,8 +37,6 @@ export interface NewsPosition {
   ticker: string;
   name?: string;
   notes: string;
-  // Our analytical read on what the news means for the (long) position.
-  claude_take?: string;
 }
 
 export interface MorningNote {
@@ -50,7 +46,13 @@ export interface MorningNote {
   one_liner: string;
 }
 
-export default function MorningNewsPage() {
+export default async function MorningNewsPage() {
   const notes = morningNewsRaw as MorningNote[];
-  return <MorningNewsClient notes={notes} />;
+  const positions = await getPortfolioPositions();
+  const tickerDomain: Record<string, string> = Object.fromEntries(
+    positions
+      .filter((p) => p.domain)
+      .map((p) => [p.ticker, p.domain!])
+  );
+  return <MorningNewsClient notes={notes} tickerDomain={tickerDomain} />;
 }
