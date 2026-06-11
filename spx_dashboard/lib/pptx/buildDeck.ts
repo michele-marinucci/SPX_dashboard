@@ -2,7 +2,8 @@ import fs from "fs";
 import path from "path";
 import pptxgen from "pptxgenjs";
 
-import { getDashboard, ThreeDateTable, GrowthTable, NtmPeTableData } from "@/lib/data";
+import { ThreeDateTable, GrowthTable, NtmPeTableData } from "@/lib/data";
+import { loadSpxDashboard } from "@/lib/spxLive";
 import { getTwitterData } from "@/lib/tweets";
 import type { MorningNote } from "@/app/morning-news/page";
 import morningNewsRaw from "@/data/morning_news.json";
@@ -253,9 +254,9 @@ export async function buildHubDeck(): Promise<Buffer> {
   dividerSlide(pptx, "Equities Dashboard", "Valuation, IRRs & decomposition · prior-day closes");
   await addEquitiesSlides(pptx, new Date());
 
-  // 2) SPX Monitor — Aggregate S&P 500 only.
+  // 2) SPX Monitor — Aggregate S&P 500 only (live-overlaid like the web page).
   dividerSlide(pptx, "SPX Monitor", "Aggregate S&P 500");
-  const t = getDashboard().tables;
+  const t = (await loadSpxDashboard()).tables;
   threeDateTableSlide(pptx, t.stock_performance, "Stock Performance · Market cap ($b)", 0);
   growthTableSlide(pptx, t.earnings_growth);
   threeDateTableSlide(pptx, t.est_rev_2026, "Estimate Revisions · 2026 ($b)", 1);

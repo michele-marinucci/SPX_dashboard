@@ -193,15 +193,30 @@ def open_session() -> blpapi.Session | None:
     return session
 
 
+# Bloomberg requests are batched, but very large universes (the S&P 500) are
+# split into chunks of this size per request to stay well within limits.
+CHUNK = 100
+
+
+def _chunks(items: list[str]) -> list[list[str]]:
+    return [items[i : i + CHUNK] for i in range(0, len(items), CHUNK)]
+
+
 def reference_data(
     session: blpapi.Session,
     securities: list[str],
     fields: list[str],
     overrides: dict[str, str] | None = None,
 ) -> dict[str, dict[str, float]]:
-    """One ReferenceDataRequest → {security: {field: value}} (numeric only)."""
+    """Batched ReferenceDataRequest → {security: {field: value}} (numeric
+    only). Universes larger than CHUNK are split across several requests."""
     if not securities:
         return {}
+    if len(securities) > CHUNK:
+        out: dict[str, dict[str, float]] = {}
+        for part in _chunks(securities):
+            out.update(reference_data(session, part, fields, overrides))
+        return out
     svc = session.getService("//blp/refdata")
     req = svc.createRequest("ReferenceDataRequest")
     for s in securities:
@@ -395,16 +410,23 @@ def historical_closes(
     securities: list[str],
     start: dt.date,
     end: dt.date,
+    field: str = "PX_LAST",
 ) -> dict[str, list[tuple[dt.date, float]]]:
-    """One HistoricalDataRequest → {security: [(date, close), ...]} sorted by
-    date, from which the prior close and the 1M/3M/6M windows are derived."""
+    """Batched HistoricalDataRequest → {security: [(date, value), ...]} sorted
+    by date. `field` defaults to closes; CUR_MKT_CAP gives daily market caps.
+    Universes larger than CHUNK are split across several requests."""
     if not securities:
         return {}
+    if len(securities) > CHUNK:
+        out: dict[str, list[tuple[dt.date, float]]] = {}
+        for part in _chunks(securities):
+            out.update(historical_closes(session, part, start, end, field))
+        return out
     svc = session.getService("//blp/refdata")
     req = svc.createRequest("HistoricalDataRequest")
     for s in securities:
         req.getElement("securities").appendValue(s)
-    req.getElement("fields").appendValue("PX_LAST")
+    req.getElement("fields").appendValue(field)
     req.set("startDate", start.strftime("%Y%m%d"))
     req.set("endDate", end.strftime("%Y%m%d"))
     req.set("periodicitySelection", "DAILY")
@@ -426,12 +448,12 @@ def historical_closes(
             rows = out.setdefault(name, [])
             if sd.hasElement("fieldData"):
                 for bar in sd.getElement("fieldData").values():
-                    if bar.hasElement("date") and bar.hasElement("PX_LAST"):
+                    if bar.hasElement("date") and bar.hasElement(field):
                         d = bar.getElementAsDatetime("date")
                         if isinstance(d, dt.datetime):
                             d = d.date()
                         try:
-                            rows.append((d, bar.getElementAsFloat("PX_LAST")))
+                            rows.append((d, bar.getElementAsFloat(field)))
                         except Exception:
                             pass
         done = ev.eventType() == blpapi.Event.RESPONSE
@@ -441,13 +463,19 @@ def historical_closes(
 
 
 def windowed_closes(
-    session: blpapi.Session, securities: list[str], anchor: dt.date, cushion: int = 10
+    session: blpapi.Session,
+    securities: list[str],
+    anchor: dt.date,
+    cushion: int = 10,
+    field: str = "PX_LAST",
 ) -> dict[str, tuple[dt.date, float]]:
-    """Most recent close on/before `anchor` for each security, from one SHORT
+    """Most recent value on/before `anchor` for each security, from one SHORT
     HistoricalDataRequest (a `cushion`-day window). Pulling a handful of days
     around each anchor — instead of months of daily history — keeps the
     monthly Bloomberg data usage minimal while still surviving holidays."""
-    hist = historical_closes(session, securities, anchor - dt.timedelta(days=cushion), anchor)
+    hist = historical_closes(
+        session, securities, anchor - dt.timedelta(days=cushion), anchor, field
+    )
     out: dict[str, tuple[dt.date, float]] = {}
     for sec, rows in hist.items():  # rows are sorted ascending by date
         on_or_before = [(d, px) for d, px in rows if d <= anchor]
@@ -530,6 +558,176 @@ def gather_prices(
 # --------------------------------------------------------------------------- #
 # Dashboard API
 # --------------------------------------------------------------------------- #
+def run_equities(session, web, base: str, universe: dict, expected: dt.date) -> str:
+    """The Equities Dashboard leg: prior closes + perf + ADV + index BEst P/E
+    for the ~37-name dashboard universe. Returns a one-line summary."""
+    stocks = [s for s in universe["securities"] if not s["is_index"]]
+    indexes = [s for s in universe["securities"] if s["is_index"]]
+    years: list[int] = universe["years"]
+
+    prices, method = gather_prices(session, [s["bbg"] for s in stocks + indexes], expected)
+    adv = reference_data(session, [s["bbg"] for s in stocks], REF_FIELDS)
+
+    quotes = []
+    companies = []
+    data_date: str | None = None
+    for s in stocks + indexes:
+        row = prices.get(s["bbg"])
+        if not row:
+            companies.append({"ticker": s["ticker"], "perf": {}})
+            continue
+        if data_date is None or row["date"] > data_date:
+            data_date = row["date"]
+        perf = {k: row.get(k) for k in PERF_DAYS}
+        if s["yahoo"]:
+            quotes.append({"symbol": s["yahoo"], "price": row["price"], **perf})
+        entry: dict = {"ticker": s["ticker"], "perf": perf}
+        ref = adv.get(s["bbg"], {})
+        if ref.get("AVG_DAILY_VALUE_TRADED_3M") is not None:
+            entry["adv_3m"] = ref["AVG_DAILY_VALUE_TRADED_3M"] / 1e6
+        companies.append(entry)
+
+    # Index BEst P/E: one request per forecast year (overrides are
+    # request-wide). nFY counts from the current year, mirroring the
+    # workbook's best_fperiod_override.
+    this_year = dt.date.today().year
+    for y in years:
+        n = y - this_year + 1
+        if n < 1:
+            continue
+        pe = reference_data(
+            session,
+            [ix["bbg"] for ix in indexes],
+            ["BEST_PE_RATIO"],
+            {"BEST_FPERIOD_OVERRIDE": f"{n}FY"},
+        )
+        for ix in indexes:
+            v = pe.get(ix["bbg"], {}).get("BEST_PE_RATIO")
+            if v is None:
+                continue
+            entry = next(c for c in companies if c["ticker"] == ix["ticker"])
+            entry.setdefault("best_pe", {})[str(y)] = v
+
+    r = web.post(
+        f"{base}/api/equities/bloomberg",
+        json={"quotes": quotes, "companies": companies, "data_date": data_date},
+        timeout=60,
+    )
+    if not r.ok:
+        sys.exit(f"Equities push failed: HTTP {r.status_code} {r.text[:300]}")
+    d = r.json()
+    return (
+        f"Equities: pushed {d.get('quotes', 0)} quotes and patched "
+        f"{d.get('companies', 0)} names — closes as of {data_date}, via {method}."
+    )
+
+
+# ---- SPX Monitor leg -------------------------------------------------------- #
+def best_ni_by_year(session, securities: list[str], year: int) -> dict[str, float]:
+    """Calendar-year consensus net income ($ millions) per security. Probes
+    the BEST_FPERIOD_OVERRIDE syntax on a handful of names first so a syntax
+    the terminal doesn't accept never burns a full-universe request."""
+    for override in (f"CY{year}", str(year)):
+        before = len(ERRORS)
+        probe = reference_data(
+            session, securities[:5], ["BEST_NET_INCOME"],
+            {"BEST_FPERIOD_OVERRIDE": override},
+        )
+        del ERRORS[before:]  # probe misses are expected, not warnings
+        if sum(1 for v in probe.values() if "BEST_NET_INCOME" in v) >= 2:
+            full = reference_data(
+                session, securities, ["BEST_NET_INCOME"],
+                {"BEST_FPERIOD_OVERRIDE": override},
+            )
+            return {
+                s: v["BEST_NET_INCOME"] for s, v in full.items() if "BEST_NET_INCOME" in v
+            }
+    NOTES.append(f"SPX: consensus NI for {year} unavailable (override not accepted)")
+    return {}
+
+
+def best_ntm_ni(
+    session, securities: list[str], ni_by_year: dict[int, dict[str, float]]
+) -> dict[str, float]:
+    """Next-twelve-months consensus NI ($ millions): the 1BF blended-forward
+    override when the terminal supports it, otherwise a calendar-weighted
+    blend of this year's and next year's consensus."""
+    before = len(ERRORS)
+    probe = reference_data(
+        session, securities[:5], ["BEST_NET_INCOME"], {"BEST_FPERIOD_OVERRIDE": "1BF"}
+    )
+    del ERRORS[before:]
+    if sum(1 for v in probe.values() if "BEST_NET_INCOME" in v) >= 2:
+        full = reference_data(
+            session, securities, ["BEST_NET_INCOME"], {"BEST_FPERIOD_OVERRIDE": "1BF"}
+        )
+        out = {s: v["BEST_NET_INCOME"] for s, v in full.items() if "BEST_NET_INCOME" in v}
+        if out:
+            return out
+
+    today = dt.date.today()
+    y = today.year
+    frac = ((dt.date(y, 12, 31) - today).days + 1) / 365.0
+    this_yr, next_yr = ni_by_year.get(y, {}), ni_by_year.get(y + 1, {})
+    out = {}
+    for s in securities:
+        a, b = this_yr.get(s), next_yr.get(s)
+        if a is not None and b is not None:
+            out[s] = frac * a + (1 - frac) * b
+    if out:
+        NOTES.append("SPX: NTM NI approximated as a calendar blend (1BF not accepted)")
+    return out
+
+
+def run_spx(session, web, base: str, spx_universe: dict, expected: dt.date) -> str:
+    """The SPX Monitor leg: prior-day market caps + consensus NI for the full
+    S&P 500. ~4 values per name per day; chunked batched requests."""
+    tickers: list[str] = spx_universe["tickers"]
+    years = [int(y) for y in spx_universe.get("years", [])]
+
+    mc = windowed_closes(session, tickers, expected, field="CUR_MKT_CAP")
+    ni_by_year = {y: best_ni_by_year(session, tickers, y) for y in years}
+    ntm = best_ntm_ni(session, tickers, ni_by_year)
+
+    quotes = []
+    data_date: str | None = None
+    for t in tickers:
+        row: dict = {"ticker": t}
+        got = False
+        if t in mc:
+            d, v = mc[t]
+            row["mkt_cap"] = v / 1000.0  # millions → $ billions
+            if data_date is None or d.isoformat() > data_date:
+                data_date = d.isoformat()
+            got = True
+        est = {
+            str(y): ni_by_year[y][t] / 1000.0 for y in years if t in ni_by_year.get(y, {})
+        }
+        if est:
+            row["est_ni"] = est
+            got = True
+        if t in ntm:
+            row["ntm_ni"] = ntm[t] / 1000.0
+            got = True
+        if got:
+            quotes.append(row)
+
+    if not quotes:
+        return "SPX: no data returned — nothing pushed."
+    r = web.post(
+        f"{base}/api/spx/bloomberg",
+        json={"quotes": quotes, "data_date": data_date or expected.isoformat()},
+        timeout=120,
+    )
+    if not r.ok:
+        sys.exit(f"SPX push failed: HTTP {r.status_code} {r.text[:300]}")
+    d = r.json()
+    return (
+        f"SPX Monitor: pushed {d.get('quotes', 0)} of {len(tickers)} names — "
+        f"market caps as of {data_date or expected.isoformat()}."
+    )
+
+
 def main() -> None:
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     force = "--force" in sys.argv
@@ -560,18 +758,29 @@ def main() -> None:
             f"at this URL yet — check that the branch with the equities pages is "
             f"the one live at {base}.\nResponse started with: {body!r}"
         )
-    stocks = [s for s in universe["securities"] if not s["is_index"]]
-    indexes = [s for s in universe["securities"] if s["is_index"]]
-    years: list[int] = universe["years"]
 
-    # Cache guard: if the site already holds the latest weekday close, exit
-    # before opening a Bloomberg session — zero data pulls for redundant runs
-    # (same-day re-runs, weekends, holidays-after-a-push).
+    # SPX Monitor universe — absent on older deployments; leg skipped then.
+    spx_universe: dict | None = None
+    try:
+        sr = web.get(f"{base}/api/spx/bloomberg", timeout=30)
+        if sr.ok:
+            spx_universe = sr.json()
+    except Exception:
+        pass
+
+    # Cache guards, per leg: a leg runs only if a NEW weekday close exists
+    # that the site doesn't have. If neither leg is stale, exit before even
+    # opening a Bloomberg session — zero data pulls for redundant runs.
     expected = last_weekday_before(dt.date.today())
-    cached = universe.get("bloomberg_data_date")
-    if not force and cached and str(cached) >= expected.isoformat():
+    eq_cached = str(universe.get("bloomberg_data_date") or "")
+    eq_stale = force or not (eq_cached and eq_cached >= expected.isoformat())
+    spx_cached = str((spx_universe or {}).get("bloomberg_data_date") or "")
+    spx_stale = spx_universe is not None and (
+        force or not (spx_cached and spx_cached >= expected.isoformat())
+    )
+    if not eq_stale and not spx_stale:
         print(
-            f"Already up to date — cached Bloomberg closes are as of {cached} "
+            f"Already up to date — cached Bloomberg data is as of {eq_cached} "
             f"(latest weekday close: {expected}). No Bloomberg requests made; "
             f"use --force to re-pull."
         )
@@ -582,66 +791,23 @@ def main() -> None:
         print("Bloomberg Terminal not running — nothing pushed (site stays on Yahoo).")
         return
 
+    summaries: list[str] = []
     try:
-        prices, method = gather_prices(
-            session, [s["bbg"] for s in stocks + indexes], expected
-        )
-        adv = reference_data(session, [s["bbg"] for s in stocks], REF_FIELDS)
-
-        quotes = []
-        companies = []
-        data_date: str | None = None
-        for s in stocks + indexes:
-            row = prices.get(s["bbg"])
-            if not row:
-                companies.append({"ticker": s["ticker"], "perf": {}})
-                continue
-            if data_date is None or row["date"] > data_date:
-                data_date = row["date"]
-            perf = {k: row.get(k) for k in PERF_DAYS}
-            if s["yahoo"]:
-                quotes.append({"symbol": s["yahoo"], "price": row["price"], **perf})
-            entry: dict = {"ticker": s["ticker"], "perf": perf}
-            ref = adv.get(s["bbg"], {})
-            if ref.get("AVG_DAILY_VALUE_TRADED_3M") is not None:
-                entry["adv_3m"] = ref["AVG_DAILY_VALUE_TRADED_3M"] / 1e6
-            companies.append(entry)
-
-        # Index BEst P/E: one request per forecast year (overrides are
-        # request-wide). nFY counts from the current year, mirroring the
-        # workbook's best_fperiod_override.
-        this_year = dt.date.today().year
-        for y in years:
-            n = y - this_year + 1
-            if n < 1:
-                continue
-            pe = reference_data(
-                session,
-                [ix["bbg"] for ix in indexes],
-                ["BEST_PE_RATIO"],
-                {"BEST_FPERIOD_OVERRIDE": f"{n}FY"},
-            )
-            for ix in indexes:
-                v = pe.get(ix["bbg"], {}).get("BEST_PE_RATIO")
-                if v is None:
-                    continue
-                entry = next(c for c in companies if c["ticker"] == ix["ticker"])
-                entry.setdefault("best_pe", {})[str(y)] = v
+        if eq_stale:
+            summaries.append(run_equities(session, web, base, universe, expected))
+        else:
+            summaries.append(f"Equities: already up to date ({eq_cached}).")
+        if spx_universe is not None:
+            if spx_stale:
+                summaries.append(run_spx(session, web, base, spx_universe, expected))
+            else:
+                summaries.append(f"SPX Monitor: already up to date ({spx_cached}).")
     finally:
         session.stop()
 
-    r = web.post(
-        f"{base}/api/equities/bloomberg",
-        json={"quotes": quotes, "companies": companies, "data_date": data_date},
-        timeout=60,
-    )
-    if not r.ok:
-        sys.exit(f"Push failed: HTTP {r.status_code} {r.text[:300]}")
-    d = r.json()
-    print(
-        f"Pushed {d.get('quotes', 0)} quotes and patched {d.get('companies', 0)} names — "
-        f"closes as of {data_date}, via {method} (run {dt.datetime.now():%Y-%m-%d %H:%M})."
-    )
+    for line in summaries:
+        print(line)
+    print(f"(run {dt.datetime.now():%Y-%m-%d %H:%M})")
     # De-duplicated, calm notes (e.g. BQL not entitled — expected, not a fault).
     for n in dict.fromkeys(NOTES):
         print(f"Note: {n}")

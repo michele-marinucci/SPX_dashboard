@@ -2,13 +2,12 @@ import { Column, DataTable, TableRow } from "@/components/DataTable";
 import { NtmPeTable } from "@/components/NtmPeTable";
 import { DashboardFrame } from "@/components/DashboardFrame";
 import { ViewHeading } from "@/components/ViewHeading";
-import {
-  getBloombergDateLabel,
-  getCompounderTables,
-  getDashboard,
-  GrowthTable,
-  ThreeDateTable,
-} from "@/lib/data";
+import { bloombergDateLabelOf, GrowthTable, ThreeDateTable } from "@/lib/data";
+import { loadSpxDashboard } from "@/lib/spxLive";
+
+// The tables overlay the daily Bloomberg push (when newer than the committed
+// workbook snapshot), so this page must render per-request.
+export const dynamic = "force-dynamic";
 
 // --- column builders ------------------------------------------------------- //
 function threeDateColumns(t: ThreeDateTable, digits: number): Column[] {
@@ -122,18 +121,20 @@ function Section({
   );
 }
 
-export default function SpxMonitorPage() {
-  const d = getDashboard();
+export default async function SpxMonitorPage() {
+  const d = await loadSpxDashboard();
   const t = d.tables;
-  const tc = getCompounderTables();
+  const tc = d.tables_compounders ?? null;
+  const asOf = bloombergDateLabelOf(d);
 
   return (
     <DashboardFrame
+      asOf={asOf}
       heading={
         <ViewHeading
           title="Aggregate SPX"
           meta="AI beneficiary & software tracker"
-          trailing={`Bloomberg data as of ${getBloombergDateLabel()}`}
+          trailing={`Bloomberg data as of ${asOf}`}
         />
       }
     >

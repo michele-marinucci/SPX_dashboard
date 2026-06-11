@@ -9,12 +9,16 @@ import { getBloombergDateLabel, getNavModel } from "@/lib/data";
 export function DashboardFrame({
   heading,
   children,
+  asOf: asOfProp,
 }: {
   heading: React.ReactNode;
   children: React.ReactNode;
+  // Pages that overlay live Bloomberg data pass their own as-of date;
+  // default is the committed workbook snapshot's date.
+  asOf?: string;
 }) {
   const nav = getNavModel();
-  const asOf = getBloombergDateLabel();
+  const asOf = asOfProp ?? getBloombergDateLabel();
 
   return (
     <div className="shell">

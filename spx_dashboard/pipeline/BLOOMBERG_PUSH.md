@@ -1,15 +1,24 @@
 # Bloomberg → dashboard auto-push
 
 `bloomberg_push.py` runs on any PC where the Bloomberg Terminal is open and
-logged in. It reads **prior-day closes** through the Desktop API (no Excel
-involved) and posts them to the Equities Dashboard, where they're stored in
-Supabase for the whole team:
+logged in. It reads **prior-day data** through the Desktop API (no Excel
+involved) and posts it to the site, where it's stored in Supabase for the
+whole team. Two legs, each with its own skip-when-cached guard:
 
+**Equities Dashboard** (~37 names):
 - prior close + 1M/3M/6M performance for every name (a Bloomberg push wins
   over the site's once-a-day Yahoo fallback — freshest source wins),
 - 3M average daily value traded,
 - index BEst P/E for the displayed forecast years (incl. the custom
   B500XM7T index, which has no public feed).
+
+**SPX Monitor** (full S&P 500, requires `supabase/spx.sql` to have been run):
+- prior-day market cap per name,
+- consensus net income for the current/forward calendar years + NTM.
+The site overlays these onto the committed workbook snapshot and recomputes
+every aggregate row; the historical anchor columns (1/1, quarter start, P/E
+averages and history) stay from the workbook, so refreshing the workbook
+(re-running `parse_excel.py`) always remains the deeper refresh.
 
 ## Designed around the monthly data limit
 
