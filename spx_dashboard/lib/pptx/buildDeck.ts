@@ -248,7 +248,7 @@ function twitterSection(pptx: pptxgen) {
     s1,
     (d.daily_summary.items || []).map((it) => ({
       title: `${it.label}${it.tickers?.length ? `  [${it.tickers.join(", ")}]` : ""}`,
-      body: it.summary,
+      body: it.summary || (it.points ?? []).map((p) => p.text).join("  "),
     })),
   );
   if (d.recurring?.length) {
