@@ -3,27 +3,20 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
-import { logoUrl, normTicker } from "@/lib/diligence";
+import { logoCandidates } from "@/lib/diligence";
 import { TOOL_NAMES } from "@/lib/toolMeta";
 import type { MorningNote, ThemeChart } from "./page";
 
-// Non-US listings keep their full Bloomberg ticker (exchange suffix and all —
-// downstream Bloomberg formulas depend on it). Parqet's symbol CDN doesn't
-// resolve those, so map the few exchange-listed names straight to a logo
-// domain. Plain US tickers fall through to the shared parqet lookup.
-const LOGO_DOMAIN: Record<string, string> = {
-  "LSEG LN": "lseg.com",
-  "SAP GY": "sap.com",
-  "DSV DC": "dsv.com",
-};
-
+// Stock logo, shared with the Diligence Tracker: logoCandidates() resolves a
+// ticker (including full Bloomberg symbols like "SAP GY") to an ordered list of
+// logo URLs — a domain-keyed source first for symbols the CDN gets wrong or
+// can't resolve, then the symbol CDN. We walk that list on each image error and
+// fall back to the symbol's initial only after every source fails.
 function TickerLogo({ ticker }: { ticker: string }) {
-  const [failed, setFailed] = useState(false);
+  const candidates = logoCandidates(ticker);
+  const [idx, setIdx] = useState(0);
 
-  const domain = LOGO_DOMAIN[ticker.trim().toUpperCase()];
-  const src = domain ? `https://logo.clearbit.com/${domain}` : logoUrl(ticker);
-
-  if (failed) {
+  if (idx >= candidates.length) {
     return (
       <span className="news-position-logo news-position-logo-ph" aria-hidden>
         {ticker.trim().charAt(0)}
@@ -34,12 +27,12 @@ function TickerLogo({ ticker }: { ticker: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={src}
+      src={candidates[idx]}
       alt=""
       width={20}
       height={20}
       className="news-position-logo"
-      onError={() => setFailed(true)}
+      onError={() => setIdx((i) => i + 1)}
     />
   );
 }

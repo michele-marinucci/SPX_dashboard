@@ -13,7 +13,7 @@ import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { ANALYSTS } from "@/lib/equities/config";
 import { Company, EditRecord, Quote } from "@/lib/equities/types";
 import { fieldLabel, fmtEditValue } from "@/lib/equities/editLog";
-import { logoUrl } from "@/lib/diligence";
+import { logoCandidates } from "@/lib/diligence";
 import { NO_SORT, nextSort, SortState, sortRows } from "@/lib/sort";
 import { SortGlyph } from "@/components/SortGlyph";
 
@@ -879,12 +879,15 @@ function monoColor(ticker: string): string {
 const fFx = (v: number | null | undefined) => (v == null ? "n/a" : `${v.toFixed(1)}x`);
 const fFp = (v: number | null | undefined) => (v == null ? "n/a" : `${(v * 100).toFixed(0)}%`);
 
-// The Focus header logo: the real company mark (same CDN as the Diligence
-// Tracker) with a graceful monogram fallback when the CDN can't resolve the
-// ticker, so a blocked/missing image never leaves a broken icon.
+// The Focus header logo: the real company mark, resolved through the shared
+// logoCandidates() cascade (same as the Diligence Tracker and Morning Notes) —
+// a domain-keyed source first for symbols the CDN gets wrong, then the symbol
+// CDN. Falls back to a monogram only after every source fails, so a blocked or
+// missing image never leaves a broken icon.
 function FocusLogo({ ticker }: { ticker: string }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) {
+  const candidates = logoCandidates(ticker);
+  const [idx, setIdx] = useState(0);
+  if (idx >= candidates.length) {
     return (
       <span className="monotile eq-focus-tile" style={{ background: monoColor(ticker) }}>
         {ticker.slice(0, 2)}
@@ -895,11 +898,11 @@ function FocusLogo({ ticker }: { ticker: string }) {
     // eslint-disable-next-line @next/next/no-img-element
     <img
       className="eq-focus-tile eq-focus-logo"
-      src={logoUrl(ticker)}
+      src={candidates[idx]}
       alt={`${ticker} logo`}
       width={44}
       height={44}
-      onError={() => setFailed(true)}
+      onError={() => setIdx((i) => i + 1)}
     />
   );
 }

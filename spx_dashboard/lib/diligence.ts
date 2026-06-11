@@ -153,6 +153,8 @@ export const TICKER_DOMAIN: Record<string, string> = {
   SU: "se.com",
   AI: "airliquide.com",
   DTE: "telekom.com",
+  LSEG: "lseg.com",
+  DSV: "dsv.com",
 };
 
 // Logo for a domain. Uses a domain-keyed service (unambiguous: a real company
@@ -178,9 +180,4 @@ function symbolLogo(ticker: string): string {
 export function logoCandidates(ticker: string): string[] {
   const domain = TICKER_DOMAIN[rootTicker(ticker)];
   return domain ? [domainLogo(domain), symbolLogo(ticker)] : [symbolLogo(ticker)];
-}
-
-// Back-compat single-URL accessor (first candidate).
-export function logoUrl(ticker: string): string {
-  return logoCandidates(ticker)[0];
 }
