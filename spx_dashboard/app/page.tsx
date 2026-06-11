@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
-import { getActiveIdeasCount, getGeneratedAtLabel } from "@/lib/themes";
+import { getGeneratedAtLabel, getTweetCount } from "@/lib/tweets";
 
-// The post-login launcher (Ledger "hub"): one ledger row per tool. Two are
-// live (SPX Monitor, X Themes); three are flagged work-in-progress.
+// The post-login launcher (Ledger "hub"): one ledger row per tool. Four are
+// live (SPX Monitor, Twitter Monitor, Diligence Tracker, Morning News); the
+// rest are WIP.
 export default function HomePage() {
-  const ideas = getActiveIdeasCount();
+  const tweets = getTweetCount();
   const asOf = getGeneratedAtLabel();
 
   return (
@@ -13,19 +14,15 @@ export default function HomePage() {
       <div className="hub-top">
         <div className="hub-brand">
           <span className="hub-brand-dot" aria-hidden="true" />
-          <span className="sys">MENDO&nbsp;MONITOR</span>
+          <span className="sys">MENDO&nbsp;HUB</span>
         </div>
         <div className="hub-right">
-          {asOf && <span className="hub-clock">X THEMES · {asOf}</span>}
+          {asOf && <span className="hub-clock">TWITTER · {asOf}</span>}
           <LogoutButton />
         </div>
       </div>
 
-      <h1>Mendo Monitor</h1>
-      <p className="hub-tagline">
-        An AI-beneficiary &amp; software tracker within the S&amp;P 500, plus a
-        daily briefing of investment ideas surfaced from X.
-      </p>
+      <h1>Mendo Hub</h1>
 
       <div className="colhead">
         <span>#</span>
@@ -73,11 +70,11 @@ export default function HomePage() {
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
-            X Themes
+            Twitter Monitor
           </div>
           <p className="rdesc">
-            A daily, curated briefing of investment ideas surfaced from X about
-            your themes — ranked by conviction and grounded in real posts.
+            A summary of the day&apos;s tweets from your followed accounts —
+            organized by theme, with portfolio mentions and recurring topics.
           </p>
         </div>
         <div className="stats">
@@ -86,8 +83,8 @@ export default function HomePage() {
             <span className="v on">LIVE</span>
           </div>
           <div className="stat">
-            <span className="k">IDEAS</span>
-            <span className="v">{ideas}</span>
+            <span className="k">TWEETS</span>
+            <span className="v">{tweets}</span>
           </div>
           <div className="stat">
             <span className="k">UPDATED</span>
@@ -102,8 +99,76 @@ export default function HomePage() {
         </div>
       </Link>
 
-      <Link href="/dashboard" className="hub-row live">
+      <Link href="/diligence" className="hub-row live">
         <div className="hub-idx">03</div>
+        <div>
+          <div className="rname">
+            <span className="livedot" aria-hidden="true" />
+            Diligence Tracker
+          </div>
+          <p className="rdesc">
+            Every position&apos;s Microsoft List in one place — click through to a
+            name&apos;s tracker, add or remove links, shared across the team.
+          </p>
+        </div>
+        <div className="stats">
+          <div className="stat">
+            <span className="k">STATUS</span>
+            <span className="v on">LIVE</span>
+          </div>
+          <div className="stat">
+            <span className="k">SOURCE</span>
+            <span className="v">MS LISTS</span>
+          </div>
+          <div className="stat">
+            <span className="k">ACCESS</span>
+            <span className="v">SHARED</span>
+          </div>
+        </div>
+        <div className="cta">
+          Open
+          <span className="arr" aria-hidden="true">
+            →
+          </span>
+        </div>
+      </Link>
+
+      <Link href="/morning-news" className="hub-row live">
+        <div className="hub-idx">04</div>
+        <div>
+          <div className="rname">
+            <span className="livedot" aria-hidden="true" />
+            Morning News Summary
+          </div>
+          <p className="rdesc">
+            A pre-market digest of overnight headlines and the news that moves
+            your names, summarized each morning.
+          </p>
+        </div>
+        <div className="stats">
+          <div className="stat">
+            <span className="k">STATUS</span>
+            <span className="v on">LIVE</span>
+          </div>
+          <div className="stat">
+            <span className="k">CADENCE</span>
+            <span className="v">PRE-MARKET</span>
+          </div>
+          <div className="stat">
+            <span className="k">UPDATED</span>
+            <span className="v">DAILY</span>
+          </div>
+        </div>
+        <div className="cta">
+          Open
+          <span className="arr" aria-hidden="true">
+            →
+          </span>
+        </div>
+      </Link>
+
+      <Link href="/dashboard" className="hub-row live">
+        <div className="hub-idx">05</div>
         <div>
           <div className="rname">
             <span className="livedot" aria-hidden="true" />
@@ -121,7 +186,7 @@ export default function HomePage() {
           </div>
           <div className="stat">
             <span className="k">PRICES</span>
-            <span className="v">INTRADAY</span>
+            <span className="v">PRIOR CLOSE</span>
           </div>
         </div>
         <div className="cta">
@@ -132,23 +197,8 @@ export default function HomePage() {
         </div>
       </Link>
 
-      <Link href="/diligence" className="hub-row wip">
-        <div className="hub-idx">04</div>
-        <div>
-          <div className="rname">Diligence Tracker</div>
-          <p className="rdesc">
-            Open questions, notes, and status as each idea moves through the
-            process.
-          </p>
-        </div>
-        <div>
-          <span className="wiptag">Work in progress</span>
-        </div>
-        <div className="prev">Preview →</div>
-      </Link>
-
       <Link href="/podcast" className="hub-row wip">
-        <div className="hub-idx">05</div>
+        <div className="hub-idx">06</div>
         <div>
           <div className="rname">Podcast Creator</div>
           <p className="rdesc">
@@ -163,7 +213,7 @@ export default function HomePage() {
       </Link>
 
       <Link href="/insider" className="hub-row wip">
-        <div className="hub-idx">06</div>
+        <div className="hub-idx">07</div>
         <div>
           <div className="rname">Insider Selling</div>
           <p className="rdesc">
@@ -177,24 +227,9 @@ export default function HomePage() {
         <div className="prev">Preview →</div>
       </Link>
 
-      <Link href="/morning-news" className="hub-row wip">
-        <div className="hub-idx">07</div>
-        <div>
-          <div className="rname">Morning News Summary</div>
-          <p className="rdesc">
-            A pre-market digest of overnight headlines and the news that moves
-            your names, summarized each morning.
-          </p>
-        </div>
-        <div>
-          <span className="wiptag">Work in progress</span>
-        </div>
-        <div className="prev">Preview →</div>
-      </Link>
-
       <div className="hub-foot">
-        <span>{asOf ? `X THEMES AS OF ${asOf}` : "X THEMES"}</span>
-        <span>7 MODULES · 2 LIVE</span>
+        <span>{asOf ? `TWITTER MONITOR AS OF ${asOf}` : "TWITTER MONITOR"}</span>
+        <span>7 MODULES · 4 LIVE</span>
       </div>
     </div>
   );

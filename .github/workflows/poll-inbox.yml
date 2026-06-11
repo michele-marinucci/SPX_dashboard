@@ -37,15 +37,23 @@ jobs:
 
       - name: Commit refreshed data (triggers Vercel redeploy)
         run: |
-          if [ -n "$(git status --porcelain spx_dashboard/data/ spx_dashboard/public/SPX_inputs.xlsx)" ]; then
-            git config user.name "spx-dashboard-bot"
-            git config user.email "actions@github.com"
-            # Commit the parsed data AND the workbook itself, so the
-            # "Export Excel" button always serves the same file the tables
-            # were built from.
-            git add spx_dashboard/data/dashboard.json spx_dashboard/data/.source_hash spx_dashboard/public/SPX_inputs.xlsx
-            git commit -m "data: refresh dashboard from new SPX_inputs.xlsx"
-            git push
-          else
+          if [ -z "$(git status --porcelain spx_dashboard/data/ spx_dashboard/public/SPX_inputs.xlsx)" ]; then
             echo "No data changes; nothing to deploy."
+            exit 0
           fi
+          git config user.name "spx-dashboard-bot"
+          git config user.email "actions@github.com"
+          # Commit the parsed data AND the workbook itself, so the
+          # "Export Excel" button always serves the same file the tables
+          # were built from.
+          git add spx_dashboard/data/dashboard.json spx_dashboard/data/.source_hash spx_dashboard/public/SPX_inputs.xlsx
+          git commit -m "data: refresh dashboard from new SPX_inputs.xlsx"
+          for i in 1 2 3 4 5; do
+            if git pull --rebase --autostash origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "push attempt $i failed; re-syncing and retrying..."
+            sleep 5
+          done
+          echo "push failed after 5 attempts" >&2
+          exit 1

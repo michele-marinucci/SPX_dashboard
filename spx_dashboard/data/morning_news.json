@@ -1,0 +1,66 @@
+[
+  {
+    "date": "2026-06-11",
+    "top_themes": [
+      {
+        "headline": "Anthropic releases Claude Fable 5, raises prices and guardrails",
+        "detail": "Anthropic launched Fable 5, a public Mythos-class model that early testers say materially outperforms prior models on long-duration, complex tasks (e.g., Stripe migrating a 50M-line codebase in a day). It is priced at 2x Opus ($10/$50 per M tokens), with aggressive guardrails that route sensitive queries to weaker models and explicitly block use for frontier LLM development by rivals. With an IPO filing in the background, commentary converged on 'the subsidy era is over' \u2014 model pricing is going up, which matters for AI cost structures across software and for AI-lab revenue trajectories.",
+        "sources": [
+          "Stratechery",
+          "TLDR",
+          "TLDR AI",
+          "Axios AI+",
+          "The Information AI Agenda"
+        ]
+      },
+      {
+        "headline": "AI datacenter capex accelerating; financing structures getting exotic",
+        "detail": "SemiAnalysis sees 2026 datacenter leasing potentially reaching 30GW, with multiple credible 5GW+ Texas sites and Anthropic on an 80GW roadmap; Google appears to be going direct on the Wyoming/Tallgrass site, displacing Crusoe. Financing is increasingly layered: Broadcom is tapping Apollo and Blackstone to fund Anthropic/OpenAI chip deals, and Google is backstopping Anthropic's $35B chip lease at five data centers. Oracle fell 6% after hours on higher-than-expected datacenter spend \u2014 a reminder the market is starting to penalize capex without visible returns.",
+        "sources": [
+          "SemiAnalysis",
+          "The Information AM",
+          "TLDR AI",
+          "Axios Closer"
+        ]
+      },
+      {
+        "headline": "Rates and Iran escalation pressuring equities ahead of CPI",
+        "detail": "Stocks have become unusually sensitive to Treasury yields after Friday's strong jobs report triggered the Nasdaq 100's worst day (-4.8%) since April 2025; May CPI was expected at 4.2% y/y with risk skewed to further selling on an upside surprise. The S&P 500 closed down 1.6% Wednesday with chip stocks falling again and oil up on fresh U.S.-Iran strikes. Morgan Stanley flags the 2021 parallel: a Fed (under Warsh) leaning accommodative into persistent inflation, likely through the mid-terms.",
+        "sources": [
+          "Axios Markets",
+          "Axios Closer"
+        ]
+      },
+      {
+        "headline": "SpaceX IPO this week; Starlink India approval stalls",
+        "detail": "Details emerging ahead of the SpaceX IPO suggest index funds could absorb ~30% of the float, potentially stressing index-inclusion mechanics. Separately, Starlink's regulatory approval in India has stalled over the Iran war, and SpaceX detailed its AI1 orbital compute satellite with filings for up to one million orbital data center satellites. A mega-IPO with geopolitical overhangs is a liquidity and sentiment event for the broader tech tape.",
+        "sources": [
+          "Axios Markets",
+          "The Information AM",
+          "TLDR"
+        ]
+      },
+      {
+        "headline": "CFTC formalizing prediction-market sports rules",
+        "detail": "The CFTC proposed rules allowing prediction markets like Kalshi and Polymarket to offer nationwide sports event contracts (with single-play and pure-chance bets excluded), opening a 90-day comment period. The casino lobby is opposed and the matter is widely expected to end up at the Supreme Court. Kalshi is separately asking some customers for employer information, suggesting tightening compliance.",
+        "sources": [
+          "Axios Closer",
+          "The Information AM"
+        ]
+      }
+    ],
+    "positions": [
+      {
+        "ticker": "MSFT",
+        "name": "Microsoft",
+        "notes": "SemiAnalysis identifies ~1GW of US datacenter capacity leased so far in Q2, on par with Q1, plus a planned 2GW European region driven by OpenAI and Anthropic demand \u2014 roughly 1GW of which was signed in Q2 with leading operators. Capex/leasing intensity remains very high."
+      },
+      {
+        "ticker": "META",
+        "name": "Meta Platforms",
+        "notes": "SemiAnalysis says Meta is actively leasing and seeking GWs of capacity; it is the suspected customer behind 810MW of Applied Digital deals signed in Q2 and likely leased Vantage's 900MW Millersport (OH) site, expanding the Prometheus cluster to 3GW."
+      }
+    ],
+    "one_liner": "Anthropic's pricier, guardrailed Fable 5 dominates the AI conversation while accelerating datacenter capex (MSFT, META leasing GWs) collides with a tape made fragile by rates, CPI risk, Iran escalation, and Oracle's capex-driven after-hours slide."
+  }
+]

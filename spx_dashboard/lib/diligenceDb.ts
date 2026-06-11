@@ -3,7 +3,14 @@
 // Mirrors lib/supabase.ts; kept separate so the two features never share a file.
 import { DiligenceLink, normTicker } from "@/lib/diligence";
 
-const URL = (process.env.SUPABASE_URL ?? "").trim().replace(/\/+$/, "") || undefined;
+// Tolerate the common paste mistakes: trailing slashes and a "/rest/v1" suffix
+// (the URL should be the bare project origin; rest() appends the path itself).
+const URL =
+  (process.env.SUPABASE_URL ?? "")
+    .trim()
+    .replace(/\/+$/, "")
+    .replace(/\/rest\/v1$/i, "")
+    .replace(/\/+$/, "") || undefined;
 const KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim() || undefined;
 
 export function diligenceEnabled(): boolean {
@@ -22,47 +29,6 @@ async function rest(path: string, init: RequestInit = {}): Promise<Response> {
     // Always hit the source of truth; never cache DB reads.
     cache: "no-store",
   });
-}
-
-// Connection diagnostics for /api/diligence?debug=1 — reports whether the env
-// vars are present, which Supabase role the key carries, and the HTTP status of
-// a one-row probe read. Never echoes the key itself; the route sits behind the
-// password gate like every other page.
-export async function diligenceDebug(): Promise<Record<string, string>> {
-  let urlInfo = "NOT SET";
-  if (URL) {
-    try {
-      urlInfo = `set (host: ${new globalThis.URL(URL).host})`;
-    } catch {
-      urlInfo = "set but MALFORMED (not a valid URL)";
-    }
-  }
-
-  let keyInfo = "NOT SET";
-  if (KEY) {
-    try {
-      const payload = JSON.parse(
-        Buffer.from(KEY.split(".")[1], "base64").toString("utf8"),
-      );
-      keyInfo = `set (role: ${payload.role ?? "unknown"})`;
-    } catch {
-      keyInfo = "set but not a JWT — wrong value pasted?";
-    }
-  }
-
-  let probe = "skipped (env incomplete)";
-  if (URL && KEY) {
-    try {
-      const res = await rest("diligence_links?select=ticker&limit=1");
-      probe = res.ok
-        ? `HTTP ${res.status} OK — connection works`
-        : `HTTP ${res.status} — ${(await res.text()).slice(0, 300)}`;
-    } catch (e) {
-      probe = `fetch failed: ${e instanceof Error ? e.message : String(e)}`;
-    }
-  }
-
-  return { supabase_url: urlInfo, service_role_key: keyInfo, probe };
 }
 
 export async function dbGetDiligence(): Promise<DiligenceLink[]> {
