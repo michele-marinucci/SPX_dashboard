@@ -181,9 +181,21 @@ def reference_data(
 
 
 # ---- Primary price path: one BQL query for the whole universe -------------- #
+def _as_dict(v):
+    """Best-effort: turn a BQL payload piece into a dict (JSON strings are
+    decoded; anything else that isn't a dict yields {})."""
+    if isinstance(v, str):
+        try:
+            v = json.loads(v)
+        except Exception:
+            return {}
+    return v if isinstance(v, dict) else {}
+
+
 def _bql_results(msg) -> list[dict]:
     """Pull the result items out of a //blp/bqlsvc response message, across
-    the slightly different shapes blpapi versions deliver them in."""
+    the slightly different shapes blpapi versions deliver them in: toPy()
+    dicts, JSON strings, and dicts whose values are themselves JSON strings."""
     py = None
     try:
         py = msg.toPy()  # blpapi >= 3.18
@@ -191,15 +203,23 @@ def _bql_results(msg) -> list[dict]:
         pass
     if py is None:
         try:
-            py = json.loads(msg.getElementAsString("results"))
+            py = msg.getElementAsString("results")
         except Exception:
-            return []
+            try:
+                py = str(msg)
+            except Exception:
+                return []
+    py = _as_dict(py) or py
     if isinstance(py, dict):
         results = py.get("results", py)
+        results = _as_dict(results) or results
         if isinstance(results, dict):
-            return list(results.values())
-        if isinstance(results, list):
-            return results
+            items = list(results.values())
+        elif isinstance(results, list):
+            items = results
+        else:
+            items = []
+        return [d for d in (_as_dict(i) for i in items) if d]
     return []
 
 
@@ -239,14 +259,23 @@ def bql_anchor_closes(
             for msg in ev:
                 if DEBUG:
                     print(f"--- raw message (bql) ---\n{msg}\n", file=sys.stderr)
-                for item in _bql_results(msg):
+                try:
+                    parsed = _bql_results(msg)
+                except Exception as e:
+                    ERRORS.append(f"bql: parse: {type(e).__name__}: {e}")
+                    parsed = []
+                for item in parsed:
                     name = str(item.get("name", "")).lstrip("#")
                     if name not in anchors:
                         continue
-                    ids = (item.get("idColumn") or {}).get("values") or []
-                    vals = (item.get("valuesColumn") or {}).get("values") or []
+                    ids = _as_dict(item.get("idColumn")).get("values") or []
+                    vals = _as_dict(item.get("valuesColumn")).get("values") or []
                     dates = []
-                    for col in item.get("secondaryColumns") or []:
+                    cols = item.get("secondaryColumns")
+                    if not isinstance(cols, list):
+                        cols = []
+                    for col in cols:
+                        col = _as_dict(col)
                         if str(col.get("name", "")).upper() == "DATE":
                             dates = col.get("values") or []
                     for i, sec in enumerate(ids):
@@ -330,6 +359,16 @@ def close_on_or_before(rows: list[tuple[dt.date, float]], target: dt.date) -> fl
     return best
 
 
+def flush_events(session: blpapi.Session) -> None:
+    """Drain any leftover events from an aborted request so they can't be
+    mistaken for the next request's response."""
+    try:
+        while session.nextEvent(500).eventType() != blpapi.Event.TIMEOUT:
+            pass
+    except Exception:
+        pass
+
+
 def gather_prices(
     session: blpapi.Session, securities: list[str], expected: dt.date
 ) -> tuple[dict[str, dict], str]:
@@ -340,6 +379,10 @@ def gather_prices(
         anchors[key] = expected - dt.timedelta(days=days)
 
     bql = bql_anchor_closes(session, securities, anchors)
+    if bql is None:
+        # A failed/aborted BQL attempt may leave unread events behind; drain
+        # them so the historical request reads its own response, not BQL's.
+        flush_events(session)
     if bql is not None:
         out = {}
         for sec, row in bql.items():
