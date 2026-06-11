@@ -3,7 +3,14 @@
 // Mirrors lib/diligenceDb.ts; kept separate so features never share a file.
 import { Company, EditRecord, FieldChange, Quote } from "@/lib/equities/types";
 
-const URL = (process.env.SUPABASE_URL ?? "").trim().replace(/\/+$/, "") || undefined;
+// Normalize away a stray "/rest/v1" suffix some setups include in the env var
+// (the REST prefix is appended below) — same fix as lib/supabase.ts.
+const URL =
+  (process.env.SUPABASE_URL ?? "")
+    .trim()
+    .replace(/\/+$/, "")
+    .replace(/\/rest\/v1$/i, "")
+    .replace(/\/+$/, "") || undefined;
 const KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim() || undefined;
 
 export function equitiesEnabled(): boolean {

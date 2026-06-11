@@ -88,9 +88,16 @@ function spxTable(
   cols: SpxCol[],
   rows: { label: string; isTotal: boolean; cells: (number | null)[] }[],
 ) {
-  const scales = cols.map((_, ci) =>
-    computeScale(rows.filter((r) => !r.isTotal).map((r) => r.cells[ci] ?? null)),
-  );
+  // Blue (level) shading is reserved for the AI-beneficiary categories — the
+  // rows above the first subtotal ("Total AI Capex Beneficiaries"). Everything
+  // from that subtotal down (funders, software, Other, SPX total) stays plain.
+  const firstTotalIdx = rows.findIndex((r) => r.isTotal);
+  const blueCutoff = firstTotalIdx === -1 ? rows.length : firstTotalIdx;
+  const blueRows = rows.slice(0, blueCutoff);
+  const scales = cols.map((col, ci) => {
+    const pool = col.heat === "blue" ? blueRows : rows.filter((r) => !r.isTotal);
+    return computeScale(pool.map((r) => r.cells[ci] ?? null));
+  });
 
   // Grouped header band (like the web's group-row) + per-column label row.
   const groupHeader: Row = [{ text: "", options: {} }];
@@ -103,7 +110,7 @@ function spxTable(
   }
   const header: Row = ["", ...cols.map((c) => c.label)];
 
-  const body: Row[] = rows.map((r) => {
+  const body: Row[] = rows.map((r, ri) => {
     const out: Row = [
       {
         text: r.label,
@@ -121,7 +128,7 @@ function spxTable(
         out.push({ text, options: { bold: true, fill: { color: "EFEFF3" } } });
         return;
       }
-      if (col.heat === "blue") {
+      if (col.heat === "blue" && ri < blueCutoff) {
         const h = blueHeat(v, scales[ci]);
         out.push({
           text,
