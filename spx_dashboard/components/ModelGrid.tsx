@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cx } from "@/lib/format";
 
 // A small Excel-like grid for the Edit-model modal. It edits a flat string map
@@ -21,6 +21,18 @@ import { cx } from "@/lib/format";
 export interface GridRowDef {
   label: React.ReactNode;
   keys: string[]; // one draft key per column
+  // Mono unit hint rendered after the label, e.g. "($M)" / "(%)" / "×".
+  unit?: string;
+  // Display-only formatting for committed cell values ("60922" → "60,922").
+  // The raw draft string is always what gets edited and saved.
+  format?: (raw: string) => string;
+  // Confirm-guarded row (target multiple): cells render but refuse edits,
+  // paste and delete until the guard is lifted.
+  locked?: boolean;
+  // Extra class on the <tr> (e.g. the emphasized target-multiple row).
+  rowClass?: string;
+  // Full-width strip rendered as its own row directly above this row.
+  section?: React.ReactNode;
 }
 
 interface Pos {
@@ -97,6 +109,7 @@ export function ModelGrid({
   };
 
   const startEdit = (initial?: string) => {
+    if (rows[active.r].locked) return; // confirm-guarded row
     setEditValue(initial != null ? initial : valAt(active.r, active.c));
     setEditing(true);
   };
@@ -113,9 +126,11 @@ export function ModelGrid({
 
   const clearSelection = () => {
     const ups: { key: string; value: string }[] = [];
-    for (let r = rect.r0; r <= rect.r1; r++)
+    for (let r = rect.r0; r <= rect.r1; r++) {
+      if (rows[r].locked) continue;
       for (let c = rect.c0; c <= rect.c1; c++) ups.push({ key: keyAt(r, c), value: "" });
-    onCommit(ups);
+    }
+    if (ups.length) onCommit(ups);
   };
 
   const copySelection = async () => {
@@ -200,6 +215,7 @@ export function ModelGrid({
     if (!text) return;
     e.preventDefault();
     if (!/[\t\n]/.test(text)) {
+      if (rows[active.r].locked) return;
       onCommit([{ key: keyAt(active.r, active.c), value: cleanCell(text) }]);
       setEditing(false);
       return;
@@ -211,10 +227,11 @@ export function ModelGrid({
       line.split("\t").forEach((cell, ci) => {
         const r = active.r + ri;
         const c = active.c + ci;
-        if (r < nR && c < nC) ups.push({ key: keyAt(r, c), value: cleanCell(cell) });
+        if (r < nR && c < nC && !rows[r].locked)
+          ups.push({ key: keyAt(r, c), value: cleanCell(cell) });
       });
     });
-    onCommit(ups);
+    if (ups.length) onCommit(ups);
     setEditing(false);
     setCopied(null);
   };
@@ -249,46 +266,62 @@ export function ModelGrid({
         </thead>
         <tbody>
           {rows.map((row, r) => (
-            <tr key={r}>
-              {hasRowLabels && <th scope="row">{row.label}</th>}
-              {columns.map((_, c) => {
-                const isActive = active.r === r && active.c === c;
-                const selected = inRect(r, c, rect);
-                const isCopied = copied != null && inRect(r, c, copied);
-                return (
-                  <td
-                    key={c}
-                    className={cx(
-                      "eq-cell",
-                      selected && "is-sel",
-                      isActive && "is-active",
-                      isCopied && "is-copied",
-                    )}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      selectCell(r, c, e.shiftKey);
-                    }}
-                    onDoubleClick={() => {
-                      setActive({ r, c });
-                      setAnchor({ r, c });
-                      startEdit();
-                    }}
-                  >
-                    {isActive && editing ? (
-                      <input
-                        ref={inputRef}
-                        className="eq-cell-input"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        inputMode="decimal"
-                      />
-                    ) : (
-                      <span className="eq-cell-val">{valAt(r, c)}</span>
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
+            <React.Fragment key={r}>
+              {row.section != null && (
+                <tr className="eq-grid-strip-row">
+                  <td colSpan={nC + (hasRowLabels ? 1 : 0)}>{row.section}</td>
+                </tr>
+              )}
+              <tr className={row.rowClass}>
+                {hasRowLabels && (
+                  <th scope="row">
+                    {row.label}
+                    {row.unit && <span className="eq-grid-unit">{row.unit}</span>}
+                  </th>
+                )}
+                {columns.map((_, c) => {
+                  const isActive = active.r === r && active.c === c;
+                  const selected = inRect(r, c, rect);
+                  const isCopied = copied != null && inRect(r, c, copied);
+                  const raw = valAt(r, c);
+                  return (
+                    <td
+                      key={c}
+                      className={cx(
+                        "eq-cell",
+                        selected && "is-sel",
+                        isActive && "is-active",
+                        isCopied && "is-copied",
+                        row.locked && "is-locked",
+                      )}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        selectCell(r, c, e.shiftKey);
+                      }}
+                      onDoubleClick={() => {
+                        setActive({ r, c });
+                        setAnchor({ r, c });
+                        startEdit();
+                      }}
+                    >
+                      {isActive && editing ? (
+                        <input
+                          ref={inputRef}
+                          className="eq-cell-input"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          inputMode="decimal"
+                        />
+                      ) : (
+                        <span className="eq-cell-val">
+                          {row.format ? row.format(raw) : raw}
+                        </span>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            </React.Fragment>
           ))}
         </tbody>
       </table>

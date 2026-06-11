@@ -2211,8 +2211,9 @@ thead .row-head {
 }
 .eq-grid {
   border-collapse: collapse;
-  width: auto;
-  font-size: 12px;
+  width: 100%;
+  table-layout: fixed;
+  font-size: 12.5px;
 }
 .eq-grid th {
   text-align: left;
@@ -2221,43 +2222,51 @@ thead .row-head {
   padding: 5px 8px;
   white-space: nowrap;
 }
-.eq-grid-emph {
-  color: var(--brand);
-  font-weight: 700;
-}
-/* Excel-style header band over the year columns. */
+/* Excel-style header band over the year columns (right-aligned mono). */
 .eq-grid thead th {
-  text-align: center;
+  text-align: right;
   font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
   font-weight: 600;
   color: var(--muted);
   background: var(--surface-2);
-  border: 1px solid var(--line-strong);
+  border: 0;
+  border-bottom: 1px solid var(--line-2);
+  padding: 0 11px 7px;
 }
 .eq-grid thead th:first-child {
+  width: 184px;
   text-align: left;
   background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--line-strong);
 }
-/* Row-header (field name) — like Excel's left gutter. */
+/* Row-header (field name) — like Excel's left gutter, unit hint inline. */
 .eq-grid tbody th {
   background: var(--surface-2);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-soft);
   font-weight: 600;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  padding: 8px 12px;
+}
+.eq-grid-unit {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--faint);
+  margin-left: 5px;
 }
 /* The year cells butt up against each other to read as one pasteable block. */
 .eq-grid td {
   padding: 0;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-soft);
 }
 .eq-grid input {
-  width: 92px;
-  padding: 6px 8px;
+  width: 100%;
+  padding: 8px 11px;
   border: 0;
   border-radius: 0;
   background: transparent;
-  font-size: 12px;
+  font-size: 12.5px;
   text-align: right;
   font-family: var(--font-mono, ui-monospace, monospace);
 }
@@ -2342,10 +2351,254 @@ thead .row-head {
   justify-content: space-between;
   gap: 12px;
   margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
 }
 .eq-modal-foot > div {
   display: flex;
   gap: 8px;
+}
+
+/* ---- Edit-model: rich header (monogram + identity + Updated-by) ---- */
+.eq-modal-head-rich {
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-soft);
+  margin-bottom: 16px;
+}
+.eq-modal-id {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.eq-modal-tile {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  background: #23306b;
+  flex-shrink: 0;
+}
+.eq-modal-id-text {
+  min-width: 0;
+}
+.eq-modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.eq-modal-tk {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+.eq-modal-nm {
+  font-size: 13px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.eq-modal-subline {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  color: var(--faint);
+  margin-top: 2px;
+}
+.eq-modal-head-r {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.eq-updatedby {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.eq-updatedby select {
+  font-family: var(--font-sans, "Hanken Grotesk", sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 7px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  min-width: 130px;
+  cursor: pointer;
+}
+
+/* ---- Edit-model: target-multiple emphasis strip + confirm guard ---- */
+.eq-grid-strip-row td {
+  padding: 14px 0 0;
+  border: 0;
+  background: transparent;
+}
+.eq-mult-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: #f4f3fe;
+  border: 1px solid #d7d4f6;
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.eq-mult-strip-l {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.eq-mult-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--brand-700);
+  white-space: nowrap;
+}
+.eq-mult-note {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 10px;
+  font-weight: 600;
+  color: #6d66ef;
+}
+.eq-mult-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-700);
+  cursor: pointer;
+  user-select: none;
+}
+.eq-mult-confirm input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+.eq-grid tr.eq-row-mult th {
+  background: #ecebfb;
+  border-color: #d7d4f6;
+  border-left: 3px solid var(--brand);
+  color: var(--brand-700);
+  font-weight: 700;
+}
+.eq-grid tr.eq-row-mult td.eq-cell {
+  background: #f4f3fe;
+  border-color: #d7d4f6;
+}
+.eq-grid tr.eq-row-mult .eq-cell-val,
+.eq-grid tr.eq-row-mult .eq-cell-input {
+  font-weight: 700;
+  color: var(--brand-700);
+}
+.eq-grid tr.eq-row-mult td.eq-cell.is-locked {
+  background: #efeef9;
+  cursor: not-allowed;
+}
+.eq-grid tr.eq-row-mult td.eq-cell.is-locked .eq-cell-val {
+  color: var(--faint);
+  font-weight: 600;
+}
+.eq-lock-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #6d66ef;
+  margin: 9px 0 0;
+}
+.eq-keys-note {
+  display: block;
+  margin-top: 14px;
+}
+
+/* ---- Edit-model: footer remove (ghost danger) + confirm panel ---- */
+.eq-danger-ghost {
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid #f0d2d2;
+  color: #c0322b;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.eq-danger-ghost:hover {
+  background: #fdf3f3;
+}
+.eq-danger-ghost:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.eq-act-primary.is-dim {
+  background: #a7a4ec;
+  border-color: #a7a4ec;
+}
+.eq-remove-confirm {
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: var(--danger-soft);
+  border: 1px solid #f3c9c9;
+  border-radius: 9px;
+}
+.eq-remove-confirm-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #a02520;
+  margin-bottom: 3px;
+}
+.eq-remove-confirm-body {
+  font-size: 12px;
+  color: #b56b66;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+.eq-remove-confirm-btns {
+  display: flex;
+  gap: 9px;
+}
+.eq-remove-confirm-yes {
+  padding: 8px 14px;
+  border: 1px solid #c0322b;
+  background: #c0322b;
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.eq-remove-confirm-yes:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---- IRR Decomp tab: emphasized Return column ---- */
+.eq-table th.eq-th-ret {
+  font-weight: 800;
+  background: #eef0fb;
+  border-left: 1px solid #c9c6f2;
+}
+.eq-table td.eq-td-ret {
+  border-left: 1px solid #c9c6f2;
 }
 
 /* Edits log */
@@ -4030,72 +4283,19 @@ th.tw-link-col { text-align: center; }
   font-weight: 700;
   letter-spacing: -0.01em;
 }
-.eq-decomp-bar-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 11px;
-}
-.eq-decomp-label {
-  width: 96px;
-  font-size: 13px;
-  color: var(--ink-soft);
-}
-.eq-decomp-track {
-  flex: 1;
-  height: 14px;
-  background: var(--bg);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.eq-decomp-fill {
+/* The decomposition renders as a standard finance waterfall (inline SVG). */
+.eq-wf {
   display: block;
-  height: 100%;
-  border-radius: 4px;
+  margin-top: 4px;
 }
-/* Diverging variant: fills are anchored to a centre axis so a component can
-   contribute negatively (red, growing left) as well as positively. */
-.eq-decomp-track-div {
-  position: relative;
-  overflow: visible;
-}
-.eq-decomp-axis {
-  position: absolute;
-  left: 50%;
-  top: -2px;
-  bottom: -2px;
-  width: 1px;
-  background: var(--line-2);
-}
-.eq-decomp-fill-div {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  border-radius: 3px;
-}
-.eq-decomp-val {
-  width: 46px;
-  text-align: right;
+.eq-decomp-pill {
   font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--ink);
-}
-.eq-decomp-total {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line-soft);
-}
-.eq-decomp-total .eq-decomp-label {
-  font-weight: 800;
-}
-.eq-decomp-track-total {
-  background: var(--brand-050);
-  height: 16px;
-}
-.eq-decomp-total .eq-decomp-val {
   color: var(--brand);
-  font-weight: 800;
+  background: var(--brand-050);
+  padding: 2px 7px;
+  border-radius: 4px;
 }
 
 @media (max-width: 820px) {
@@ -4112,7 +4312,7 @@ th.tw-link-col { text-align: center; }
 
 /* ---- Equities Edit-model: Excel-like spreadsheet grid ---- */
 .eq-grid-wrap {
-  display: inline-block;
+  display: block;
   outline: none;
   max-width: 100%;
   overflow-x: auto;
@@ -4121,30 +4321,29 @@ th.tw-link-col { text-align: center; }
    cells keep a uniform height (like an Excel range). */
 .eq-grid td.eq-cell {
   padding: 0;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-soft);
   position: relative;
   cursor: cell;
   background: var(--surface);
 }
 .eq-cell-val {
   display: block;
-  min-width: 92px;
   min-height: 17px;
-  padding: 6px 8px;
+  padding: 8px 11px;
   text-align: right;
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 17px;
 }
 .eq-cell-input {
-  width: 92px;
-  padding: 6px 8px;
+  width: 100%;
+  padding: 8px 11px;
   border: 0;
   border-radius: 0;
   background: transparent;
   text-align: right;
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 17px;
 }
 .eq-cell-input:focus {
@@ -4198,9 +4397,10 @@ th.tw-link-col { text-align: center; }
   color: var(--faint);
   margin-bottom: 6px;
 }
-/* A grid with no row-label gutter (the scalar block): header sits over the
-   first data column, so left-align the header cells flush with the values. */
+/* A grid with no row-label gutter (the scalar block): the first header is a
+   data column like the rest — no 184px gutter, same band styling. */
 .eq-grid-nolabels thead th:first-child {
-  border: 1px solid var(--line-strong);
-  text-align: center;
+  width: auto;
+  text-align: right;
+  background: var(--surface-2);
 }

@@ -166,6 +166,14 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
     v != null && peStats ? scale3(v, peStats.lo, peStats.mid, peStats.hi, [GREEN, YELLOW, RED]) : undefined;
   const heatIrr = (v: number | null) =>
     v != null && irrStats ? scale3(v, irrStats.lo, irrStats.mid, irrStats.hi, [YELLOW, YELLOW, GREEN]) : undefined;
+  // Return column on the IRR-decomp tab: same green scale as the Summary IRR,
+  // computed over the decomp totals so the heat tracks what the column shows.
+  const retStats = useMemo(
+    () => stats(stocks.map((c) => derived.get(c.ticker)?.decomp.ret ?? null)),
+    [stocks, derived],
+  );
+  const heatRet = (v: number | null) =>
+    v != null && retStats ? scale3(v, retStats.lo, retStats.mid, retStats.hi, [YELLOW, YELLOW, GREEN]) : undefined;
   const heatPerf = (v: number | null) =>
     v == null ? undefined : scale3(v, -0.3, 0, 0.3, [RED, WHITE, GREEN]);
 
@@ -259,7 +267,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
         {num(fp(dc.yld), undefined, "y")}
         {num(<span className="eq-blue">{fp(dc.epsDivs)}</span>, undefined, "e")}
         {num(fp(dc.multiple), undefined, "x")}
-        {num(fp(dc.ret), undefined, "t")}
+        {num(<b>{fp(dc.ret)}</b>, heatRet(dc.ret), "t", "eq-td-ret")}
         {num(fp(d.gpCagr), undefined, "cg")}
         {num(fp(d.mepsCagr), undefined, "ce")}
       </tr>
@@ -342,8 +350,12 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
     </th>
   );
 
-  const num = (v: React.ReactNode, bg?: string, key?: string | number) => (
-    <td key={key} className="eq-num" style={bg ? { background: bg } : undefined}>
+  const num = (v: React.ReactNode, bg?: string, key?: string | number, cls?: string) => (
+    <td
+      key={key}
+      className={`eq-num${cls ? ` ${cls}` : ""}`}
+      style={bg ? { background: bg } : undefined}
+    >
       {v}
     </td>
   );
@@ -618,7 +630,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
             <span className="eq-bullet-key-fill" />
             <span className="eq-bullet-key-tick" />
           </span>{" "}
-          IRR (to YE+{String(y2).slice(2)}) vs book median · green ticker = portfolio
+          IRR (to YE+{String(y2).slice(2)}) vs dashboard median · green ticker = portfolio
         </div>
       ) : view === "focus" ? (
         <div className="eq-legend">
@@ -805,7 +817,13 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
                     ["multiple", "Multiple"],
                     ["ret", "Return"],
                   ] as const
-                ).map(([k, l], i) => sortTh(`dec:${k}`, l, i === 0 ? " eq-sep" : ""))}
+                ).map(([k, l], i) =>
+                  sortTh(
+                    `dec:${k}`,
+                    l,
+                    (i === 0 ? " eq-sep" : "") + (k === "ret" ? " eq-th-ret" : ""),
+                  ),
+                )}
                 {sortTh("gpcagr", "GP", " eq-sep")}
                 {sortTh("mepscagr", "mEPS")}
               </tr>
@@ -907,6 +925,166 @@ function FocusLogo({ ticker }: { ticker: string }) {
   );
 }
 
+// Standard finance waterfall for the IRR decomposition (Focus tab). Pure SVG —
+// no chart library. Geometry follows the approved design: floats for the three
+// operating components, full bars for the Operating IRR subtotal and the total,
+// dashed running-level connectors between neighbours.
+const WF_NAVY = "#23306b";
+const WF_INC = "#5cab78";
+const WF_DEC = "#d76b6b";
+
+function DecompWaterfall({ dc, yEnd }: { dc: Decomp; yEnd: number }) {
+  const { revs, margin, yld, multiple, ret } = dc;
+  if (revs == null || margin == null || yld == null || multiple == null || ret == null) {
+    return (
+      <p className="eq-note">
+        IRR decomposition unavailable for this name (incomplete model).
+      </p>
+    );
+  }
+
+  const opIrr = revs + margin + yld;
+  type Kind = "inc" | "dec" | "sub" | "total";
+  const bars: { l: string; s: number; e: number; v: number; kind: Kind }[] = [
+    { l: "Revenue Growth", s: 0, e: revs, v: revs, kind: revs >= 0 ? "inc" : "dec" },
+    { l: "Margin Expansion", s: revs, e: revs + margin, v: margin, kind: margin >= 0 ? "inc" : "dec" },
+    { l: "Yield", s: revs + margin, e: opIrr, v: yld, kind: yld >= 0 ? "inc" : "dec" },
+    { l: "Operating IRR", s: 0, e: opIrr, v: opIrr, kind: "sub" },
+    { l: "Multiple Change", s: opIrr, e: opIrr + multiple, v: multiple, kind: multiple >= 0 ? "inc" : "dec" },
+    { l: `Total IRR · ${String(yEnd).slice(2)}E`, s: 0, e: ret, v: ret, kind: "total" },
+  ];
+
+  // Axis: 0 → peak running level × 1.18, rounded up to the next 5%; extends
+  // below zero only if a running level actually dips negative.
+  const peak = Math.max(...bars.map((b) => Math.max(b.s, b.e)), 0.0001);
+  const axisMax = Math.max(0.05, Math.ceil((peak * 1.18) / 0.05) * 0.05);
+  const low = Math.min(...bars.map((b) => Math.min(b.s, b.e)), 0);
+  const axisMin = low < 0 ? Math.floor((low * 1.18) / 0.05) * 0.05 : 0;
+
+  const W = 920;
+  const H = 300;
+  const padL = 40;
+  const padR = 14;
+  const padT = 20;
+  const plotB = 232;
+  const plotH = plotB - padT;
+  const span = axisMax - axisMin;
+  const n = bars.length;
+  const colW = (W - padL - padR) / n;
+  const center = (i: number) => padL + colW * (i + 0.5);
+  const barW = Math.min(62, colW * 0.5);
+  const yOf = (v: number) => plotB - ((v - axisMin) / span) * plotH;
+  const colorOf = (k: Kind) =>
+    k === "sub" || k === "total" ? WF_NAVY : k === "inc" ? WF_INC : WF_DEC;
+  const valTxt = (b: { v: number; kind: Kind }) =>
+    b.kind === "dec"
+      ? `(${(Math.abs(b.v) * 100).toFixed(1)}%)`
+      : `${(b.v * 100).toFixed(1)}%`;
+
+  const grid: React.ReactNode[] = [];
+  for (let g = axisMin; g <= axisMax + 1e-9; g += 0.05) {
+    const gy = yOf(g);
+    const zero = Math.abs(g) < 1e-9;
+    grid.push(
+      <line
+        key={`gl${g.toFixed(2)}`}
+        x1={padL}
+        y1={gy}
+        x2={W - padR}
+        y2={gy}
+        stroke="#ededf3"
+        strokeWidth={1}
+        strokeDasharray={zero ? undefined : "3 3"}
+      />,
+      <text
+        key={`ga${g.toFixed(2)}`}
+        x={padL - 6}
+        y={gy + 3}
+        textAnchor="end"
+        fontSize={9.5}
+        fontFamily="var(--font-mono, 'JetBrains Mono', monospace)"
+        fill="var(--faint)"
+      >
+        {(g * 100).toFixed(0)}%
+      </text>,
+    );
+  }
+
+  return (
+    <svg
+      className="eq-wf"
+      viewBox={`0 0 ${W} ${H}`}
+      width="100%"
+      preserveAspectRatio="xMidYMid meet"
+      role="img"
+      aria-label="IRR decomposition waterfall"
+    >
+      {grid}
+      {bars.slice(0, -1).map((b, i) => {
+        const ly = yOf(b.e);
+        return (
+          <line
+            key={`cn${i}`}
+            x1={center(i) + barW / 2}
+            y1={ly}
+            x2={center(i + 1) - barW / 2}
+            y2={ly}
+            stroke="#c7c7d4"
+            strokeWidth={1}
+            strokeDasharray="3 3"
+          />
+        );
+      })}
+      {bars.map((b, i) => {
+        const top = Math.max(b.s, b.e);
+        const bot = Math.min(b.s, b.e);
+        const by = yOf(top);
+        const bh = Math.max(1.5, ((top - bot) / span) * plotH);
+        const fill = colorOf(b.kind);
+        const emph = b.kind === "sub" || b.kind === "total";
+        // Wrap the category label to two lines on the space nearest the middle.
+        const words = b.l.split(" ");
+        const lines =
+          words.length > 1
+            ? [
+                words.slice(0, Math.ceil(words.length / 2)).join(" "),
+                words.slice(Math.ceil(words.length / 2)).join(" "),
+              ]
+            : [b.l];
+        return (
+          <g key={`b${i}`}>
+            <rect x={center(i) - barW / 2} y={by} width={barW} height={bh} rx={2} fill={fill} />
+            <text
+              x={center(i)}
+              y={by - 6}
+              textAnchor="middle"
+              fontSize={11}
+              fontWeight={700}
+              fontFamily="var(--font-mono, 'JetBrains Mono', monospace)"
+              fill={b.kind === "dec" ? "#b91c1c" : b.kind === "inc" ? "#15803d" : WF_NAVY}
+            >
+              {valTxt(b)}
+            </text>
+            {lines.map((ln, li) => (
+              <text
+                key={li}
+                x={center(i)}
+                y={plotB + 16 + li * 12}
+                textAnchor="middle"
+                fontSize={10.5}
+                fontWeight={emph ? 700 : 500}
+                fill={emph ? "var(--ink-2, #3a3a45)" : "var(--muted)"}
+              >
+                {ln}
+              </text>
+            ))}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 function FocusLayout({
   stocks,
   selected,
@@ -932,21 +1110,7 @@ function FocusLayout({
 }) {
   const [y0, y1, y2, y3] = years;
   const d = selected ? derived.get(selected.ticker) ?? null : null;
-
-  // IRR decomposition bars, scaled to the largest-magnitude component.
   const dc = d?.decomp;
-  const decompItems = dc
-    ? ([
-        ["Revenue", dc.revs, "var(--brand)"],
-        ["Margin", dc.margin, "#6d66ef"],
-        ["Yield", dc.yld, "var(--green)"],
-        ["Multiple", dc.multiple, "var(--amber)"],
-      ] as const)
-    : [];
-  const decompMax = Math.max(
-    0.0001,
-    ...decompItems.map(([, v]) => (v == null ? 0 : Math.abs(v))),
-  );
 
   return (
     <div className="eq-focus">
@@ -1053,53 +1217,21 @@ function FocusLayout({
 
             <div className="eq-decomp-block">
               <div className="eq-decomp-head">
-                <span className="eq-decomp-title">IRR decomposition</span>
-                <span className="eq-note mono">NTM → YE+{String(y2).slice(2)} · approximate</span>
-              </div>
-              {decompItems.map(([label, v, color]) => {
-                const neg = v != null && v < 0;
-                // Diverging track: components can pull IRR up (right, in their
-                // colour) or down (left, red) from the zero axis.
-                const fillStyle: React.CSSProperties = {
-                  width: `${(v == null ? 0 : Math.abs(v) / decompMax) * 50}%`,
-                  background: neg ? "var(--red)" : color,
-                };
-                if (neg) fillStyle.right = "50%";
-                else fillStyle.left = "50%";
-                return (
-                  <div className="eq-decomp-bar-row" key={label}>
-                    <span className="eq-decomp-label">{label}</span>
-                    <span className="eq-decomp-track eq-decomp-track-div">
-                      <span className="eq-decomp-axis" />
-                      {v != null && <span className="eq-decomp-fill-div" style={fillStyle} />}
-                    </span>
-                    <span
-                      className="eq-decomp-val"
-                      style={neg ? { color: "var(--red)" } : undefined}
-                    >
-                      {fFp(v)}
-                    </span>
-                  </div>
-                );
-              })}
-              <div className="eq-decomp-bar-row eq-decomp-total">
-                <span className="eq-decomp-label">Total IRR</span>
-                <span className="eq-decomp-track eq-decomp-track-total">
-                  <span
-                    className="eq-decomp-fill"
-                    style={{
-                      width: "100%",
-                      background: (dc?.ret ?? 0) < 0 ? "var(--red)" : "var(--brand)",
-                    }}
-                  />
-                </span>
-                <span
-                  className="eq-decomp-val"
-                  style={(dc?.ret ?? 0) < 0 ? { color: "var(--red)" } : undefined}
-                >
-                  {fFp(dc?.ret)}
+                <span className="eq-decomp-title">IRR Decomposition</span>
+                <span className="eq-note mono">
+                  TEV Decomp Metric:{" "}
+                  <span className="eq-decomp-pill">
+                    NTM → YE{String(y2).slice(2)}E
+                  </span>
                 </span>
               </div>
+              {dc ? (
+                <DecompWaterfall dc={dc} yEnd={y2} />
+              ) : (
+                <p className="eq-note">
+                  IRR decomposition unavailable for this name.
+                </p>
+              )}
             </div>
           </>
         )}
@@ -1170,22 +1302,42 @@ function AnalystSelect({ value, onChange }: { value: string; onChange: (a: strin
 
 // ---- edit modal -------------------------------------------------------------- //
 
-const SERIES_FIELDS: { key: string; label: string; pct?: boolean }[] = [
-  { key: "revs", label: "Revenue" },
-  { key: "gm", label: "GM %", pct: true },
-  { key: "adj_eps", label: "Adj EPS" },
-  { key: "mendo_eps", label: "Mendo EPS" },
-  { key: "dps", label: "DPS" },
-  { key: "target_mult", label: "Target mult" },
-  { key: "ncps", label: "Net cash/sh" },
-  { key: "wadso", label: "WADSO" },
-  { key: "net_debt", label: "Net debt" },
+// Display-only cell formatting for the Edit-model grid: the raw draft string
+// is what gets edited and saved; these only shape committed values on screen
+// (grouping for $M figures, fixed decimals for per-share lines).
+function fmtGroup(raw: string): string {
+  const n = Number(raw.replace(/,/g, ""));
+  return raw.trim() !== "" && isFinite(n)
+    ? n.toLocaleString("en-US", { maximumFractionDigits: 0 })
+    : raw;
+}
+const fmtFixed = (places: number) => (raw: string): string => {
+  const n = Number(raw.replace(/,/g, ""));
+  return raw.trim() !== "" && isFinite(n) ? n.toFixed(places) : raw;
+};
+
+const SERIES_FIELDS: {
+  key: string;
+  label: string;
+  pct?: boolean;
+  unit?: string;
+  format?: (raw: string) => string;
+}[] = [
+  { key: "revs", label: "Revenue", unit: "($M)", format: fmtGroup },
+  { key: "gm", label: "Gross margin", pct: true, unit: "(%)", format: fmtFixed(1) },
+  { key: "adj_eps", label: "Adj. EPS", unit: "($)", format: fmtFixed(2) },
+  { key: "mendo_eps", label: "Mendo EPS", unit: "($)", format: fmtFixed(2) },
+  { key: "dps", label: "DPS", unit: "($)", format: fmtFixed(2) },
+  { key: "target_mult", label: "Target multiple", unit: "×", format: fmtFixed(1) },
+  { key: "ncps", label: "Net cash / sh", unit: "($)", format: fmtFixed(2) },
+  { key: "wadso", label: "WADSO", unit: "(M)", format: fmtGroup },
+  { key: "net_debt", label: "Net debt", unit: "($M)", format: fmtGroup },
 ];
-const SCALAR_FIELDS: { key: string; label: string }[] = [
-  { key: "shares", label: "Shares" },
-  { key: "cash", label: "Cash (−)" },
-  { key: "debt", label: "Debt" },
-  { key: "min_int", label: "Min interest" },
+const SCALAR_FIELDS: { key: string; label: string; format?: (raw: string) => string }[] = [
+  { key: "shares", label: "Shares (M)", format: fmtGroup },
+  { key: "cash", label: "Cash (−) ($M)", format: fmtGroup },
+  { key: "debt", label: "Debt ($M)", format: fmtGroup },
+  { key: "min_int", label: "Min interest ($M)", format: fmtGroup },
 ];
 
 function fmtDraft(v: number | null | undefined, pct?: boolean): string {
@@ -1227,6 +1379,11 @@ function EditModal({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [adminOpen, setAdminOpen] = useState(false);
+  // Both guards reset whenever the modal opens (it mounts per open):
+  // the target-multiple row stays locked until explicitly confirmed, and
+  // "Remove name" always goes through its confirm panel.
+  const [confirmMult, setConfirmMult] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
 
   // Draft inputs as strings, keyed by dotted path. Only touched keys are sent.
   const initialDraft = useMemo(() => {
@@ -1345,7 +1502,6 @@ function EditModal({
 
   const remove = async () => {
     if (!analyst) return setError("Pick your name first.");
-    if (!window.confirm(`Remove ${company.ticker} from the dashboard?`)) return;
     setBusy(true);
     try {
       const res = await fetch("/api/equities", {
@@ -1366,26 +1522,54 @@ function EditModal({
   return (
     <div className="eq-overlay" onClick={onClose}>
       <div className="eq-modal" onClick={(e) => e.stopPropagation()} onKeyDown={onModalKeyDown}>
-        <div className="eq-modal-head">
-          <h2>
-            Update {company.ticker}
-            <span className="eq-modal-sub">
-              {company.update_date
-                ? ` · last updated ${company.update_date}${company.update_by ? ` by ${company.update_by}` : ""}`
-                : ""}
+        <div className="eq-modal-head eq-modal-head-rich">
+          <div className="eq-modal-id">
+            <span className="eq-modal-tile" aria-hidden="true">
+              {company.ticker.slice(0, 2)}
             </span>
-          </h2>
-          <button type="button" className="eq-x" onClick={onClose} aria-label="Close">
-            ×
-          </button>
+            <div className="eq-modal-id-text">
+              <div className="eq-modal-title-row">
+                <span className="eq-modal-tk">{company.ticker}</span>
+                <span className="eq-modal-nm">{company.bbg}</span>
+              </div>
+              <div className="eq-modal-subline">
+                Model inputs · {years[0]}E – {years[years.length - 1]}E · shared
+                with the team
+                {company.update_date
+                  ? ` · last updated ${company.update_date}${company.update_by ? ` by ${company.update_by}` : ""}`
+                  : ""}
+              </div>
+            </div>
+          </div>
+          <div className="eq-modal-head-r">
+            <label className="eq-updatedby">
+              Updated by
+              <select value={analyst} onChange={(e) => setAnalyst(e.target.value)}>
+                <option value="">Select…</option>
+                {ANALYSTS.map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button type="button" className="eq-x" onClick={onClose} aria-label="Close">
+              ×
+            </button>
+          </div>
         </div>
-
-        <AnalystSelect value={analyst} onChange={setAnalyst} />
 
         {company.is_index ? (
           <ModelGrid
-            columns={years}
-            rows={[{ label: "BEst P/E", keys: years.map((y) => `best_pe.${y}`) }]}
+            columns={years.map((y) => `${y}E`)}
+            rows={[
+              {
+                label: "BEst P/E",
+                unit: "×",
+                format: fmtFixed(1),
+                keys: years.map((y) => `best_pe.${y}`),
+              },
+            ]}
             values={draft}
             onCommit={applyCells}
             cleanCell={cleanCell}
@@ -1393,30 +1577,69 @@ function EditModal({
           />
         ) : (
           <>
+            <div className="eq-scalars-cap">Operating model</div>
             <ModelGrid
-              columns={years}
-              rows={SERIES_FIELDS.map((f) => ({
-                // Target multiples drive every target price/IRR, so flag the
-                // row so analysts spot it's editable here too.
-                label:
-                  f.key === "target_mult" ? (
-                    <span className="eq-grid-emph">{f.label}</span>
-                  ) : (
-                    f.label
+              columns={years.map((y) => `${y}E`)}
+              rows={[
+                ...SERIES_FIELDS.filter((f) => f.key !== "target_mult").map((f) => ({
+                  label: f.label,
+                  unit: f.unit,
+                  format: f.format,
+                  keys: years.map((y) => `${f.key}.${y}`),
+                })),
+                // Target multiple drives every target price/IRR, so it sits at
+                // the bottom of the same grid, visually elevated and locked
+                // behind an explicit confirm.
+                {
+                  label: "Target multiple",
+                  unit: "×",
+                  format: fmtFixed(1),
+                  keys: years.map((y) => `target_mult.${y}`),
+                  locked: !confirmMult,
+                  rowClass: "eq-row-mult",
+                  section: (
+                    <div className="eq-mult-strip">
+                      <div className="eq-mult-strip-l">
+                        <span className="eq-mult-title">Target multiple</span>
+                        <span className="eq-mult-note">(×) · drives IRR</span>
+                      </div>
+                      <label className="eq-mult-confirm">
+                        <input
+                          type="checkbox"
+                          checked={confirmMult}
+                          onChange={(e) => setConfirmMult(e.target.checked)}
+                        />
+                        Confirm before editing
+                      </label>
+                    </div>
                   ),
-                keys: years.map((y) => `${f.key}.${y}`),
-              }))}
+                },
+              ]}
               values={draft}
               onCommit={applyCells}
               cleanCell={cleanCell}
               ariaLabel="Model inputs"
             />
+            {!confirmMult && (
+              <p className="eq-lock-note">
+                <span aria-hidden="true">🔒</span> Tick &ldquo;Confirm before
+                editing&rdquo; to change the valuation multiple.
+              </p>
+            )}
 
             <div className="eq-scalars-block">
               <div className="eq-scalars-cap">Balance sheet</div>
               <ModelGrid
                 columns={SCALAR_FIELDS.map((f) => f.label)}
-                rows={[{ label: "", keys: SCALAR_FIELDS.map((f) => f.key) }]}
+                rows={[
+                  {
+                    label: "",
+                    keys: SCALAR_FIELDS.map((f) => f.key),
+                    // Per-column formats live on the row in a single-row grid;
+                    // group everything (these are $M / share-count scalars).
+                    format: fmtGroup,
+                  },
+                ]}
                 values={draft}
                 onCommit={applyCells}
                 cleanCell={cleanCell}
@@ -1425,7 +1648,7 @@ function EditModal({
             </div>
 
             <button type="button" className="eq-admin-toggle" onClick={() => setAdminOpen(!adminOpen)}>
-              {adminOpen ? "▾" : "▸"} Admin (portfolio flag, sector, remove)
+              {adminOpen ? "▾" : "▸"} Admin (portfolio flag, sector)
             </button>
             {adminOpen && (
               <div className="eq-admin">
@@ -1447,27 +1670,71 @@ function EditModal({
                     ))}
                   </select>
                 </label>
-                <button type="button" className="eq-danger" onClick={remove} disabled={busy}>
-                  Remove {company.ticker}
-                </button>
               </div>
             )}
           </>
         )}
 
+        <p className="eq-note eq-keys-note">
+          <b>Works like Excel:</b> arrows to move, Shift+arrows to select,
+          Ctrl/Cmd+C to copy and Ctrl/Cmd+V to paste a block, F2 to edit, Esc
+          to cancel, Delete to clear. GM % in percent (e.g. 80.5).
+        </p>
+
         {error && <p className="eq-error">{error}</p>}
+        {confirmRemove && (
+          <div className="eq-remove-confirm" role="alertdialog" aria-label="Confirm removal">
+            <div className="eq-remove-confirm-title">
+              Remove {company.ticker} from the dashboard?
+            </div>
+            <div className="eq-remove-confirm-body">
+              This hides {company.ticker} from every view. The model is kept
+              and can be restored from &ldquo;Removed&rdquo;.
+            </div>
+            <div className="eq-remove-confirm-btns">
+              <button
+                type="button"
+                className="eq-act"
+                onClick={() => setConfirmRemove(false)}
+                disabled={busy}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="eq-remove-confirm-yes"
+                onClick={remove}
+                disabled={busy}
+              >
+                {busy ? "Removing…" : "Yes, remove name"}
+              </button>
+            </div>
+          </div>
+        )}
         <div className="eq-modal-foot">
-          <span className="eq-note">
-            <b>Works like Excel:</b> arrows to move, Shift+arrows to select,
-            Ctrl/Cmd+C to copy and Ctrl/Cmd+V to paste a block, F2 to edit,
-            Esc to cancel, Delete to clear. GM % in percent (e.g. 80.5).
-          </span>
+          {!company.is_index ? (
+            <button
+              type="button"
+              className="eq-danger-ghost"
+              onClick={() => setConfirmRemove(true)}
+              disabled={busy || confirmRemove}
+            >
+              Remove name
+            </button>
+          ) : (
+            <span />
+          )}
           <div>
             <button type="button" className="eq-act" onClick={onClose} disabled={busy}>
               Cancel
             </button>
-            <button type="button" className="eq-act eq-act-primary" onClick={save} disabled={busy}>
-              {busy ? "Saving…" : "Save changes"}
+            <button
+              type="button"
+              className={`eq-act eq-act-primary${analyst ? "" : " is-dim"}`}
+              onClick={save}
+              disabled={busy}
+            >
+              {busy ? "Saving…" : "Save model"}
             </button>
           </div>
         </div>
