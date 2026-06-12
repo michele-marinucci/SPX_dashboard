@@ -559,7 +559,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
               setSort(NO_SORT);
             }}
           >
-            Focus
+            Models
           </button>
         </div>
         <span className="eq-note">
