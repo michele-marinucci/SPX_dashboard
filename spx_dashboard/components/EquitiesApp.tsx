@@ -549,7 +549,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
               setSort(NO_SORT);
             }}
           >
-            Signal
+            Rel Value
           </button>
           <button
             type="button"
