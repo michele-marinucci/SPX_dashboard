@@ -43,23 +43,25 @@ function summarySheet(
   const yr = (y: number) => String(y).slice(2); // "27"
   const rows: string[] = [];
 
-  // Title + subtitle band. No merged cells anywhere in this workbook — the
-  // long labels simply overflow into the empty cells to their right, which
-  // keeps every cell independently selectable/copyable.
-  rows.push(new Row(1).str("Equities Dashboard — Summary", S.TITLE).xml());
+  // Title + subtitle band. No merged cells anywhere — the title is centered
+  // across the table via "Center Across Selection" (a styled run of cells),
+  // which looks merged but keeps every cell independently selectable/copyable.
+  rows.push(new Row(1).span("Equities Dashboard — Summary", S.TITLE_BAND, N_COLS).xml());
   rows.push(new Row(2).str(asOfNote, S.SUBTITLE).xml());
   rows.push(new Row(3).xml()); // spacer
 
-  // Group header (row 4) + column header (row 5).
+  // Group header (row 4) + column header (row 5). Each band is centered across
+  // its columns (Center Across Selection) so the brand highlight spans the
+  // whole group like a merged header.
   const gh = new Row(4)
-    .str("Company", S.GROUP_HEAD)
-    .str("Price", S.GROUP_HEAD)
-    .str("EV / GP", S.GROUP_HEAD).skip(1)
-    .str("Mendo P/E", S.GROUP_HEAD).skip(4)
-    .str("Target Mult", S.GROUP_HEAD).skip(2)
-    .str("IRR", S.GROUP_HEAD).skip(2)
-    .str("MoM", S.GROUP_HEAD).skip(3)
-    .str("Recent Perf", S.GROUP_HEAD).skip(2);
+    .span("Company", S.GROUP_HEAD, 1)
+    .span("Price", S.GROUP_HEAD, 1)
+    .span("EV / GP", S.GROUP_HEAD, 2)
+    .span("Mendo P/E", S.GROUP_HEAD, 5)
+    .span("Target Mult", S.GROUP_HEAD, 3)
+    .span("IRR", S.GROUP_HEAD, 3)
+    .span("MoM", S.GROUP_HEAD, 4)
+    .span("Recent Perf", S.GROUP_HEAD, 3);
   rows.push(gh.xml());
 
   const ch = new Row(5)
@@ -153,7 +155,7 @@ function summarySheet(
 
 function editLogSheet(edits: EditRecord[]): string {
   const rows: string[] = [];
-  rows.push(new Row(1).str("Equities Dashboard — Edit Log", S.TITLE).xml());
+  rows.push(new Row(1).span("Equities Dashboard — Edit Log", S.TITLE_BAND, 6).xml());
   rows.push(
     new Row(2)
       .str("Every change, most recent first. Times are UTC.", S.SUBTITLE)
@@ -280,7 +282,7 @@ function modelSheet(
   };
 
   const rows: string[] = [];
-  rows.push(new Row(1).str("Equities Dashboard — Live Model", S.TITLE).xml());
+  rows.push(new Row(1).span("Equities Dashboard — Live Model", S.TITLE_BAND, NCOLS).xml());
   rows.push(
     new Row(2)
       .str(`${asOfNote} · price = Bloomberg BDP · derived columns are live formulas`, S.SUBTITLE)
@@ -288,8 +290,9 @@ function modelSheet(
   );
   rows.push(new Row(3).xml());
 
-  // Group band (row 4) — the label sits in the first column of each group and
-  // overflows right (no merged cells). Per-column header on row 5.
+  // Group band (row 4) — each label is centered across its group's columns
+  // (Center Across Selection), so the brand highlight spans the group like a
+  // merged header without any merged cells. Per-column header on row 5.
   const gh = new Row(4);
   let ci = 0;
   while (ci < keys.length) {
@@ -297,7 +300,7 @@ function modelSheet(
     let span = 1;
     while (ci + span < keys.length && g !== "" && describe(keys[ci + span]).group === g) span++;
     if (g) {
-      gh.str(g, S.GROUP_HEAD).skip(span - 1);
+      gh.span(g, S.GROUP_HEAD, span);
     } else {
       gh.skip(span);
     }
@@ -371,11 +374,14 @@ function modelSheet(
               const n0 = `((DATE(${y0},12,31)-TODAY())/365)`;
               let divs = `${PR(`dps_${y0}`)}*${n0}`;
               for (let j = 1; j <= k; j++) divs += `+${PR(`dps_${y0 + j}`)}`;
-              // No IFERROR wrapper: it was swallowing the live RRI result (e.g.
-              // while BDP prices were still loading) and leaving the IRR cells
-              // blank. Let RRI compute/raise directly so the value shows.
+              // RRI is a post-2007 function, so it MUST be stored with the
+              // "_xlfn." prefix — otherwise Excel reads it as an unknown name,
+              // renders it as "@RRI", and errors. (That broken "@" formula, not
+              // IFERROR, was the real problem.) With the prefix it resolves, so
+              // we can safely wrap it: a genuine RRI error (e.g. a non-positive
+              // price while BDP is still loading) shows blank, not #NUM!.
               row.formula(
-                `RRI((DATE(${y},12,31)-TODAY())/365,${PR("price")},${PR(`tpx_${y}`)}+${divs})`,
+                `IFERROR(_xlfn.RRI((DATE(${y},12,31)-TODAY())/365,${PR("price")},${PR(`tpx_${y}`)}+${divs}),"")`,
                 S.PERCENT, d.irr[y],
               );
               break;

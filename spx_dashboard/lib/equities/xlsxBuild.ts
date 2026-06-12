@@ -43,7 +43,7 @@ export const S = {
   DEFAULT: 0,
   TITLE: 1,
   SUBTITLE: 2,
-  GROUP_HEAD: 3, // brand fill, white bold, centered (group band)
+  GROUP_HEAD: 3, // brand fill, white bold, center-across-selection (group band)
   COL_HEAD: 4, // dark fill, white bold, centered (column labels)
   SECTOR: 5, // light fill, bold, left (sector band)
   TICKER: 6, // bold, left, bottom rule
@@ -56,6 +56,7 @@ export const S = {
   PERCENT: 13, // 0.0%
   NUMBER: 14, // #,##0
   DATETIME: 15, // yyyy-mm-dd hh:mm
+  TITLE_BAND: 16, // title font, light fill, center-across-selection (banner)
 } as const;
 
 export function currencyStyle(ccy: string): number {
@@ -95,11 +96,11 @@ const STYLES_XML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <border><left/><right/><top/><bottom style="thin"><color rgb="FFE2E2EC"/></bottom><diagonal/></border>
 </borders>
 <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
-<cellXfs count="16">
+<cellXfs count="17">
 <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
 <xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center"/></xf>
 <xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center"/></xf>
-<xf numFmtId="0" fontId="3" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+<xf numFmtId="0" fontId="3" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="centerContinuous" vertical="center"/></xf>
 <xf numFmtId="0" fontId="3" fillId="3" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
 <xf numFmtId="0" fontId="4" fillId="4" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
 <xf numFmtId="0" fontId="4" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left"/></xf>
@@ -112,6 +113,7 @@ const STYLES_XML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xf numFmtId="168" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
 <xf numFmtId="169" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
 <xf numFmtId="170" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+<xf numFmtId="0" fontId="1" fillId="4" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="centerContinuous" vertical="center"/></xf>
 </cellXfs>
 <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
 </styleSheet>`;
@@ -149,6 +151,16 @@ export class Row {
     const ref = colLetter(this.col++) + this.r;
     const v = cached != null && isFinite(cached) ? `<v>${cached}</v>` : "";
     this.cells.push(`<c r="${ref}" s="${style}"><f>${esc(f)}</f>${v}</c>`);
+    return this;
+  }
+  // A banner/header centered across `n` columns via Excel's "Center Across
+  // Selection" — the label goes in the first cell and the next n-1 cells are
+  // written empty but with the SAME style, so the fill (highlight) and the
+  // centerContinuous alignment span the whole run. Looks merged, but every
+  // cell stays independently selectable (no merged-cell pitfalls).
+  span(v: string, style: number, n: number): this {
+    this.str(v, style);
+    for (let i = 1; i < n; i++) this.str("", style);
     return this;
   }
   skip(n = 1): this {
