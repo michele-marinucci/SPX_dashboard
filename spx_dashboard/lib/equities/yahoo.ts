@@ -38,6 +38,9 @@ async function fetchOne(symbol: string): Promise<Quote | null> {
   const res = await fetch(url, {
     headers: { "User-Agent": "Mozilla/5.0 (internal dashboard)" },
     cache: "no-store",
+    // Yahoo occasionally hangs; without a deadline this stalls the whole
+    // quote refresh (callers handle the rejection via Promise.allSettled).
+    signal: AbortSignal.timeout(10_000),
   });
   if (!res.ok) return null;
   const data = (await res.json()) as { chart?: { result?: ChartResult[] } };
