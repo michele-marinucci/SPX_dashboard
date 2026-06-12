@@ -343,8 +343,8 @@ body {
 .seg-count {
   font-family: var(--font-mono, "JetBrains Mono", monospace);
   font-size: 11.5px;
-  font-weight: 600;
-  color: var(--faint);
+  font-weight: 700;
+  color: var(--ink-soft);
   background: var(--surface-3);
   padding: 2px 8px;
   border-radius: 20px;
@@ -357,7 +357,7 @@ body {
   color: #fff;
 }
 .seg-btn-on .seg-count {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.28);
   color: #fff;
 }
 /* the first seg-btn sits in a padded wrapper */
@@ -3679,6 +3679,12 @@ th.tw-link-col { text-align: center; }
 }
 .rail-cats .seg-count {
   background: var(--surface-3);
+  color: var(--ink-soft);
+}
+/* Active (blue) segment: a dark pill so the white count reads clearly. */
+.rail-cats .seg-btn-on .seg-count {
+  background: rgba(0, 0, 0, 0.28);
+  color: #fff;
 }
 
 /* Collapsed rail hides everything but the toggle. */
