@@ -2532,6 +2532,10 @@ thead .row-head {
 }
 
 /* ---- Edit-model: footer remove (ghost danger) + confirm panel ---- */
+.eq-foot-left {
+  display: flex;
+  gap: 8px;
+}
 .eq-danger-ghost {
   padding: 8px 14px;
   background: var(--surface);
@@ -2548,6 +2552,34 @@ thead .row-head {
 .eq-danger-ghost:disabled {
   opacity: 0.55;
   cursor: default;
+}
+/* "Add to Portfolio": filled with the same light green the dashboard uses to
+   mark a held name (#d9efdc), so the button reads as "make this green". */
+.eq-portfolio-ghost {
+  padding: 8px 14px;
+  background: #d9efdc;
+  border: 1px solid #b6ddbf;
+  color: #1f7a3d;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.eq-portfolio-ghost:hover {
+  background: #cde9d3;
+}
+.eq-portfolio-ghost:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+/* Already-held: a white outline variant for the "remove from portfolio" undo. */
+.eq-portfolio-ghost.is-in {
+  background: var(--surface);
+  border-color: #b6ddbf;
+  color: #1f7a3d;
+}
+.eq-portfolio-ghost.is-in:hover {
+  background: #f1faf3;
 }
 .eq-act-primary.is-dim {
   background: #a7a4ec;

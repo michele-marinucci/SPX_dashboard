@@ -1489,6 +1489,36 @@ function EditModal({
     }
   };
 
+  // Toggle portfolio membership: port === 1 is the single source of truth the
+  // whole site reads (the green dashboard highlight, Morning Notes, Twitter
+  // Monitor — all via getPortfolioPositions). Persists immediately and lifts
+  // the updated company into app state so every view reflects it. The modal
+  // stays open so the button flips to its opposite action.
+  const setPortfolio = async (on: boolean) => {
+    setError("");
+    if (!analyst) return setError("Pick your name first — every change is logged.");
+    setBusy(true);
+    try {
+      const res = await fetch("/api/equities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update",
+          ticker: company.ticker,
+          analyst,
+          changes: { port: on ? 1 : null },
+        }),
+      });
+      const d = await res.json();
+      if (!res.ok || !d?.ok) setError(d?.error || "Could not update portfolio.");
+      else onSaved(d.company as Company);
+    } catch {
+      setError("Network error.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="eq-overlay" onClick={onClose}>
       <div className="eq-modal" onClick={(e) => e.stopPropagation()} onKeyDown={onModalKeyDown}>
@@ -1683,14 +1713,37 @@ function EditModal({
         )}
         <div className="eq-modal-foot">
           {!company.is_index ? (
-            <button
-              type="button"
-              className="eq-danger-ghost"
-              onClick={() => setConfirmRemove(true)}
-              disabled={busy || confirmRemove}
-            >
-              Remove name
-            </button>
+            <div className="eq-foot-left">
+              <button
+                type="button"
+                className="eq-danger-ghost"
+                onClick={() => setConfirmRemove(true)}
+                disabled={busy || confirmRemove}
+              >
+                Remove name
+              </button>
+              {company.port === 1 ? (
+                <button
+                  type="button"
+                  className="eq-portfolio-ghost is-in"
+                  onClick={() => setPortfolio(false)}
+                  disabled={busy}
+                  title="Remove this name from the team portfolio"
+                >
+                  Remove from Portfolio
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="eq-portfolio-ghost"
+                  onClick={() => setPortfolio(true)}
+                  disabled={busy}
+                  title="Add this name to the team portfolio (reflected across the site)"
+                >
+                  Add to Portfolio
+                </button>
+              )}
+            </div>
           ) : (
             <span />
           )}
