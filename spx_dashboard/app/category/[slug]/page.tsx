@@ -94,6 +94,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
   return (
     <DashboardFrame
       asOf={asOf}
+      mobileTitle={category.category}
       heading={
         <ViewHeading
           title={category.category}

@@ -11,12 +11,20 @@ export function DashboardFrame({
   heading,
   children,
   asOf: asOfProp,
+  mobileTitle,
+  mobileActions,
 }: {
   heading: React.ReactNode;
   children: React.ReactNode;
   // Pages that overlay live Bloomberg data pass their own as-of date;
   // default is the committed workbook snapshot's date.
   asOf?: string;
+  // The mobile top bar's title (defaults to the tool name; per-category pages
+  // pass the category name since the desktop heading is CSS-hidden ≤768px).
+  mobileTitle?: string;
+  // Extra mobile-only top-bar action (the SPX Filter button), rendered before
+  // the shared "?" how-it-works button.
+  mobileActions?: React.ReactNode;
 }) {
   const nav = getNavModel();
   const asOf = asOfProp ?? getBloombergDateLabel();
@@ -52,7 +60,15 @@ export function DashboardFrame({
   return (
     <div className="shell">
       <Sidebar nav={nav} />
-      <MobileTopBar tool="SPX Monitor" actions={howItWorks} />
+      <MobileTopBar
+        tool={mobileTitle ?? "SPX Monitor"}
+        actions={
+          <>
+            {mobileActions}
+            {howItWorks}
+          </>
+        }
+      />
       <div className="content">
         <header className="content-header">
           <div className="header-lead">

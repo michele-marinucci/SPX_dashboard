@@ -4513,6 +4513,16 @@ th.tw-link-col { text-align: center; }
   display: none;
 }
 
+/* The SPX server page renders both the desktop sections and the mobile card
+   layer; CSS picks one per breakpoint (display:contents keeps the desktop
+   wrapper layout-neutral). */
+.ms-mobile {
+  display: none;
+}
+.ms-desktop {
+  display: contents;
+}
+
 /* ---- Bottom sheet primitive (Sheet.tsx) — global so any view can use it. */
 .m-sheet-scrim {
   position: fixed;
@@ -5267,6 +5277,303 @@ th.tw-link-col { text-align: center; }
     border-radius: 22px 22px 0 0;
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
     animation: m-sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* ---- Mobile: SPX ---- */
+  /* The desktop sections give way to the card layer under the breakpoint. */
+  .ms-desktop {
+    display: none;
+  }
+  .ms-mobile {
+    display: block;
+  }
+
+  .ms-intro {
+    margin: 0 0 13px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .ms-intro .mono {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Section chips (horizontal scroll), one per SPX_SECTIONS entry. */
+  .ms-chips {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -16px 13px;
+    padding: 0 16px 4px;
+  }
+  .ms-chips::-webkit-scrollbar {
+    display: none;
+  }
+  .ms-chip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 8px 13px;
+    border: 1px solid var(--line-2);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ms-chip-num {
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+  .ms-chip.on {
+    border-color: var(--brand);
+    background: var(--brand-050);
+    color: var(--brand);
+  }
+
+  /* Aggregate/Compounders segmented toggle + the "Full" landscape button. */
+  .ms-toggle-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .ms-seg {
+    flex: 1 1 auto;
+    display: flex;
+    gap: 4px;
+    background: var(--surface-3);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .ms-seg button {
+    flex: 1 1 0;
+    min-height: 36px;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ms-seg button.on {
+    background: var(--surface);
+    color: var(--brand);
+    box-shadow: 0 1px 2px rgba(26, 26, 34, 0.12);
+  }
+
+  /* Section head (mirrors the desktop .section-head, phone-sized). */
+  .ms-head {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    padding: 4px 2px 12px;
+  }
+  .ms-head-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--brand);
+  }
+  .ms-head-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .ms-head-note {
+    margin-left: auto;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    color: var(--faint);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  /* Category cards (label + count pill + 3-up metric grid). */
+  .ms-card {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font-sans);
+    color: var(--ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ms-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .ms-card-label {
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .ms-pill {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand);
+    background: var(--brand-050);
+    padding: 2px 9px;
+    border-radius: 20px;
+  }
+  /* Inline P/E history row on the NTM P/E section's cards. */
+  .ms-spark {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .ms-spark-cap {
+    font-size: 9px;
+    letter-spacing: 0.6px;
+    color: var(--faint);
+    font-weight: 600;
+  }
+
+  /* Drill-down sheet: category metrics + member-stock list. */
+  .ms-drill-sub {
+    margin: 0 0 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .ms-drill-sub .mono {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .ms-drill-metrics {
+    margin-bottom: 16px;
+  }
+  .ms-members-head {
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    color: var(--faint);
+    font-weight: 700;
+    padding: 0 2px 8px;
+  }
+  .ms-member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 10px 12px;
+    background: var(--surface-2);
+    border-radius: 9px;
+    margin-bottom: 6px;
+  }
+  .ms-member-tk {
+    flex: 1 1 auto;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .ms-member-pe {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    margin-right: 12px;
+  }
+  .ms-member-ytd {
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .ms-cat-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    border: 1px solid var(--line-2);
+    border-radius: 11px;
+    color: var(--brand);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* Top-bar Filter button + the "Browse categories" sheet list. */
+  .ms-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--brand);
+    cursor: pointer;
+  }
+  .ms-browse-group {
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    color: var(--faint);
+    font-weight: 700;
+    padding: 10px 2px 6px;
+  }
+  .ms-browse-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 44px;
+    padding: 11px 12px;
+    background: var(--surface-2);
+    border-radius: 9px;
+    margin-bottom: 6px;
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .ms-browse-item .mono {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand);
+  }
+
+  /* Full-table overlay: the reused desktop table loses its card chrome and
+     pins both header rows; .row-head is already sticky-left in the base
+     layer, so only the top axis needs wiring here. */
+  .ms-full-scroll .table-wrap {
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+  }
+  .ms-full-scroll .data-table .group-row th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    height: 26px;
+    box-sizing: border-box;
+    background: var(--surface);
+  }
+  .ms-full-scroll .data-table thead tr:not(.group-row) th {
+    top: 26px;
+  }
+  .ms-full-scroll .data-table thead .row-head {
+    z-index: 4;
   }
 }
 
