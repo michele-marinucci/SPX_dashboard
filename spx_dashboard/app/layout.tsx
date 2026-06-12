@@ -33,6 +33,9 @@ export const viewport: Viewport = {
   // suppresses pinch/double-tap so the fixed dashboard layout doesn't shift.
   maximumScale: 5,
   userScalable: true,
+  // Let the app paint under the notch/home indicator; the mobile shell pads
+  // itself with env(safe-area-inset-*).
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

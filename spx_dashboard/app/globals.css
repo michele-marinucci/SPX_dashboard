@@ -1617,76 +1617,20 @@ thead .row-head {
    RESPONSIVE
    ========================================================================== */
 @media (max-width: 768px) {
+  /* Mobile shell: the rail is replaced by the bottom tab bar + top app bar
+     (see the MOBILE layer at the end of this file). */
   .shell {
     flex-direction: column;
   }
   .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 60;
-    width: 100%;
-    height: 100dvh;
-    overflow-y: auto;
-    border-right: none;
-  }
-  .sidebar-collapsed {
-    height: auto;
-    overflow-y: visible;
-    background: var(--brand);
-    border-bottom: none;
-  }
-  .sidebar-collapsed .sidebar-head {
-    margin: 0;
-    padding: 13px 16px;
-    border-bottom: none;
-    justify-content: flex-start;
-    gap: 11px;
-    cursor: pointer;
-  }
-  .sidebar-collapsed .sidebar-brand {
-    display: flex;
-    color: #fff;
-    font-size: 16px;
-  }
-  .sidebar-collapsed .sidebar-toggle {
-    background: rgba(255, 255, 255, 0.16);
-    border-color: rgba(255, 255, 255, 0.45);
-    color: #fff;
-  }
-  .sidebar-collapsed .sidebar-hint {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-left: auto;
-    padding: 4px 11px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.18);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .sidebar-collapsed .sidebar-hint::before {
-    content: "▾";
-    font-size: 11px;
-    line-height: 1;
-  }
-  /* When the rail is open it IS the screen — hide content underneath. */
-  .sidebar:not(.sidebar-collapsed) ~ .content {
     display: none;
   }
   .content {
-    padding: 76px 16px 50px;
+    padding: 14px 16px calc(84px + env(safe-area-inset-bottom));
   }
+  /* The tool title lives in the mobile top app bar. */
   .content-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  .content-header h1 {
-    font-size: 22px;
+    display: none;
   }
   .hub,
   .solo {
@@ -4476,4 +4420,230 @@ th.tw-link-col { text-align: center; }
   width: auto;
   text-align: right;
   background: var(--surface-2);
+}
+
+/* ============================================================================
+   MOBILE — phone shell (≤768px; reference width 393px)
+   Bottom tab bar + top app bar + bottom-sheet modals. Desktop keeps the rail.
+   ========================================================================== */
+
+/* Chrome is rendered on every page but only displayed on small screens. */
+.m-appbar,
+.m-tabbar {
+  display: none;
+}
+
+/* ---- Bottom sheet primitive (Sheet.tsx) — global so any view can use it. */
+.m-sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(12, 12, 18, 0.4);
+  animation: m-fade 0.2s ease;
+}
+.m-sheet {
+  width: 100%;
+  max-height: 78dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: m-sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.m-sheet-handle {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 4px;
+  margin: 9px auto 0;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+.m-sheet-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px 10px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.m-sheet-title {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.m-sheet-close {
+  width: 32px;
+  height: 32px;
+  margin-right: -6px;
+  border: none;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+}
+.m-sheet-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 18px 18px;
+}
+.m-sheet-foot {
+  flex: 0 0 auto;
+  padding: 12px 18px;
+  border-top: 1px solid var(--line-soft);
+}
+@keyframes m-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes m-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  /* ---- Top app bar ---- */
+  .m-appbar {
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: calc(9px + env(safe-area-inset-top)) 14px 9px;
+  }
+  .m-appbar-brand {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .m-appbar-brand img {
+    height: 20px;
+    width: auto;
+  }
+  .m-appbar-lead {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .m-appbar-title {
+    font-size: 15.5px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .m-appbar-crumb {
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    color: var(--faint);
+  }
+  .m-appbar-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* Compact the shared "ⓘ How it works" button into a round ? in the bar. */
+  .m-appbar-actions .hiw-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
+    font-size: 0;
+  }
+  .m-appbar-actions .hiw-btn span {
+    font-size: 15px;
+  }
+  /* No download/export affordances on mobile (intentional design decision). */
+  .m-appbar-actions a[download],
+  .m-appbar-actions .export-ppt-btn,
+  .hub .export-ppt-btn,
+  .content a[download] {
+    display: none;
+  }
+
+  /* ---- Bottom tab bar (frosted, safe-area aware) ---- */
+  .m-tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    display: flex;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    padding: 5px 6px calc(7px + env(safe-area-inset-bottom));
+  }
+  .m-tab {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 44px;
+    padding: 4px 0;
+    border-radius: 9px;
+    color: var(--faint);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .m-tab-label {
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+  .m-tab-active {
+    color: var(--brand);
+  }
+
+  /* ---- Pop-ups become bottom sheets: restyle the shared HowItWorks modal. */
+  .hiw-overlay {
+    display: flex;
+    align-items: flex-end;
+    padding: 0;
+    background: rgba(12, 12, 18, 0.4);
+  }
+  .hiw-modal {
+    max-width: none;
+    max-height: 78dvh;
+    overflow-y: auto;
+    border: none;
+    border-radius: 22px 22px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    animation: m-sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Routed view fade-in. */
+  .content {
+    animation: m-fade 0.3s ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-sheet,
+  .m-sheet-scrim,
+  .hiw-modal,
+  .content {
+    animation: none !important;
+  }
+  .livedot {
+    animation: none !important;
+  }
 }
