@@ -60,6 +60,19 @@ export interface MsCategory {
 export interface MsGroup {
   group: string;
   categories: MsCategory[];
+  // The group's "Total …" aggregate row (e.g. Total AI Capex Beneficiaries),
+  // when the workbook carries one.
+  total?: MsTotal | null;
+}
+
+// A total line rendered as a card: same anatomy as a category card, but
+// non-tappable (no member list) and tinted like the desktop totals row.
+export interface MsTotal {
+  label: string;
+  count: number;
+  compounderCount: number;
+  agg: MsAgg | null;
+  comp: MsAgg | null;
 }
 
 // Column/row props for one full-table section (built by the server page with
@@ -183,9 +196,43 @@ function CompoundersSeg() {
   );
 }
 
+// Total line as a card: same chip grid as a category card, tinted like the
+// desktop totals row, and not tappable (totals have no member drill-down).
+function MsTotalCard({
+  total,
+  section,
+  labels,
+  compoundersOnly,
+}: {
+  total: MsTotal;
+  section: string;
+  labels: MsLabels;
+  compoundersOnly: boolean;
+}) {
+  const a = compoundersOnly && total.comp ? total.comp : total.agg;
+  return (
+    <div className="ms-card ms-card-total">
+      <span className="ms-card-top">
+        <span className="ms-card-label">{total.label}</span>
+        <span className="ms-pill mono">
+          {compoundersOnly ? total.compounderCount : total.count}
+        </span>
+      </span>
+      <span className="me-card-metrics">{cardMetrics(a, section, labels)}</span>
+      {section === "pe" && (
+        <span className="ms-spark">
+          <span className="ms-spark-cap mono">P/E SINCE &apos;20</span>
+          <Sparkline values={a?.peSeries ?? []} width={150} height={26} />
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function SpxMobile({
   asOf,
   groups,
+  grandTotal,
   totalCompounders,
   totalStocks,
   labels,
@@ -194,6 +241,8 @@ export function SpxMobile({
 }: {
   asOf: string;
   groups: MsGroup[];
+  // The workbook's "Total SPX" row, rendered as a pinned card after the groups.
+  grandTotal?: MsTotal | null;
   totalCompounders: number;
   totalStocks: number;
   labels: MsLabels;
@@ -317,8 +366,25 @@ export function SpxMobile({
               </button>
             );
           })}
+          {g.total && (
+            <MsTotalCard
+              total={g.total}
+              section={section}
+              labels={labels}
+              compoundersOnly={compoundersOnly}
+            />
+          )}
         </div>
       ))}
+
+      {grandTotal && (
+        <MsTotalCard
+          total={grandTotal}
+          section={section}
+          labels={labels}
+          compoundersOnly={compoundersOnly}
+        />
+      )}
 
       <p className="me-src mono">TOTALS RECONCILE TO S&amp;P 500 · {totalStocks} NAMES</p>
 

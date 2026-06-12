@@ -74,6 +74,10 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   touch-action: pan-x pan-y;
+  /* Prevent the page body from being wider than the viewport on phones,
+     which would cause unwanted horizontal scrolling on iPhone 14/15. */
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .mono {
@@ -4791,14 +4795,14 @@ th.tw-link-col { text-align: center; }
     align-items: center;
     gap: 6px;
     min-height: 44px;
-    padding: 7px 11px;
-    border: 1px solid var(--line-2);
+    padding: 7px 13px;
+    border: none;
     border-radius: 9px;
-    background: var(--surface);
-    color: var(--brand);
+    background: var(--brand);
+    color: #fff;
     font-family: var(--font-sans);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
   }
 
@@ -5185,6 +5189,22 @@ th.tw-link-col { text-align: center; }
     flex-direction: column;
     background: var(--surface);
     animation: m-fade 0.2s ease;
+    /* Force landscape orientation so the table gets full width. */
+    width: 100dvh;
+    height: 100dvw;
+    max-width: none;
+    transform-origin: bottom left;
+    transform: rotate(90deg) translateY(-100%);
+    /* Ensure desktop chrome (sidebar, content-header) is invisible inside. */
+    overflow: hidden;
+  }
+  /* Hide all desktop chrome that might render inside the full-table overlay. */
+  .me-full .sidebar,
+  .me-full .content-header,
+  .me-full a[download],
+  .me-full .export-ppt-btn,
+  .me-full .hiw-btn {
+    display: none !important;
   }
   .me-full-head {
     flex: 0 0 auto;
@@ -5427,6 +5447,19 @@ th.tw-link-col { text-align: center; }
     color: var(--ink);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+  }
+  /* Total lines (Total AI Capex Beneficiaries / Total SPX): same card anatomy,
+     tinted like the desktop totals row and not tappable. */
+  .ms-card-total {
+    background: var(--total-bg);
+    border-color: var(--line-strong);
+    cursor: default;
+  }
+  .ms-card-total .ms-card-label {
+    font-weight: 800;
+  }
+  .ms-card-total .me-metric {
+    background: var(--surface);
   }
   .ms-card-top {
     display: flex;
