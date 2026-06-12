@@ -35,7 +35,7 @@ all touched pipeline files.
 | 1 | High | `api/equities`, `api/equities/bloomberg`, `api/spx/bloomberg` returned raw Supabase error bodies (`e.message` includes the full backend response text) to the client | Generic "Database error." to the client; full error to server log |
 | 2 | High | Non-atomic JSON writes in `run_news.py` / `run_twitter.py` / `prune_unfollowed.py`: a crash mid-write leaves invalid JSON, and the next run's loader treats it as missing and **silently wipes the archive** | Temp-file + `os.replace` atomic writes |
 | 3 | Medium | `bbg`/`yahoo`/`currency`/`grp` accepted arbitrary strings; `bbg` is interpolated into the Excel `=BDP("…")` formula on export, so a stray quote breaks every exported price formula | `cleanStr()`: strip `"<>`, trim, length-cap, on add and on grp update |
-| 4 | Medium | `run_news.py` parsed LLM JSON with no shape validation — a malformed response would be archived and emailed | Validate object shape (`top_themes`/`positions` lists); fail the workflow loudly instead |
+| 4 | Medium | `run_news.py` parsed LLM JSON with no shape validation — a malformed response would be archived and emailed | Validate object shape (`top_themes`/`positions` lists); fail the workflow loudly instead. *(`positions` has since been removed from the LLM schema entirely — see limitation 7 below.)* |
 | 5 | Medium | `prune_unfollowed.py` built a PostgREST `not.in.(…)` DELETE filter by string concat, unencoded; with an **empty followed set** the filter would match (and delete) the whole tweets table | Filter passed via `params=` (URL-encoded) and the sweep is skipped when the followed set is empty |
 | 6 | Medium | `yahoo.ts` quote fetch had no timeout — a hung Yahoo request stalls the daily refresh | `AbortSignal.timeout(10s)`; failures already contained by `Promise.allSettled` |
 | 7 | Low | `TwitterMonitor` initial-fetch effect could `setState` after unmount | Cancelled-flag guard |
@@ -76,6 +76,11 @@ design or because "fixing" them would change behavior:
    surface). The tweet pipeline grounds output against tool citations, and the
    note pipeline now validates output shape (#4). Full mitigation isn't
    possible — summarizing untrusted text is the product.
+   **Update (PR #30):** the firm's holdings are no longer part of that surface
+   at all — `run_news.py` sends Claude only the newsletter text and builds the
+   "Portfolio Mentions" section locally (`_match_positions`), mirroring the
+   Twitter pipeline's `match_portfolio`. No holdings data is transmitted to
+   Anthropic or xAI.
 8. **Workflows have `contents: write`** — required, since they commit data
    files back to `main`.
 9. **Dual DST cron lines** in `morning-news.yml` (EST/EDT pair) — inherent to
