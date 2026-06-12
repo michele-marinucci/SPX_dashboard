@@ -11,7 +11,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { ModelGrid } from "@/components/ModelGrid";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { ANALYSTS } from "@/lib/equities/config";
-import { Company, EditRecord, Quote } from "@/lib/equities/types";
+import { Company, EditRecord, Quote, YearMap } from "@/lib/equities/types";
 import { fieldLabel, fmtEditValue } from "@/lib/equities/editLog";
 import { logoCandidates } from "@/lib/diligence";
 import { NO_SORT, nextSort, SortState, sortRows } from "@/lib/sort";
@@ -857,7 +857,6 @@ function monoColor(ticker: string): string {
   for (let i = 0; i < ticker.length; i++) h = (h * 31 + ticker.charCodeAt(i)) >>> 0;
   return MONO_PALETTE[h % MONO_PALETTE.length];
 }
-const fFx = (v: number | null | undefined) => (v == null ? "n/a" : `${v.toFixed(1)}x`);
 const fFp = (v: number | null | undefined) => (v == null ? "n/a" : `${(v * 100).toFixed(0)}%`);
 
 // The Focus header logo: the real company mark, resolved through the shared
@@ -1082,7 +1081,20 @@ function FocusLayout({
     const cur = selected?.model.revs[String(y)];
     return prev != null && cur != null && prev !== 0 ? cur / prev - 1 : null;
   };
-  const gMargin = (y: number) => selected?.model.gm[String(y)] ?? null;
+  const mv = (
+    key: "revs" | "gm" | "adj_eps" | "mendo_eps" | "target_mult",
+    y: number,
+  ): number | null => {
+    const m = selected?.model[key] as YearMap | undefined;
+    const v = m?.[String(y)];
+    return v == null ? null : v;
+  };
+  // Model-snapshot cell formatters: grouped $M, 1-dp %, 2-dp per-share, 1-dp ×.
+  const sM = (v: number | null) =>
+    v == null ? "—" : Math.round(v).toLocaleString("en-US");
+  const sP = (v: number | null) => (v == null ? "—" : `${(v * 100).toFixed(1)}%`);
+  const sE = (v: number | null) => (v == null ? "—" : v.toFixed(2));
+  const sX = (v: number | null) => (v == null ? "—" : v.toFixed(1));
 
   return (
     <div className="eq-focus">
@@ -1165,24 +1177,56 @@ function FocusLayout({
               </div>
             </div>
 
-            <div className="eq-val-grid">
-              {(
-                [
-                  [`Rev gr '${yr(y0)}`, fFp(revGrow(y0)), "var(--ink)"],
-                  [`Rev gr '${yr(y1)}`, fFp(revGrow(y1)), "var(--ink)"],
-                  [`GM '${yr(y0)}`, fFp(gMargin(y0)), "var(--ink)"],
-                  [`GM '${yr(y1)}`, fFp(gMargin(y1)), "var(--ink)"],
-                  ["Target P/E", fFx(selected.model.target_mult[String(y1)] ?? null), "var(--brand)"],
-                  ["NTM P/E", fFx(d.mendoPe[y1]), "var(--ink)"],
-                ] as const
-              ).map(([k, v, c]) => (
-                <div className="eq-val-cell" key={k}>
-                  <div className="eq-val-k">{k}</div>
-                  <div className="eq-val-v" style={{ color: c }}>
-                    {v}
-                  </div>
-                </div>
-              ))}
+            <div className="eq-snap">
+              <div className="eq-snap-title">Model Snapshot</div>
+              <table className="eq-snap-tbl">
+                <thead>
+                  <tr>
+                    <th />
+                    {years.map((y) => (
+                      <th key={y}>{yr(y)}E</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>Revenue ($M)</th>
+                    {years.map((y) => (
+                      <td key={y}>{sM(mv("revs", y))}</td>
+                    ))}
+                  </tr>
+                  <tr className="eq-snap-sub">
+                    <th>YoY growth</th>
+                    {years.map((y) => (
+                      <td key={y}>{sP(revGrow(y))}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th>Gross margin</th>
+                    {years.map((y) => (
+                      <td key={y}>{sP(mv("gm", y))}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th>Adj. EPS ($)</th>
+                    {years.map((y) => (
+                      <td key={y}>{sE(mv("adj_eps", y))}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th>Mendo EPS ($)</th>
+                    {years.map((y) => (
+                      <td key={y}>{sE(mv("mendo_eps", y))}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th>Target mult (×)</th>
+                    {years.map((y) => (
+                      <td key={y}>{sX(mv("target_mult", y))}</td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             <div className="eq-decomp-block">

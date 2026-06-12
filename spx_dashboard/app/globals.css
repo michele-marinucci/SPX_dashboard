@@ -4280,32 +4280,68 @@ th.tw-link-col { text-align: center; }
   font-size: 11px;
   margin-top: 2px;
 }
-.eq-val-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line-soft);
+/* Model Snapshot: a compact year-by-year table (Revenue, YoY growth, margin,
+   EPS, target multiple) shown when a Focus name is selected. */
+.eq-snap {
+  margin-top: 18px;
   border: 1px solid var(--line-soft);
   border-radius: 9px;
   overflow: hidden;
-  margin-top: 18px;
-}
-.eq-val-cell {
   background: var(--surface);
-  padding: 12px 14px;
 }
-.eq-val-k {
+.eq-snap-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  padding: 13px 16px 11px;
+}
+.eq-snap-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.eq-snap-tbl th,
+.eq-snap-tbl td {
+  padding: 9px 16px;
+  text-align: right;
   font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 9.5px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.eq-snap-tbl thead th {
+  font-size: 10.5px;
+  letter-spacing: 0.5px;
   color: var(--faint);
-  margin-bottom: 5px;
-}
-.eq-val-v {
-  font-family: var(--font-mono, "JetBrains Mono", monospace);
-  font-size: 15px;
   font-weight: 600;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+.eq-snap-tbl tbody th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink);
+}
+.eq-snap-tbl tbody td {
+  color: var(--ink);
+  font-weight: 600;
+}
+.eq-snap-tbl tbody tr {
+  border-top: 1px solid var(--line-soft);
+}
+.eq-snap-tbl tbody tr:first-child,
+.eq-snap-tbl tbody tr.eq-snap-sub {
+  border-top: none;
+}
+/* YoY growth tucks under Revenue: muted, lighter, snug to the row above. */
+.eq-snap-sub th,
+.eq-snap-sub td {
+  color: var(--faint);
+  font-weight: 500;
+  font-size: 11.5px;
+  padding-top: 1px;
+}
+.eq-snap-tbl tbody tr:nth-child(2) {
+  padding-top: 0;
 }
 .eq-decomp-block {
   margin-top: 22px;
@@ -4343,8 +4379,10 @@ th.tw-link-col { text-align: center; }
   .eq-focus-list {
     width: 100%;
   }
-  .eq-val-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .eq-snap-tbl th,
+  .eq-snap-tbl td {
+    padding: 8px 10px;
+    font-size: 11.5px;
   }
 }
 
