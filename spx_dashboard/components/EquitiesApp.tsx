@@ -543,16 +543,6 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           </button>
           <button
             type="button"
-            className={view === "signal" ? "on" : ""}
-            onClick={() => {
-              setView("signal");
-              setSort(NO_SORT);
-            }}
-          >
-            Rel Value
-          </button>
-          <button
-            type="button"
             className={view === "focus" ? "on" : ""}
             onClick={() => {
               setView("focus");
@@ -560,6 +550,16 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
             }}
           >
             Models
+          </button>
+          <button
+            type="button"
+            className={view === "signal" ? "on" : ""}
+            onClick={() => {
+              setView("signal");
+              setSort(NO_SORT);
+            }}
+          >
+            Rel Value
           </button>
         </div>
         <span className="eq-note">
