@@ -74,20 +74,23 @@ function eqSlide(pptx: pptxgen, title: string, subtitle: string): pptxgen.Slide 
   slide.addText(title, {
     x: MARGIN,
     y: 0.1,
-    w: 7.5,
+    w: 4.8,
     h: 0.34,
     fontFace: FONT,
     fontSize: 16,
     bold: true,
     color: NAVY,
   });
+  // Right-aligned note. Wide box + 8pt so the long "…prices as of prior close
+  // 2026-06-10" stays on one line — a narrower box wraps and snaps the ISO date
+  // at a hyphen ("2026-06-" / "10").
   slide.addText(subtitle, {
-    x: 8.1,
+    x: 5.3,
     y: 0.14,
-    w: PAGE_W_SAFE - 8.1,
+    w: PAGE_W_SAFE - 5.3,
     h: 0.3,
     fontFace: FONT,
-    fontSize: 8.5,
+    fontSize: 8,
     color: MUTED,
     align: "right",
   });
