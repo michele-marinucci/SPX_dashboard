@@ -2,11 +2,13 @@ name: Generate morning news summary
 
 on:
   schedule:
-    # 9:00 AM ET. EST is UTC-5 (9am = 14:00 UTC); EDT is UTC-4 (9am = 13:00 UTC).
-    # Two crons so it lands at 9am ET regardless of DST — only the active one
-    # fires in any given month.
-    - cron: "0 14 * 11,12,1,2,3 *"   # Nov–Mar (EST, UTC-5): 9am ET = 14:00 UTC
-    - cron: "0 13 * 4,5,6,7,8,9,10 *" # Apr–Oct (EDT, UTC-4): 9am ET = 13:00 UTC
+    # 9:12 AM ET. EST is UTC-5 (9:12am = 14:12 UTC); EDT is UTC-4 (9:12am = 13:12 UTC).
+    # Two crons so it lands at ~9am ET regardless of DST — only the active one
+    # fires in any given month. NB: deliberately :12 past the hour, not :00 —
+    # GitHub frequently delays/drops scheduled runs at the top of the hour
+    # (its most congested slot), which was silently skipping this job.
+    - cron: "12 14 * 11,12,1,2,3 *"   # Nov–Mar (EST, UTC-5): 9:12am ET = 14:12 UTC
+    - cron: "12 13 * 4,5,6,7,8,9,10 *" # Apr–Oct (EDT, UTC-4): 9:12am ET = 13:12 UTC
   workflow_dispatch:
     inputs:
       lookback_hours:
