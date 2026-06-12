@@ -4714,12 +4714,568 @@ th.tw-link-col { text-align: center; }
   .content {
     animation: m-fade 0.3s ease;
   }
+
+  /* ---- Mobile: Equities ---- */
+  /* Segmented view switcher (Valuation · IRR Decomp · Rel Value · Focus). */
+  .me-switch {
+    display: flex;
+    gap: 3px;
+    background: var(--surface-3);
+    border-radius: 11px;
+    padding: 4px;
+    margin-bottom: 14px;
+  }
+  .me-switch button {
+    flex: 1 1 0;
+    min-height: 36px;
+    padding: 9px 2px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .me-switch button.on {
+    background: var(--surface);
+    color: var(--brand);
+    box-shadow: 0 1px 2px rgba(26, 26, 34, 0.12);
+  }
+
+  /* Column hint + "Full table" row. */
+  .me-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .me-hint {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    color: var(--faint);
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .me-full-btn {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 7px 11px;
+    border: 1px solid var(--line-2);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--brand);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Sector groups of stock cards. */
+  .me-group {
+    margin-bottom: 16px;
+  }
+  .me-group-head {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2px 8px;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .me-group-count {
+    color: var(--faint);
+  }
+  .me-card {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font-sans);
+    color: var(--ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .me-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .me-card-id {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .me-tile {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--brand-050);
+    color: var(--brand);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .me-card-names {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .me-card-tk {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15.5px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .me-star {
+    color: var(--brand);
+    font-size: 12px;
+  }
+  .me-card-nm {
+    font-size: 11.5px;
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+  }
+  .me-card-px {
+    flex: 0 0 auto;
+    text-align: right;
+  }
+  .me-card-px-val {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .me-card-px-cap {
+    display: block;
+    font-size: 9.5px;
+    letter-spacing: 0.5px;
+    color: var(--faint);
+    font-weight: 500;
+  }
+  .me-card-metrics,
+  .me-grid6 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+  .me-grid6 {
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .me-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 7px 8px;
+  }
+  .me-metric-cap {
+    font-size: 8.5px;
+    letter-spacing: 0.6px;
+    color: var(--faint);
+    font-weight: 600;
+  }
+  .me-metric-val {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .me-cta {
+    text-align: center;
+    padding: 6px 0 4px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--brand);
+  }
+  .me-src {
+    text-align: center;
+    padding: 8px 0 4px;
+    margin: 0;
+    font-size: 9.5px;
+    letter-spacing: 1.5px;
+    color: var(--faint);
+    font-weight: 500;
+  }
+
+  /* Focus: horizontally-scrolling company picker pills. */
+  .me-picker {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -16px 13px;
+    padding: 0 16px 4px;
+  }
+  .me-picker::-webkit-scrollbar {
+    display: none;
+  }
+  .me-pill {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 7px 12px;
+    border: 1px solid var(--line-2);
+    border-radius: 20px;
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .me-pill .me-pill-star {
+    font-size: 10px;
+    color: var(--brand);
+  }
+  .me-pill.on {
+    border-color: var(--brand);
+    background: var(--brand);
+    color: #fff;
+  }
+  .me-pill.on .me-pill-star {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  /* Focus: identity card. */
+  .me-id {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .me-id .eq-focus-tile {
+    width: 40px;
+    height: 40px;
+  }
+  .me-id-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .me-id-tk {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .me-id-sub {
+    font-size: 12.5px;
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .me-id-px {
+    flex: 0 0 auto;
+    text-align: right;
+  }
+  .me-id-px-val {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .me-id-irr {
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* Focus: section heads + operating model table (sticky first column). */
+  .me-sec {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 9px;
+  }
+  .me-sec-tag {
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--brand-050);
+    color: var(--brand);
+    font-size: 9px;
+    letter-spacing: 0.8px;
+    text-transform: none;
+  }
+  .me-model-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -16px 22px;
+    padding: 0 16px;
+  }
+  .me-model {
+    border-collapse: collapse;
+    min-width: 100%;
+    font-variant-numeric: tabular-nums;
+  }
+  .me-model thead th {
+    padding: 7px 9px;
+    text-align: right;
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 10.5px;
+    color: var(--muted);
+    font-weight: 700;
+    border-bottom: 1.5px solid var(--line-strong);
+  }
+  .me-model thead th:first-child,
+  .me-model tbody th {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--bg);
+    text-align: left;
+    padding: 8px 10px 8px 0;
+    white-space: nowrap;
+  }
+  .me-model tbody th {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+  .me-model tbody td {
+    padding: 8px 9px;
+    text-align: right;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--line);
+  }
+  /* YoY sub-rows: lighter, italic, green/red, "—" in the first year. */
+  .me-model-sub th {
+    padding: 5px 10px 5px 14px;
+    font-size: 10.5px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--faint);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .me-model td.me-model-yoy {
+    padding: 5px 9px;
+    font-size: 10.5px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  /* Focus: IRR build card + model-note callout. */
+  .me-irr {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px 14px;
+    margin-bottom: 20px;
+  }
+  .me-irr-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .me-irr-row .mono {
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .me-irr-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 11px;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .me-irr-total .mono {
+    font-size: 16px;
+    font-weight: 800;
+  }
+  .me-note {
+    background: var(--brand-050);
+    border: 1px solid var(--brand-100);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+  }
+  .me-note-cap {
+    font-size: 9px;
+    letter-spacing: 0.8px;
+    color: var(--brand);
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .me-note p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  /* Full-table overlay: the complete desktop table (heatmaps, sorting,
+     grouping) full-screen above the tab bar, frozen first column + sticky
+     headers, horizontal + vertical scroll. */
+  .me-full {
+    position: fixed;
+    inset: 0;
+    z-index: 240;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    animation: m-fade 0.2s ease;
+  }
+  .me-full-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .me-full-title {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+  }
+  .me-full-title > span:first-child {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .me-full-sub {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--faint);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .me-full-close {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 44px;
+    padding: 7px 13px;
+    border: none;
+    border-radius: 9px;
+    background: var(--brand);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .me-full-scroll {
+    flex: 1 1 auto;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  /* The reused desktop table loses its card chrome inside the overlay and
+     gains sticky headers; .eq-tick is already sticky-left in the base layer. */
+  .me-full-scroll .eq-wrap {
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+  }
+  .me-full-scroll .eq-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: var(--surface);
+  }
+  .me-full-scroll .eq-table .eq-h1 th {
+    height: 28px;
+    box-sizing: border-box;
+  }
+  .me-full-scroll .eq-table .eq-h2 th {
+    top: 28px;
+  }
+  /* The Rel Value table has a single header row — it pins at the very top. */
+  .me-full-scroll .eq-signal .eq-h2 th {
+    top: 0;
+  }
+  .me-full-scroll .eq-table thead th.eq-tick {
+    z-index: 4;
+  }
+
+  /* The spreadsheet edit-model flow is desktop-only on the phone: hide the
+     per-row ✎ / ↺ affordances (the cards and Focus view replace them). */
+  .me-full-scroll .eq-btns {
+    display: none;
+  }
+
+  /* Any Equities modal that still opens on a phone renders as a bottom sheet
+     (same treatment as the shared HowItWorks popup above). */
+  .eq-overlay {
+    align-items: flex-end;
+    padding: 0;
+    background: rgba(12, 12, 18, 0.4);
+    z-index: 220; /* above the tab bar, like the Sheet primitive */
+  }
+  .eq-overlay .eq-modal {
+    width: 100%;
+    max-width: none;
+    max-height: 78dvh;
+    overflow-y: auto;
+    border: none;
+    border-radius: 22px 22px 0 0;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    animation: m-sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .m-sheet,
   .m-sheet-scrim,
   .hiw-modal,
+  .me-full,
+  .eq-overlay .eq-modal,
   .content {
     animation: none !important;
   }
