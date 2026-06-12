@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
+import { Sheet } from "@/components/Sheet";
 import { DiligenceLink, logoCandidates, normTicker } from "@/lib/diligence";
 
 // The Microsoft Lists app glyph: a teal rounded tile with list rows and a
@@ -149,6 +150,8 @@ export function DiligenceApp({
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  // Mobile add sheet (the desktop uses the inline form instead).
+  const [addOpen, setAddOpen] = useState(false);
   // The user's saved manual ordering (tickers in display order), or null for the
   // default alphabetical sort. Held in a ref so the async add/remove callbacks
   // always arrange against the latest order without re-binding.
@@ -219,15 +222,26 @@ export function DiligenceApp({
     }
   };
 
+  // Returns whether the entry was saved, so the mobile add sheet knows when to
+  // close (validation/network errors keep it open with the message visible).
   const add = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: React.FormEvent): Promise<boolean> => {
       e.preventDefault();
       setError("");
       const t = normTicker(ticker);
       const u = url.trim();
-      if (!t) return setError("Enter a ticker.");
-      if (!u) return setError("Paste the Microsoft List link.");
-      if (!/^https?:\/\//i.test(u)) return setError("Link must start with http(s)://");
+      if (!t) {
+        setError("Enter a ticker.");
+        return false;
+      }
+      if (!u) {
+        setError("Paste the Microsoft List link.");
+        return false;
+      }
+      if (!/^https?:\/\//i.test(u)) {
+        setError("Link must start with http(s)://");
+        return false;
+      }
       const entry: DiligenceLink = { ticker: t, name: name.trim(), url: u };
 
       if (dbEnabled) {
@@ -240,9 +254,13 @@ export function DiligenceApp({
           });
           const d = await res.json();
           if (d?.links) setLinks(arrange(d.links));
-          else setError(d?.error || "Could not save.");
+          else {
+            setError(d?.error || "Could not save.");
+            return false;
+          }
         } catch {
           setError("Network error.");
+          return false;
         } finally {
           setBusy(false);
         }
@@ -254,8 +272,17 @@ export function DiligenceApp({
       setTicker("");
       setUrl("");
       setName("");
+      return true;
     },
     [ticker, url, name, dbEnabled, links, arrange],
+  );
+
+  // Submit handler for the mobile add sheet: close it on success only.
+  const addFromSheet = useCallback(
+    async (e: React.FormEvent) => {
+      if (await add(e)) setAddOpen(false);
+    },
+    [add],
   );
 
   const remove = useCallback(
@@ -321,14 +348,91 @@ export function DiligenceApp({
     </HowItWorks>
   );
 
+  // Phone top bar: a brand "+ Add" button (opens the add sheet) + the ? help
+  // button. The desktop's inline add form is hidden under the breakpoint.
+  const mobileActions = (
+    <>
+      <button
+        type="button"
+        className="md-topadd"
+        onClick={() => setAddOpen(true)}
+        title="Add a diligence list"
+      >
+        + Add
+      </button>
+      {actions}
+    </>
+  );
+
   return (
     <AppShell
       tool="Diligence Tracker"
       title="Diligence Tracker"
       subtitle={subtitle}
       actions={actions}
+      mobileActions={mobileActions}
       footerLeft={`Diligence Tracker · ${links.length} ${links.length === 1 ? "position" : "positions"}`}
     >
+      {/* Mobile-only subtitle + dashed add affordance (the desktop header
+          carries the subtitle and the inline form below carries the add). */}
+      <p className="md-sub">
+        Every position&apos;s Microsoft List in one place ·{" "}
+        <span className="mono">
+          {links.length} {links.length === 1 ? "name" : "names"}
+        </span>{" "}
+        · shared
+      </p>
+      <button
+        type="button"
+        className="md-add-btn"
+        onClick={() => setAddOpen(true)}
+      >
+        <span className="md-add-plus" aria-hidden="true">+</span>
+        Add a diligence list
+      </button>
+      <Sheet
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        title="Add diligence list"
+      >
+        <p className="md-sheet-lead">
+          Add a ticker and paste its Microsoft List URL to share with the team.
+        </p>
+        <form className="md-sheet-form" onSubmit={addFromSheet}>
+          <input
+            className="dil-in"
+            value={ticker}
+            onChange={(e) => setTicker(e.target.value)}
+            placeholder="Ticker"
+            aria-label="Ticker"
+            autoCapitalize="characters"
+          />
+          <input
+            className="dil-in"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Company name (optional)"
+            aria-label="Company name"
+          />
+          <input
+            className="dil-in"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Microsoft List link (https://…)"
+            aria-label="Microsoft List link"
+            inputMode="url"
+          />
+          {error && <p className="dil-error">{error}</p>}
+          <button
+            type="submit"
+            className="md-sheet-submit"
+            disabled={busy || !ticker.trim() || !url.trim()}
+          >
+            Add list
+          </button>
+        </form>
+      </Sheet>
+
       <form className="dil-add" onSubmit={add}>
         <input
           className="dil-in dil-in-ticker"

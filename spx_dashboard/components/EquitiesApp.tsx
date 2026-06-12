@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
+import { useIsMobile } from "@/components/useIsMobile";
 import { ModelGrid } from "@/components/ModelGrid";
 import { compute, Decomp, Derived, displayYears } from "@/lib/equities/calc";
 import { ANALYSTS } from "@/lib/equities/config";
@@ -79,6 +80,9 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
   const [removedOpen, setRemovedOpen] = useState(false);
   const [allLogOpen, setAllLogOpen] = useState(false);
   const [sort, setSort] = useState<SortState>(NO_SORT);
+  // Mobile-only UI state: cards by default, one tap to the full heatmap grid.
+  const isMobile = useIsMobile();
+  const [fullTableOpen, setFullTableOpen] = useState(false);
 
   const today = useMemo(() => new Date(), []);
   const years = useMemo(() => displayYears(today), [today]);
@@ -437,210 +441,10 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
   const focusSel =
     (focusTicker && stocks.find((c) => c.ticker === focusTicker)) || focusSorted[0] || null;
 
-  const subtitle = (
-    <>
-      Detailed dashboard ·{" "}
-      <span className="mono">
-        {stocks.length} {stocks.length === 1 ? "name" : "names"}
-      </span>{" "}
-      ·{" "}
-      <span className="mono">
-        {dataDate
-          ? `prior close · ${new Date(`${dataDate}T12:00:00`).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-            })}`
-          : "prior close"}
-      </span>
-    </>
-  );
-
-  const actions = (
-    <>
-      <HowItWorks title="How the Equities Dashboard works">
-        <p className="hiw-lead">
-          The team&apos;s detailed dashboard, live — recomputed on the fly from
-          shared model inputs and prior-day closing prices.
-        </p>
-        <ul className="hiw-list">
-          <li>
-            <b>Two screens</b> — <b>Summary</b> shows valuation, target
-            multiples, IRRs, and momentum; <b>IRR Decomp</b> breaks the
-            NTM–YE{String(y2).slice(2)} IRR into revenue, margin, yield, and
-            multiple.
-          </li>
-          <li>
-            <b>Edit model</b> — click <span className="mono">✎</span> on any row,
-            pick your name, and update the model. You can paste a whole block
-            straight from your Excel model. Changes are shared with the team
-            instantly.
-          </li>
-          <li>
-            <b>History</b> — every edit is logged per company; click{" "}
-            <span className="mono">↺</span> on a row to see who changed what,
-            when.
-          </li>
-          <li>
-            <b>Sort</b> — click any column header to rank across the whole book;
-            click again for ascending, then off.
-          </li>
-          <li>
-            <b>Prices</b> — prior-day closes from a Bloomberg terminal push
-            and/or Yahoo, refreshed automatically once a new close is
-            available. <b>Export Excel</b> downloads a clean snapshot: a
-            formatted Summary tab plus a tab logging every edit.
-          </li>
-          <li>
-            <b>Activity log</b> — the <span className="mono">⌃</span> Activity
-            button lists every change across the whole book, newest first.
-          </li>
-        </ul>
-      </HowItWorks>
-      <button type="button" className="btn" onClick={() => setAddOpen(true)}>
-        <span className="glyph" aria-hidden="true">＋</span> Add
-      </button>
-      <button type="button" className="btn" onClick={() => setAllLogOpen(true)}>
-        <span className="glyph" aria-hidden="true">↻</span> Activity log
-      </button>
-      <button type="button" className="btn" onClick={() => setRemovedOpen(true)}>
-        Removed{removedNames.length ? ` (${removedNames.length})` : ""}
-      </button>
-      <a className="btn-primary" href="/api/equities/export">
-        <span className="glyph" aria-hidden="true">↓</span> Export Excel
-      </a>
-    </>
-  );
-
-  return (
-    <AppShell
-      tool="Equities Dashboard"
-      title="Equities Dashboard"
-      subtitle={subtitle}
-      actions={actions}
-      footerLeft={`Equities Dashboard · ${stocks.length} names · ${stocks.filter((c) => c.port === 1).length} owned`}
-    >
-      <div className="eq-toolbar">
-        <div className="eq-tabs" role="tablist">
-          <button
-            type="button"
-            className={view === "val" ? "on" : ""}
-            onClick={() => {
-              setView("val");
-              setSort(NO_SORT);
-            }}
-          >
-            Summary
-          </button>
-          <button
-            type="button"
-            className={view === "decomp" ? "on" : ""}
-            onClick={() => {
-              setView("decomp");
-              setSort(NO_SORT);
-            }}
-          >
-            IRR Decomp
-          </button>
-          <button
-            type="button"
-            className={view === "focus" ? "on" : ""}
-            onClick={() => {
-              setView("focus");
-              setSort(NO_SORT);
-            }}
-          >
-            Models
-          </button>
-          <button
-            type="button"
-            className={view === "signal" ? "on" : ""}
-            onClick={() => {
-              setView("signal");
-              setSort(NO_SORT);
-            }}
-          >
-            Rel Value
-          </button>
-        </div>
-        <span className="eq-note">
-          {dataDate || asOf ? (
-            <>
-              Prices as of{" "}
-              {dataDate
-                ? new Date(`${dataDate}T12:00:00`).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })
-                : new Date(asOf as string).toLocaleDateString()}{" "}
-              (prior close) · {priceSource}
-            </>
-          ) : (
-            "Loading prices…"
-          )}
-          {dataDate && Date.now() - Date.parse(`${dataDate}T00:00:00Z`) > 4 * 86_400_000 && (
-            <strong className="eq-stale">
-              {" "}
-              · price feed stale — last available close shown
-            </strong>
-          )}
-          {enabled === false && " · edits disabled (no shared database configured)"}
-        </span>
-      </div>
-
-      {view === "signal" ? (
-        <div className="eq-legend">
-          <span className="eq-bullet-key" aria-hidden="true">
-            <span className="eq-bullet-key-fill" />
-            <span className="eq-bullet-key-tick" />
-          </span>{" "}
-          IRR (to YE+{String(y2).slice(2)}) vs dashboard median · green ticker = portfolio
-        </div>
-      ) : view === "focus" ? (
-        <div className="eq-legend">
-          <span className="eq-legend-swatch" aria-hidden="true" /> Pick a name on
-          the left to open its valuation and IRR decomposition
-        </div>
-      ) : view === "val" ? (
-        <div className="eq-legend">
-          <span className="eq-legend-swatch" aria-hidden="true" /> Highlighted
-          tickers (in green) indicate names in portfolio
-        </div>
-      ) : (
-        <div className="eq-legend eq-legend-decomp">
-          <b>IRR decomp is approximate:</b>
-          <ol>
-            <li>
-              Revenue CAGR, Mendo NI, and Total Return calculated as exact CAGRs
-              from models
-            </li>
-            <li>
-              EPS + Divs = EPS CAGR (exact) + dividend yield (approximate over
-              2027/2028)
-            </li>
-            <li>&ldquo;Margin&rdquo; = Mendo NI CAGR − Revs CAGR</li>
-            <li>&ldquo;Yield&rdquo; = EPS CAGR + Divs Yield − Mendo NI CAGR</li>
-            <li>
-              &ldquo;Multiple&rdquo; = Total Return IRR − EPS CAGR + Divs Yield
-            </li>
-          </ol>
-        </div>
-      )}
-
-      {view === "focus" ? (
-        <FocusLayout
-          stocks={focusSorted}
-          selected={focusSel}
-          onSelect={(t) => setFocusTicker(t)}
-          derived={derived}
-          perfOf={perfOf}
-          years={years}
-          irrMax={irrMax}
-          onEdit={(t) => setEditTicker(t)}
-          onHistory={(t) => setLogTicker(t)}
-          fpx={fpx}
-        />
-      ) : (
+  // The complete desktop table for the active view. Rendered in the desktop
+  // layout and reused, unchanged (heatmaps, sorting, grouping), inside the
+  // mobile full-table overlay so the column logic lives in one place.
+  const tableBlock = (
       <div className="eq-wrap">
         {view === "signal" ? (
           <table className="eq-table eq-signal">
@@ -807,6 +611,245 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           </table>
         )}
       </div>
+  );
+
+  const subtitle = (
+    <>
+      Detailed dashboard ·{" "}
+      <span className="mono">
+        {stocks.length} {stocks.length === 1 ? "name" : "names"}
+      </span>{" "}
+      ·{" "}
+      <span className="mono">
+        {dataDate
+          ? `prior close · ${new Date(`${dataDate}T12:00:00`).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}`
+          : "prior close"}
+      </span>
+    </>
+  );
+
+  const howItWorks = (
+    <HowItWorks title="How the Equities Dashboard works">
+        <p className="hiw-lead">
+          The team&apos;s detailed dashboard, live — recomputed on the fly from
+          shared model inputs and prior-day closing prices.
+        </p>
+        <ul className="hiw-list">
+          <li>
+            <b>Two screens</b> — <b>Summary</b> shows valuation, target
+            multiples, IRRs, and momentum; <b>IRR Decomp</b> breaks the
+            NTM–YE{String(y2).slice(2)} IRR into revenue, margin, yield, and
+            multiple.
+          </li>
+          <li>
+            <b>Edit model</b> — click <span className="mono">✎</span> on any row,
+            pick your name, and update the model. You can paste a whole block
+            straight from your Excel model. Changes are shared with the team
+            instantly.
+          </li>
+          <li>
+            <b>History</b> — every edit is logged per company; click{" "}
+            <span className="mono">↺</span> on a row to see who changed what,
+            when.
+          </li>
+          <li>
+            <b>Sort</b> — click any column header to rank across the whole book;
+            click again for ascending, then off.
+          </li>
+          <li>
+            <b>Prices</b> — prior-day closes from a Bloomberg terminal push
+            and/or Yahoo, refreshed automatically once a new close is
+            available. <b>Export Excel</b> downloads a clean snapshot: a
+            formatted Summary tab plus a tab logging every edit.
+          </li>
+          <li>
+            <b>Activity log</b> — the <span className="mono">⌃</span> Activity
+            button lists every change across the whole book, newest first.
+          </li>
+        </ul>
+    </HowItWorks>
+  );
+
+  // The mobile top bar carries only the "?" — export/admin affordances are
+  // desktop-only by design (see the MOBILE layer in globals.css).
+  const actions = (
+    <>
+      {howItWorks}
+      <button type="button" className="btn" onClick={() => setAddOpen(true)}>
+        <span className="glyph" aria-hidden="true">＋</span> Add
+      </button>
+      <button type="button" className="btn" onClick={() => setAllLogOpen(true)}>
+        <span className="glyph" aria-hidden="true">↻</span> Activity log
+      </button>
+      <button type="button" className="btn" onClick={() => setRemovedOpen(true)}>
+        Removed{removedNames.length ? ` (${removedNames.length})` : ""}
+      </button>
+      <a className="btn-primary" href="/api/equities/export">
+        <span className="glyph" aria-hidden="true">↓</span> Export Excel
+      </a>
+    </>
+  );
+
+  return (
+    <AppShell
+      tool="Equities Dashboard"
+      title="Equities Dashboard"
+      subtitle={subtitle}
+      actions={actions}
+      mobileActions={howItWorks}
+      footerLeft={`Equities Dashboard · ${stocks.length} names · ${stocks.filter((c) => c.port === 1).length} owned`}
+    >
+      {isMobile ? (
+        <MobileEquities
+          view={view}
+          setView={(v) => {
+            setView(v);
+            setSort(NO_SORT);
+          }}
+          groups={groups}
+          focusSorted={focusSorted}
+          focusSel={focusSel}
+          onSelectFocus={(t) => setFocusTicker(t)}
+          derived={derived}
+          perfOf={perfOf}
+          years={years}
+          fpx={fpx}
+          dataDate={dataDate}
+          priceSource={priceSource}
+          fullTableOpen={fullTableOpen}
+          setFullTableOpen={setFullTableOpen}
+          tableBlock={tableBlock}
+        />
+      ) : (
+      <>
+      <div className="eq-toolbar">
+        <div className="eq-tabs" role="tablist">
+          <button
+            type="button"
+            className={view === "val" ? "on" : ""}
+            onClick={() => {
+              setView("val");
+              setSort(NO_SORT);
+            }}
+          >
+            Summary
+          </button>
+          <button
+            type="button"
+            className={view === "decomp" ? "on" : ""}
+            onClick={() => {
+              setView("decomp");
+              setSort(NO_SORT);
+            }}
+          >
+            IRR Decomp
+          </button>
+          <button
+            type="button"
+            className={view === "focus" ? "on" : ""}
+            onClick={() => {
+              setView("focus");
+              setSort(NO_SORT);
+            }}
+          >
+            Models
+          </button>
+          <button
+            type="button"
+            className={view === "signal" ? "on" : ""}
+            onClick={() => {
+              setView("signal");
+              setSort(NO_SORT);
+            }}
+          >
+            Rel Value
+          </button>
+        </div>
+        <span className="eq-note">
+          {dataDate || asOf ? (
+            <>
+              Prices as of{" "}
+              {dataDate
+                ? new Date(`${dataDate}T12:00:00`).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : new Date(asOf as string).toLocaleDateString()}{" "}
+              (prior close) · {priceSource}
+            </>
+          ) : (
+            "Loading prices…"
+          )}
+          {dataDate && Date.now() - Date.parse(`${dataDate}T00:00:00Z`) > 4 * 86_400_000 && (
+            <strong className="eq-stale">
+              {" "}
+              · price feed stale — last available close shown
+            </strong>
+          )}
+          {enabled === false && " · edits disabled (no shared database configured)"}
+        </span>
+      </div>
+
+      {view === "signal" ? (
+        <div className="eq-legend">
+          <span className="eq-bullet-key" aria-hidden="true">
+            <span className="eq-bullet-key-fill" />
+            <span className="eq-bullet-key-tick" />
+          </span>{" "}
+          IRR (to YE+{String(y2).slice(2)}) vs dashboard median · green ticker = portfolio
+        </div>
+      ) : view === "focus" ? (
+        <div className="eq-legend">
+          <span className="eq-legend-swatch" aria-hidden="true" /> Pick a name on
+          the left to open its valuation and IRR decomposition
+        </div>
+      ) : view === "val" ? (
+        <div className="eq-legend">
+          <span className="eq-legend-swatch" aria-hidden="true" /> Highlighted
+          tickers (in green) indicate names in portfolio
+        </div>
+      ) : (
+        <div className="eq-legend eq-legend-decomp">
+          <b>IRR decomp is approximate:</b>
+          <ol>
+            <li>
+              Revenue CAGR, Mendo NI, and Total Return calculated as exact CAGRs
+              from models
+            </li>
+            <li>
+              EPS + Divs = EPS CAGR (exact) + dividend yield (approximate over
+              2027/2028)
+            </li>
+            <li>&ldquo;Margin&rdquo; = Mendo NI CAGR − Revs CAGR</li>
+            <li>&ldquo;Yield&rdquo; = EPS CAGR + Divs Yield − Mendo NI CAGR</li>
+            <li>
+              &ldquo;Multiple&rdquo; = Total Return IRR − EPS CAGR + Divs Yield
+            </li>
+          </ol>
+        </div>
+      )}
+
+      {view === "focus" ? (
+        <FocusLayout
+          stocks={focusSorted}
+          selected={focusSel}
+          onSelect={(t) => setFocusTicker(t)}
+          derived={derived}
+          perfOf={perfOf}
+          years={years}
+          irrMax={irrMax}
+          onEdit={(t) => setEditTicker(t)}
+          onHistory={(t) => setLogTicker(t)}
+          fpx={fpx}
+        />
+      ) : (
+        tableBlock
+      )}
+      </>
       )}
 
       <p className="eq-foot-note">
@@ -1281,6 +1324,537 @@ function GroupRows({
         <th colSpan={span}>{label}</th>
       </tr>
       {children}
+    </>
+  );
+}
+
+// ---- mobile (phone) layer ---------------------------------------------------- //
+// Cards for glanceability, one tap to the full heatmap grid. Everything below
+// renders only under the ≤768px breakpoint (useIsMobile); desktop is untouched.
+
+type View = "val" | "decomp" | "signal" | "focus";
+type Perf = { m1: number | null; m3: number | null; m6: number | null };
+
+// Chip/grid formatters: signed 1-dp %, 1-dp ×, and the prototype's tone rules
+// (IRR graded against the hurdle; deltas plain green/red).
+const mX = (v: number | null | undefined) => (v == null ? "n/a" : `${v.toFixed(1)}x`);
+const mP = (v: number | null | undefined, d = 1) =>
+  v == null ? "n/a" : `${v >= 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
+const irrTone = (v: number | null | undefined) =>
+  v == null
+    ? "var(--muted)"
+    : v >= 0.12
+      ? "var(--green)"
+      : v >= 0.06
+        ? "var(--amber)"
+        : "var(--red)";
+const signTone = (v: number | null | undefined) =>
+  v == null ? "var(--muted)" : v >= 0 ? "var(--green)" : "var(--red)";
+
+const MOBILE_VIEWS: [View, string][] = [
+  ["val", "Valuation"],
+  ["decomp", "IRR Decomp"],
+  ["signal", "Rel Value"],
+  ["focus", "Focus"],
+];
+const MOBILE_HINTS: Record<Exclude<View, "focus">, string> = {
+  val: "EV/GP · MENDO P/E · TARGET · IRR · MoM",
+  decomp: "EPS GROWTH · MULTIPLE · DIVIDEND · RETURN",
+  signal: "NTM P/E VS TARGET · IRR · MoM",
+};
+
+function MeMetric({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: React.ReactNode;
+  tone?: string;
+}) {
+  return (
+    <span className="me-metric">
+      <span className="me-metric-cap mono">{label}</span>
+      <span className="me-metric-val mono" style={tone ? { color: tone } : undefined}>
+        {value}
+      </span>
+    </span>
+  );
+}
+
+function MobileEquities({
+  view,
+  setView,
+  groups,
+  focusSorted,
+  focusSel,
+  onSelectFocus,
+  derived,
+  perfOf,
+  years,
+  fpx,
+  dataDate,
+  priceSource,
+  fullTableOpen,
+  setFullTableOpen,
+  tableBlock,
+}: {
+  view: View;
+  setView: (v: View) => void;
+  groups: readonly (readonly [string, Company[]])[];
+  focusSorted: Company[];
+  focusSel: Company | null;
+  onSelectFocus: (ticker: string) => void;
+  derived: Map<string, Derived>;
+  perfOf: (c: Company) => Perf;
+  years: number[];
+  fpx: (v: number | null | undefined, ccy: string) => React.ReactNode;
+  dataDate: string | null;
+  priceSource: string;
+  fullTableOpen: boolean;
+  setFullTableOpen: (open: boolean) => void;
+  tableBlock: React.ReactNode;
+}) {
+  const [, y1, y2] = years;
+
+  // Same behavior as the Sheet primitive: freeze the page behind the
+  // full-table overlay and let Escape close it.
+  useEffect(() => {
+    if (!fullTableOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullTableOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [fullTableOpen, setFullTableOpen]);
+
+  // The 3-up chip grid: which metrics show depends on the active view.
+  const cardMetrics = (c: Company) => {
+    const d = derived.get(c.ticker)!;
+    if (view === "decomp") {
+      const dc = d.decomp;
+      return (
+        <>
+          <MeMetric label="EPS Δ" value={mP(dc.epsDivs)} tone={signTone(dc.epsDivs)} />
+          <MeMetric label="MULT Δ" value={mP(dc.multiple)} tone={signTone(dc.multiple)} />
+          <MeMetric label="RETURN" value={mP(dc.ret)} tone={irrTone(dc.ret)} />
+        </>
+      );
+    }
+    if (view === "signal") {
+      const pe = d.mendoPe[y1];
+      const tgt = c.model.target_mult[String(y1)] ?? null;
+      const gap = pe != null && tgt != null ? pe - tgt : null;
+      return (
+        <>
+          <MeMetric
+            label="P/E vs TGT"
+            value={gap == null ? "n/a" : `${gap >= 0 ? "+" : ""}${gap.toFixed(1)}`}
+            tone={gap == null ? undefined : gap <= 0 ? "var(--green)" : "var(--red)"}
+          />
+          <MeMetric label="IRR" value={mP(d.irr[y2])} tone={irrTone(d.irr[y2])} />
+          <MeMetric label="MoM" value={mX(d.mom[y2])} />
+        </>
+      );
+    }
+    const pf = perfOf(c);
+    return (
+      <>
+        <MeMetric label="NTM P/E" value={mX(d.mendoPe[y1])} />
+        <MeMetric label="IRR" value={mP(d.irr[y2])} tone={irrTone(d.irr[y2])} />
+        <MeMetric label="1M" value={mP(pf.m1)} tone={signTone(pf.m1)} />
+      </>
+    );
+  };
+
+  return (
+    <div className="me">
+      <div className="me-switch" role="tablist">
+        {MOBILE_VIEWS.map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={view === id}
+            className={view === id ? "on" : ""}
+            onClick={() => setView(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {view === "focus" ? (
+        <MobileFocus
+          stocks={focusSorted}
+          selected={focusSel}
+          onSelect={onSelectFocus}
+          derived={derived}
+          perfOf={perfOf}
+          years={years}
+          fpx={fpx}
+        />
+      ) : (
+        <>
+          <div className="me-bar">
+            <span className="me-hint mono">{MOBILE_HINTS[view]}</span>
+            <button
+              type="button"
+              className="me-full-btn"
+              onClick={() => setFullTableOpen(true)}
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <path d="M7 9v6M17 9v6" />
+              </svg>
+              Full table
+            </button>
+          </div>
+
+          {groups.map(([grp, rows]) => (
+            <div key={grp} className="me-group">
+              <div className="me-group-head mono">
+                <span>{grp.toUpperCase()}</span>
+                <span className="me-group-count">{rows.length}</span>
+              </div>
+              {rows.map((c) => {
+                const d = derived.get(c.ticker)!;
+                return (
+                  <button
+                    key={c.ticker}
+                    type="button"
+                    className="me-card"
+                    onClick={() => {
+                      onSelectFocus(c.ticker);
+                      setView("focus");
+                    }}
+                  >
+                    <span className="me-card-top">
+                      <span className="me-card-id">
+                        <span className="me-tile mono" aria-hidden="true">
+                          {c.ticker.slice(0, 2)}
+                        </span>
+                        <span className="me-card-names">
+                          <span className="me-card-tk">
+                            {c.ticker}
+                            {c.port === 1 && <span className="me-star">★</span>}
+                          </span>
+                          <span className="me-card-nm">{c.bbg}</span>
+                        </span>
+                      </span>
+                      <span className="me-card-px">
+                        <span className="me-card-px-val mono">
+                          {fpx(d.price, c.currency)}
+                        </span>
+                        <span className="me-card-px-cap mono">PX</span>
+                      </span>
+                    </span>
+                    <span className="me-card-metrics">{cardMetrics(c)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+
+          <p className="me-cta">Tap any name for its Focus view →</p>
+          <p className="me-src mono">
+            PRICES VIA {priceSource.toUpperCase()}
+            {dataDate
+              ? ` · ${new Date(`${dataDate}T12:00:00`)
+                  .toLocaleDateString(undefined, { month: "short", day: "numeric" })
+                  .toUpperCase()}`
+              : ""}
+          </p>
+        </>
+      )}
+
+      {fullTableOpen && view !== "focus" && (
+        <div className="me-full" role="dialog" aria-modal="true" aria-label="Full table">
+          <div className="me-full-head">
+            <div className="me-full-title">
+              <span>
+                Equities ·{" "}
+                {MOBILE_VIEWS.find(([id]) => id === view)?.[1] ?? "Valuation"}
+              </span>
+              <span className="me-full-sub mono">SCROLL · TAP CLOSE</span>
+            </div>
+            <button
+              type="button"
+              className="me-full-close"
+              onClick={() => setFullTableOpen(false)}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+              Close
+            </button>
+          </div>
+          <div className="me-full-scroll">{tableBlock}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Focus, phone-sized: picker pills → identity card → metric grid → operating
+// model (with YoY sub-rows) → IRR build → model note. Reads the same model
+// series and Derived map the desktop FocusLayout / ModelGrid use.
+function MobileFocus({
+  stocks,
+  selected,
+  onSelect,
+  derived,
+  perfOf,
+  years,
+  fpx,
+}: {
+  stocks: Company[];
+  selected: Company | null;
+  onSelect: (ticker: string) => void;
+  derived: Map<string, Derived>;
+  perfOf: (c: Company) => Perf;
+  years: number[];
+  fpx: (v: number | null | undefined, ccy: string) => React.ReactNode;
+}) {
+  const [y0, y1, y2] = years;
+  // The phone model table shows a 6-year window starting the year before the
+  // desktop display window (per the design: 2025E–2030E), so the first YoY
+  // column resolves naturally to "—".
+  const modelYears = [y0 - 1, ...years];
+  const d = selected ? derived.get(selected.ticker) ?? null : null;
+  const dc = d?.decomp;
+  const pf = selected ? perfOf(selected) : null;
+
+  const mv = (
+    key: "revs" | "gm" | "adj_eps" | "mendo_eps" | "target_mult",
+    y: number,
+  ): number | null => {
+    const m = selected?.model[key] as YearMap | undefined;
+    const v = m?.[String(y)];
+    return v == null ? null : v;
+  };
+  const grow = (key: "revs" | "adj_eps" | "mendo_eps", y: number) => {
+    const prev = mv(key, y - 1);
+    const cur = mv(key, y);
+    return prev != null && cur != null && prev !== 0 ? cur / prev - 1 : null;
+  };
+  const sM = (v: number | null) =>
+    v == null ? "—" : Math.round(v).toLocaleString("en-US");
+  const sP = (v: number | null) => (v == null ? "—" : `${(v * 100).toFixed(1)}%`);
+  const sE = (v: number | null) => (v == null ? "—" : v.toFixed(2));
+  const sX = (v: number | null) => (v == null ? "—" : v.toFixed(1));
+
+  // IRR build: the decomp re-grouped the way the design shows it — pure EPS
+  // growth, multiple change, and the dividend/buyback yield sum to the total
+  // (epsDivs already includes the yield, so it is split back out here).
+  const epsGrowth = dc?.epsDivs != null && dc?.yld != null ? dc.epsDivs - dc.yld : null;
+  const tgt = selected ? selected.model.target_mult[String(y1)] ?? null : null;
+
+  const yoyCell = (v: number | null, key: React.Key) => (
+    <td
+      key={key}
+      className="mono me-model-yoy"
+      style={{ color: v == null ? "var(--faint)" : v >= 0 ? "var(--green)" : "var(--red)" }}
+    >
+      {v == null ? "—" : `${v >= 0 ? "+" : ""}${(v * 100).toFixed(0)}%`}
+    </td>
+  );
+
+  return (
+    <>
+      <div className="me-picker">
+        {stocks.map((c) => {
+          const on = selected?.ticker === c.ticker;
+          return (
+            <button
+              key={c.ticker}
+              type="button"
+              className={`me-pill${on ? " on" : ""}`}
+              onClick={() => onSelect(c.ticker)}
+            >
+              {c.ticker}
+              {c.port === 1 && (
+                <span className="me-pill-star" aria-label="portfolio">
+                  ★
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {!selected || !d ? (
+        <p className="eq-note">Select a name to see its detail.</p>
+      ) : (
+        <>
+          <div className="me-id">
+            <FocusLogo ticker={selected.ticker} />
+            <div className="me-id-main">
+              <div className="me-id-tk">
+                {selected.ticker}
+                {selected.port === 1 && <span className="me-star">★</span>}
+              </div>
+              <div className="me-id-sub">
+                {selected.bbg} · {selected.grp}
+              </div>
+            </div>
+            <div className="me-id-px">
+              <div className="me-id-px-val mono">{fpx(d.price, selected.currency)}</div>
+              <div className="me-id-irr mono" style={{ color: irrTone(d.irr[y2]) }}>
+                {mP(d.irr[y2])} IRR
+              </div>
+            </div>
+          </div>
+
+          <div className="me-grid6">
+            <MeMetric label="NTM P/E" value={mX(d.mendoPe[y1])} />
+            <MeMetric label="TARGET" value={mX(tgt)} />
+            <MeMetric label="MoM" value={mX(d.mom[y2])} />
+            <MeMetric label={`EV/GP '${String(y1).slice(2)}`} value={mX(d.evGp[y1])} />
+            <MeMetric label="1M" value={mP(pf!.m1)} tone={signTone(pf!.m1)} />
+            <MeMetric label="6M" value={mP(pf!.m6)} tone={signTone(pf!.m6)} />
+          </div>
+
+          <div className="me-sec mono">Operating model</div>
+          <div className="me-model-wrap">
+            <table className="me-model">
+              <thead>
+                <tr>
+                  <th aria-hidden="true" />
+                  {modelYears.map((y) => (
+                    <th key={y} className="mono">
+                      {String(y).slice(2)}E
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>Revenue ($M)</th>
+                  {modelYears.map((y) => (
+                    <td key={y} className="mono">
+                      {sM(mv("revs", y))}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="me-model-sub">
+                  <th>↳ YoY %</th>
+                  {modelYears.map((y) => yoyCell(grow("revs", y), y))}
+                </tr>
+                <tr>
+                  <th>Gross margin</th>
+                  {modelYears.map((y) => (
+                    <td key={y} className="mono">
+                      {sP(mv("gm", y))}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <th>Adj. EPS ($)</th>
+                  {modelYears.map((y) => (
+                    <td key={y} className="mono">
+                      {sE(mv("adj_eps", y))}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="me-model-sub">
+                  <th>↳ YoY %</th>
+                  {modelYears.map((y) => yoyCell(grow("adj_eps", y), y))}
+                </tr>
+                <tr>
+                  <th>Mendo EPS ($)</th>
+                  {modelYears.map((y) => (
+                    <td key={y} className="mono">
+                      {sE(mv("mendo_eps", y))}
+                    </td>
+                  ))}
+                </tr>
+                <tr className="me-model-sub">
+                  <th>↳ YoY %</th>
+                  {modelYears.map((y) => yoyCell(grow("mendo_eps", y), y))}
+                </tr>
+                <tr>
+                  <th>Target mult (×)</th>
+                  {modelYears.map((y) => (
+                    <td key={y} className="mono">
+                      {sX(mv("target_mult", y))}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="me-sec mono">
+            IRR build
+            <span className="me-sec-tag mono">NTM → YE&rsquo;{String(y2).slice(2)}</span>
+          </div>
+          <div className="me-irr">
+            <div className="me-irr-row">
+              <span>EPS growth</span>
+              <span className="mono" style={{ color: signTone(epsGrowth) }}>
+                {mP(epsGrowth)}
+              </span>
+            </div>
+            <div className="me-irr-row">
+              <span>Multiple change</span>
+              <span className="mono" style={{ color: signTone(dc?.multiple) }}>
+                {mP(dc?.multiple)}
+              </span>
+            </div>
+            <div className="me-irr-row">
+              <span>Dividend / buyback</span>
+              <span className="mono" style={{ color: signTone(dc?.yld) }}>
+                {mP(dc?.yld)}
+              </span>
+            </div>
+            <div className="me-irr-total">
+              <span>= Expected return</span>
+              <span className="mono" style={{ color: irrTone(dc?.ret) }}>
+                {mP(dc?.ret)}
+              </span>
+            </div>
+          </div>
+
+          <div className="me-note">
+            <div className="me-note-cap mono">MODEL NOTE</div>
+            <p>
+              Shared model
+              {selected.update_date
+                ? ` · last updated ${selected.update_date}${
+                    selected.update_by ? ` by ${selected.update_by}` : ""
+                  }`
+                : " · maintained by the team"}
+              . The IRR rests on {mP(epsGrowth, 0)} EPS growth against a {mX(tgt)}{" "}
+              exit multiple. Edit the model from the desktop dashboard.
+            </p>
+          </div>
+        </>
+      )}
     </>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
+import { MobileTabBar } from "@/components/MobileChrome";
 import { ExportPptButton } from "@/components/ExportPptButton";
 import { TodayDate } from "@/components/TodayDate";
 import { getTweetCount } from "@/lib/tweets";
@@ -238,6 +239,7 @@ export default function HomePage() {
         <span>7 MODULES · 5 LIVE</span>
         <span>MERITAGE · INTERNAL</span>
       </div>
+      <MobileTabBar />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
+import { MobileTabBar, MobileTopBar } from "@/components/MobileChrome";
 
 // The unified shell for the client-rendered tools (Equities, Twitter Themes,
 // Diligence Tracker, Morning Notes). Mirrors the server DashboardFrame used by
@@ -12,6 +13,9 @@ export function AppShell({
   title,
   subtitle,
   actions,
+  // Mobile top-bar action cluster; falls back to `actions`. Tools pass a
+  // mobile-specific set here (export/download affordances are desktop-only).
+  mobileActions,
   footerLeft,
   children,
 }: {
@@ -19,12 +23,14 @@ export function AppShell({
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   actions?: React.ReactNode;
+  mobileActions?: React.ReactNode;
   footerLeft?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="shell">
       <Sidebar />
+      <MobileTopBar tool={tool} actions={mobileActions ?? actions} />
       <div className="content">
         <header className="content-header">
           <div className="header-lead">
@@ -46,6 +52,7 @@ export function AppShell({
           <span>MERITAGE · INTERNAL</span>
         </footer>
       </div>
+      <MobileTabBar />
     </div>
   );
 }

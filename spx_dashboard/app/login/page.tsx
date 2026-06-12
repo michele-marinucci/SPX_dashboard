@@ -38,14 +38,21 @@ function LoginForm() {
   return (
     <div className="login-wrap">
       <div className="login-card">
-        <div className="login-brand">
-          <span className="login-dot" aria-hidden="true" />
-          Mendo Hub
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/meritage-logo.png" alt="Meritage" className="login-logo" />
+        <div className="login-product">
+          <span className="login-product-name">Mendo Hub</span>
+          <span className="login-internal mono">INTERNAL</span>
         </div>
+        <h1 className="login-heading">Sign in</h1>
         <p className="login-tagline">Private dashboard — authorized access only.</p>
 
         <form className="login-form" onSubmit={onSubmit}>
+          <label className="login-label mono" htmlFor="login-password">
+            PASSWORD
+          </label>
           <input
+            id="login-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -55,9 +62,10 @@ function LoginForm() {
           />
           {error && <p className="login-error">{error}</p>}
           <button type="submit" disabled={loading || !password}>
-            {loading ? "Checking…" : "Sign in"}
+            {loading ? "Checking…" : "Enter workspace"}
           </button>
         </form>
+        <p className="login-foot mono">SERVER-SIDE AUTH · NOINDEX</p>
       </div>
     </div>
   );

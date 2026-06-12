@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
+import { Sheet } from "@/components/Sheet";
+import { useIsMobile } from "@/components/useIsMobile";
 import { cx } from "@/lib/format";
 import { TOOL_NAMES } from "@/lib/toolMeta";
 import {
@@ -89,6 +91,7 @@ export function TwitterMonitor({
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setAdded(loadList(ADD_KEY));
@@ -266,16 +269,7 @@ export function TwitterMonitor({
   const daily = data.daily_summary;
   const hasContent = data.tweets.length > 0;
 
-  const actions = (
-    <>
-      <button
-        type="button"
-        className="btn-primary"
-        onClick={() => setManageOpen(true)}
-        title="Add or remove followed accounts"
-      >
-        Manage accounts <span className="mono">{followedList.length}</span>
-      </button>
+  const howItWorks = (
       <HowItWorks title={`How ${TOOL_NAMES.twitter} works`}>
         <p className="hiw-lead">
           Every <strong>Monday, Wednesday and Friday</strong> morning the monitor
@@ -303,7 +297,89 @@ export function TwitterMonitor({
           </li>
         </ul>
       </HowItWorks>
+  );
+
+  const actions = (
+    <>
+      <button
+        type="button"
+        className="btn-primary"
+        onClick={() => setManageOpen(true)}
+        title="Add or remove followed accounts"
+      >
+        Manage accounts <span className="mono">{followedList.length}</span>
+      </button>
+      {howItWorks}
     </>
+  );
+
+  // Phone top bar: a compact "Accounts" button (the manage list opens as a
+  // bottom sheet) + the ? help button.
+  const mobileActions = (
+    <>
+      <button
+        type="button"
+        className="mt-accounts-btn"
+        onClick={() => setManageOpen(true)}
+        title="Add or remove followed accounts"
+      >
+        Accounts
+      </button>
+      {howItWorks}
+    </>
+  );
+
+  // The manage-accounts editor body, shared between the desktop overlay and
+  // the mobile bottom sheet (same add form, list, and shared/local note).
+  const manageBody = (
+    <div className="tw-manage-body handles">
+      <form
+        className="handle-add"
+        onSubmit={(e) => {
+          e.preventDefault();
+          addHandle(draft);
+        }}
+      >
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="add @handle"
+          aria-label="Add a handle"
+        />
+        <button type="submit" disabled={busy || !draft.trim()}>
+          Add
+        </button>
+      </form>
+      <ul className="handle-list">
+        {followedList.map((h) => (
+          <li key={h} className="handle-row">
+            <a
+              href={`https://x.com/${h}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="handle-name"
+            >
+              @{h}
+            </a>
+            <button
+              type="button"
+              className="handle-x"
+              onClick={() => removeHandle(h)}
+              disabled={busy}
+              aria-label={`Remove @${h}`}
+              title="Remove"
+            >
+              ×
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="handles-note">
+        {dbFollowed !== null
+          ? "Shared list — edits apply for everyone."
+          : "Saved in this browser."}
+      </p>
+    </div>
   );
 
   return (
@@ -322,9 +398,23 @@ export function TwitterMonitor({
         </>
       }
       actions={actions}
+      mobileActions={mobileActions}
       footerLeft={`${TOOL_NAMES.twitter} as of ${asOf ?? "—"}`}
     >
-      {manageOpen && (
+      {isMobile ? (
+        <Sheet
+          open={manageOpen}
+          onClose={() => setManageOpen(false)}
+          title={
+            <>
+              Followed accounts{" "}
+              <span className="handles-count">{followedList.length}</span>
+            </>
+          }
+        >
+          {manageBody}
+        </Sheet>
+      ) : manageOpen && (
         <div className="tw-manage-overlay" onClick={() => setManageOpen(false)}>
           <div className="tw-manage" onClick={(e) => e.stopPropagation()}>
             <div className="tw-manage-head">
@@ -341,54 +431,7 @@ export function TwitterMonitor({
                 ×
               </button>
             </div>
-            <div className="tw-manage-body handles">
-              <form
-                className="handle-add"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  addHandle(draft);
-                }}
-              >
-                <input
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  placeholder="add @handle"
-                  aria-label="Add a handle"
-                />
-                <button type="submit" disabled={busy || !draft.trim()}>
-                  Add
-                </button>
-              </form>
-              <ul className="handle-list">
-                {followedList.map((h) => (
-                  <li key={h} className="handle-row">
-                    <a
-                      href={`https://x.com/${h}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="handle-name"
-                    >
-                      @{h}
-                    </a>
-                    <button
-                      type="button"
-                      className="handle-x"
-                      onClick={() => removeHandle(h)}
-                      disabled={busy}
-                      aria-label={`Remove @${h}`}
-                      title="Remove"
-                    >
-                      ×
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <p className="handles-note">
-                {dbFollowed !== null
-                  ? "Shared list — edits apply for everyone."
-                  : "Saved in this browser."}
-              </p>
-            </div>
+            {manageBody}
           </div>
         </div>
       )}
@@ -414,6 +457,30 @@ export function TwitterMonitor({
               {portfolioHits.length === 0 ? (
                 <p className="muted">No portfolio names came up in the latest batch.</p>
               ) : (
+                <>
+                {/* Mobile-only chips (monogram + ticker + post count); the
+                    table below is the desktop rendering. */}
+                <div className="mt-mentions">
+                  {portfolioHits.map(({ disp, tweets }) => (
+                    // Scroll to the first tweet for this ticker; fall back
+                    // gracefully if no anchor exists yet.
+                    <a
+                      key={disp}
+                      href={tweets[0] ? `#tw-${tweets[0].id}` : undefined}
+                      className="mt-mention"
+                    >
+                      <span className="mt-tile" aria-hidden="true">
+                        {disp.slice(0, 2)}
+                      </span>
+                      <span className="mt-mention-text">
+                        <span className="mt-mention-tk">{disp}</span>
+                        <span className="mt-mention-ct mono">
+                          {tweets.length} {tweets.length === 1 ? "post" : "posts"}
+                        </span>
+                      </span>
+                    </a>
+                  ))}
+                </div>
                 <table className="tw-table tw-port-table">
                   <thead>
                     <tr>
@@ -447,6 +514,7 @@ export function TwitterMonitor({
                     ))}
                   </tbody>
                 </table>
+                </>
               )}
             </section>
 
@@ -507,6 +575,48 @@ export function TwitterMonitor({
                     <span className="tw-sent-dot tw-sent-neutral" /> neutral
                   </span>
                 </span>
+              </div>
+              {/* Mobile-only rows: sentiment dot + @handle + X glyph + the
+                  summary + ticker chips. The table is the desktop rendering. */}
+              <div className="mt-tweets">
+                {recentTweets.map((t) => (
+                  <div key={t.id} className="mt-tweet">
+                    <span
+                      className={cx("tw-sent-dot", `tw-sent-${t.sentiment}`)}
+                      title={t.sentiment}
+                    />
+                    <div className="mt-tweet-main">
+                      <div className="mt-tweet-head">
+                        <a
+                          className="mt-tweet-handle"
+                          href={`https://x.com/${t.handle}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          @{t.handle}
+                        </a>
+                        <a
+                          className="mt-tweet-x"
+                          href={t.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Open the post on X"
+                          aria-label="Open the post on X"
+                        >
+                          <XLogo />
+                        </a>
+                      </div>
+                      <p className="mt-tweet-sum">{t.summary || t.text}</p>
+                      {t.tickers.length > 0 && (
+                        <div className="mt-tweet-chips">
+                          {t.tickers.map((tk) => (
+                            <TickerChip key={tk} ticker={tk} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
               <table className="tw-table tw-tweets-table">
                 <thead>
