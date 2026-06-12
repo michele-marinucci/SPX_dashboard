@@ -1074,13 +1074,6 @@ function FocusLayout({
   const d = selected ? derived.get(selected.ticker) ?? null : null;
   const dc = d?.decomp;
   const yr = (y: number) => String(y).slice(2);
-  // YoY revenue growth into `y` (needs the prior year's revenue) and gross
-  // margin for `y`, read straight from the model the same way the grid does.
-  const revGrow = (y: number) => {
-    const prev = selected?.model.revs[String(y - 1)];
-    const cur = selected?.model.revs[String(y)];
-    return prev != null && cur != null && prev !== 0 ? cur / prev - 1 : null;
-  };
   const mv = (
     key: "revs" | "gm" | "adj_eps" | "mendo_eps" | "target_mult",
     y: number,
@@ -1088,6 +1081,13 @@ function FocusLayout({
     const m = selected?.model[key] as YearMap | undefined;
     const v = m?.[String(y)];
     return v == null ? null : v;
+  };
+  // YoY growth into `y` for a model series (needs the prior year's value),
+  // read straight from the model the same way the grid does.
+  const grow = (key: "revs" | "adj_eps" | "mendo_eps", y: number) => {
+    const prev = mv(key, y - 1);
+    const cur = mv(key, y);
+    return prev != null && cur != null && prev !== 0 ? cur / prev - 1 : null;
   };
   // Model-snapshot cell formatters: grouped $M, 1-dp %, 2-dp per-share, 1-dp ×.
   const sM = (v: number | null) =>
@@ -1198,7 +1198,7 @@ function FocusLayout({
                   <tr className="eq-snap-sub">
                     <th>YoY growth</th>
                     {years.map((y) => (
-                      <td key={y}>{sP(revGrow(y))}</td>
+                      <td key={y}>{sP(grow("revs", y))}</td>
                     ))}
                   </tr>
                   <tr>
@@ -1213,10 +1213,22 @@ function FocusLayout({
                       <td key={y}>{sE(mv("adj_eps", y))}</td>
                     ))}
                   </tr>
+                  <tr className="eq-snap-sub">
+                    <th>YoY growth</th>
+                    {years.map((y) => (
+                      <td key={y}>{sP(grow("adj_eps", y))}</td>
+                    ))}
+                  </tr>
                   <tr>
                     <th>Mendo EPS ($)</th>
                     {years.map((y) => (
                       <td key={y}>{sE(mv("mendo_eps", y))}</td>
+                    ))}
+                  </tr>
+                  <tr className="eq-snap-sub">
+                    <th>YoY growth</th>
+                    {years.map((y) => (
+                      <td key={y}>{sP(grow("mendo_eps", y))}</td>
                     ))}
                   </tr>
                   <tr>
