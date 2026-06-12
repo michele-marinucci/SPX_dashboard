@@ -107,22 +107,47 @@ body {
   padding: 30px 30px 28px;
   box-shadow: 0 18px 50px rgba(26, 26, 34, 0.12);
 }
-.login-brand {
+.login-logo {
+  height: 27px;
+  width: auto;
+  display: block;
+  margin: 0 0 12px;
+}
+.login-product {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 21px;
+  gap: 11px;
+  margin: 0 0 22px;
+}
+.login-product-name {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.login-internal {
+  padding-left: 11px;
+  border-left: 1px solid var(--line-strong);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--faint);
+}
+.login-heading {
+  margin: 0 0 6px;
+  font-size: 27px;
   font-weight: 800;
   letter-spacing: -0.04em;
-  color: var(--ink);
-  margin: 0 0 6px;
 }
-.login-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 3px;
-  background: var(--brand);
-  box-shadow: 0 0 0 4px var(--brand-050);
+.login-label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--faint);
+  margin: 0 0 7px;
+}
+.login-foot {
+  margin: 18px 0 0;
+  font-size: 9.5px;
+  letter-spacing: 1.2px;
+  color: var(--faint);
 }
 .login-tagline {
   color: var(--muted);
@@ -136,9 +161,9 @@ body {
 }
 .login-card input {
   width: 100%;
-  padding: 11px 12px;
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius-sm);
+  padding: 15px 16px;
+  border: 1.5px solid var(--line-2);
+  border-radius: 11px;
   font-size: 15px;
   margin-bottom: 12px;
   outline: none;
@@ -149,13 +174,13 @@ body {
 }
 .login-card button {
   width: 100%;
-  padding: 11px;
+  padding: 14px;
   border: 1px solid var(--brand);
-  border-radius: var(--radius-sm);
+  border-radius: 11px;
   background: var(--brand);
   color: #fff;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
   transition: background 0.14s;
 }
@@ -1617,91 +1642,90 @@ thead .row-head {
    RESPONSIVE
    ========================================================================== */
 @media (max-width: 768px) {
+  /* Mobile shell: the rail is replaced by the bottom tab bar + top app bar
+     (see the MOBILE layer at the end of this file). */
   .shell {
     flex-direction: column;
   }
   .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 60;
-    width: 100%;
-    height: 100dvh;
-    overflow-y: auto;
-    border-right: none;
-  }
-  .sidebar-collapsed {
-    height: auto;
-    overflow-y: visible;
-    background: var(--brand);
-    border-bottom: none;
-  }
-  .sidebar-collapsed .sidebar-head {
-    margin: 0;
-    padding: 13px 16px;
-    border-bottom: none;
-    justify-content: flex-start;
-    gap: 11px;
-    cursor: pointer;
-  }
-  .sidebar-collapsed .sidebar-brand {
-    display: flex;
-    color: #fff;
-    font-size: 16px;
-  }
-  .sidebar-collapsed .sidebar-toggle {
-    background: rgba(255, 255, 255, 0.16);
-    border-color: rgba(255, 255, 255, 0.45);
-    color: #fff;
-  }
-  .sidebar-collapsed .sidebar-hint {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-left: auto;
-    padding: 4px 11px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.18);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .sidebar-collapsed .sidebar-hint::before {
-    content: "▾";
-    font-size: 11px;
-    line-height: 1;
-  }
-  /* When the rail is open it IS the screen — hide content underneath. */
-  .sidebar:not(.sidebar-collapsed) ~ .content {
     display: none;
   }
   .content {
-    padding: 76px 16px 50px;
+    padding: 14px 16px calc(84px + env(safe-area-inset-bottom));
   }
+  /* The tool title lives in the mobile top app bar. */
   .content-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  .content-header h1 {
-    font-size: 22px;
+    display: none;
   }
   .hub,
   .solo {
-    padding: 24px 18px 50px;
+    padding: 18px 16px calc(40px + env(safe-area-inset-bottom));
   }
-  .colhead,
-  .hub-row {
-    grid-template-columns: 36px 1fr;
+  /* Hub rows become stacked cards: accent stripe + index + name/desc + CTA. */
+  .colhead {
+    grid-template-columns: 36px 1fr auto;
+    gap: 10px;
   }
   .colhead span:nth-child(3),
-  .colhead span:nth-child(4),
-  .stats,
-  .cta,
-  .prev {
+  .stats {
     display: none;
+  }
+  .hub-head h1 {
+    font-size: 25px;
+  }
+  .hub-row {
+    grid-template-columns: 36px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 9px;
+    padding: 15px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--brand);
+    border-radius: 13px;
+  }
+  .hub-row.wip {
+    border-left-color: var(--line-strong);
+  }
+  .hub-row .rname {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .hub-row .rdesc {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hub-row .cta,
+  .hub-row .prev {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand);
+    white-space: nowrap;
+  }
+  .hub-row .prev {
+    color: var(--faint);
+  }
+  /* The WIP chip column collapses; the "Preview →" affordance carries it. */
+  .hub-row .wiptag {
+    display: none;
+  }
+
+  /* Login: full-screen, vertically centered, no card chrome. */
+  .login-wrap {
+    padding: 0 30px;
+  }
+  .login-card {
+    max-width: none;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
   }
   .data-table {
     font-size: 11px;
@@ -4476,4 +4500,1612 @@ th.tw-link-col { text-align: center; }
   width: auto;
   text-align: right;
   background: var(--surface-2);
+}
+
+/* ============================================================================
+   MOBILE — phone shell (≤768px; reference width 393px)
+   Bottom tab bar + top app bar + bottom-sheet modals. Desktop keeps the rail.
+   ========================================================================== */
+
+/* Chrome is rendered on every page but only displayed on small screens. */
+.m-appbar,
+.m-tabbar {
+  display: none;
+}
+
+/* The SPX server page renders both the desktop sections and the mobile card
+   layer; CSS picks one per breakpoint (display:contents keeps the desktop
+   wrapper layout-neutral). */
+.ms-mobile {
+  display: none;
+}
+.ms-desktop {
+  display: contents;
+}
+
+/* Mobile-only elements the Notes / Themes / Diligence clients always render;
+   the breakpoint layer below turns them on. */
+.mn-meta,
+.mt-mentions,
+.mt-tweets,
+.md-sub,
+.md-add-btn {
+  display: none;
+}
+
+/* ---- Bottom sheet primitive (Sheet.tsx) — global so any view can use it. */
+.m-sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(12, 12, 18, 0.4);
+  animation: m-fade 0.2s ease;
+}
+.m-sheet {
+  width: 100%;
+  max-height: 78dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: m-sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.m-sheet-handle {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 4px;
+  margin: 9px auto 0;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+.m-sheet-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px 10px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.m-sheet-title {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.m-sheet-close {
+  width: 32px;
+  height: 32px;
+  margin-right: -6px;
+  border: none;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+}
+.m-sheet-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 18px 18px;
+}
+.m-sheet-foot {
+  flex: 0 0 auto;
+  padding: 12px 18px;
+  border-top: 1px solid var(--line-soft);
+}
+@keyframes m-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes m-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  /* ---- Top app bar ---- */
+  .m-appbar {
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: calc(9px + env(safe-area-inset-top)) 14px 9px;
+  }
+  .m-appbar-brand {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .m-appbar-brand img {
+    height: 20px;
+    width: auto;
+  }
+  .m-appbar-lead {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .m-appbar-title {
+    font-size: 15.5px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .m-appbar-crumb {
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    color: var(--faint);
+  }
+  .m-appbar-actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* Compact the shared "ⓘ How it works" button into a round ? in the bar. */
+  .m-appbar-actions .hiw-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
+    font-size: 0;
+  }
+  .m-appbar-actions .hiw-btn span {
+    font-size: 15px;
+  }
+  /* No download/export affordances on mobile (intentional design decision). */
+  .m-appbar-actions a[download],
+  .m-appbar-actions .export-ppt-btn,
+  .hub .export-ppt-btn,
+  .content a[download] {
+    display: none;
+  }
+
+  /* ---- Bottom tab bar (frosted, safe-area aware) ---- */
+  .m-tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    display: flex;
+    background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    padding: 5px 6px calc(7px + env(safe-area-inset-bottom));
+  }
+  .m-tab {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 44px;
+    padding: 4px 0;
+    border-radius: 9px;
+    color: var(--faint);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .m-tab-label {
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+  .m-tab-active {
+    color: var(--brand);
+  }
+
+  /* ---- Pop-ups become bottom sheets: restyle the shared HowItWorks modal. */
+  .hiw-overlay {
+    display: flex;
+    align-items: flex-end;
+    padding: 0;
+    background: rgba(12, 12, 18, 0.4);
+  }
+  .hiw-modal {
+    max-width: none;
+    max-height: 78dvh;
+    overflow-y: auto;
+    border: none;
+    border-radius: 22px 22px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    animation: m-sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Routed view fade-in. */
+  .content {
+    animation: m-fade 0.3s ease;
+  }
+
+  /* ---- Mobile: Equities ---- */
+  /* Segmented view switcher (Valuation · IRR Decomp · Rel Value · Focus). */
+  .me-switch {
+    display: flex;
+    gap: 3px;
+    background: var(--surface-3);
+    border-radius: 11px;
+    padding: 4px;
+    margin-bottom: 14px;
+  }
+  .me-switch button {
+    flex: 1 1 0;
+    min-height: 36px;
+    padding: 9px 2px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .me-switch button.on {
+    background: var(--surface);
+    color: var(--brand);
+    box-shadow: 0 1px 2px rgba(26, 26, 34, 0.12);
+  }
+
+  /* Column hint + "Full table" row. */
+  .me-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .me-hint {
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    color: var(--faint);
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .me-full-btn {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 7px 11px;
+    border: 1px solid var(--line-2);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--brand);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Sector groups of stock cards. */
+  .me-group {
+    margin-bottom: 16px;
+  }
+  .me-group-head {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2px 8px;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .me-group-count {
+    color: var(--faint);
+  }
+  .me-card {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font-sans);
+    color: var(--ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .me-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .me-card-id {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .me-tile {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--brand-050);
+    color: var(--brand);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .me-card-names {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .me-card-tk {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15.5px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .me-star {
+    color: var(--brand);
+    font-size: 12px;
+  }
+  .me-card-nm {
+    font-size: 11.5px;
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+  }
+  .me-card-px {
+    flex: 0 0 auto;
+    text-align: right;
+  }
+  .me-card-px-val {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .me-card-px-cap {
+    display: block;
+    font-size: 9.5px;
+    letter-spacing: 0.5px;
+    color: var(--faint);
+    font-weight: 500;
+  }
+  .me-card-metrics,
+  .me-grid6 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+  .me-grid6 {
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .me-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 7px 8px;
+  }
+  .me-metric-cap {
+    font-size: 8.5px;
+    letter-spacing: 0.6px;
+    color: var(--faint);
+    font-weight: 600;
+  }
+  .me-metric-val {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .me-cta {
+    text-align: center;
+    padding: 6px 0 4px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--brand);
+  }
+  .me-src {
+    text-align: center;
+    padding: 8px 0 4px;
+    margin: 0;
+    font-size: 9.5px;
+    letter-spacing: 1.5px;
+    color: var(--faint);
+    font-weight: 500;
+  }
+
+  /* Focus: horizontally-scrolling company picker pills. */
+  .me-picker {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -16px 13px;
+    padding: 0 16px 4px;
+  }
+  .me-picker::-webkit-scrollbar {
+    display: none;
+  }
+  .me-pill {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 7px 12px;
+    border: 1px solid var(--line-2);
+    border-radius: 20px;
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .me-pill .me-pill-star {
+    font-size: 10px;
+    color: var(--brand);
+  }
+  .me-pill.on {
+    border-color: var(--brand);
+    background: var(--brand);
+    color: #fff;
+  }
+  .me-pill.on .me-pill-star {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  /* Focus: identity card. */
+  .me-id {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .me-id .eq-focus-tile {
+    width: 40px;
+    height: 40px;
+  }
+  .me-id-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .me-id-tk {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .me-id-sub {
+    font-size: 12.5px;
+    color: var(--faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .me-id-px {
+    flex: 0 0 auto;
+    text-align: right;
+  }
+  .me-id-px-val {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .me-id-irr {
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* Focus: section heads + operating model table (sticky first column). */
+  .me-sec {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 9px;
+  }
+  .me-sec-tag {
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--brand-050);
+    color: var(--brand);
+    font-size: 9px;
+    letter-spacing: 0.8px;
+    text-transform: none;
+  }
+  .me-model-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -16px 22px;
+    padding: 0 16px;
+  }
+  .me-model {
+    border-collapse: collapse;
+    min-width: 100%;
+    font-variant-numeric: tabular-nums;
+  }
+  .me-model thead th {
+    padding: 7px 9px;
+    text-align: right;
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 10.5px;
+    color: var(--muted);
+    font-weight: 700;
+    border-bottom: 1.5px solid var(--line-strong);
+  }
+  .me-model thead th:first-child,
+  .me-model tbody th {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--bg);
+    text-align: left;
+    padding: 8px 10px 8px 0;
+    white-space: nowrap;
+  }
+  .me-model tbody th {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+  .me-model tbody td {
+    padding: 8px 9px;
+    text-align: right;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--line);
+  }
+  /* YoY sub-rows: lighter, italic, green/red, "—" in the first year. */
+  .me-model-sub th {
+    padding: 5px 10px 5px 14px;
+    font-size: 10.5px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--faint);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .me-model td.me-model-yoy {
+    padding: 5px 9px;
+    font-size: 10.5px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  /* Focus: IRR build card + model-note callout. */
+  .me-irr {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px 14px;
+    margin-bottom: 20px;
+  }
+  .me-irr-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .me-irr-row .mono {
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .me-irr-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 11px;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .me-irr-total .mono {
+    font-size: 16px;
+    font-weight: 800;
+  }
+  .me-note {
+    background: var(--brand-050);
+    border: 1px solid var(--brand-100);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+  }
+  .me-note-cap {
+    font-size: 9px;
+    letter-spacing: 0.8px;
+    color: var(--brand);
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .me-note p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  /* Full-table overlay: the complete desktop table (heatmaps, sorting,
+     grouping) full-screen above the tab bar, frozen first column + sticky
+     headers, horizontal + vertical scroll. */
+  .me-full {
+    position: fixed;
+    inset: 0;
+    z-index: 240;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    animation: m-fade 0.2s ease;
+  }
+  .me-full-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .me-full-title {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+  }
+  .me-full-title > span:first-child {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .me-full-sub {
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--faint);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .me-full-close {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 44px;
+    padding: 7px 13px;
+    border: none;
+    border-radius: 9px;
+    background: var(--brand);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .me-full-scroll {
+    flex: 1 1 auto;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  /* The reused desktop table loses its card chrome inside the overlay and
+     gains sticky headers; .eq-tick is already sticky-left in the base layer. */
+  .me-full-scroll .eq-wrap {
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+  }
+  .me-full-scroll .eq-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: var(--surface);
+  }
+  .me-full-scroll .eq-table .eq-h1 th {
+    height: 28px;
+    box-sizing: border-box;
+  }
+  .me-full-scroll .eq-table .eq-h2 th {
+    top: 28px;
+  }
+  /* The Rel Value table has a single header row — it pins at the very top. */
+  .me-full-scroll .eq-signal .eq-h2 th {
+    top: 0;
+  }
+  .me-full-scroll .eq-table thead th.eq-tick {
+    z-index: 4;
+  }
+
+  /* The spreadsheet edit-model flow is desktop-only on the phone: hide the
+     per-row ✎ / ↺ affordances (the cards and Focus view replace them). */
+  .me-full-scroll .eq-btns {
+    display: none;
+  }
+
+  /* Any Equities modal that still opens on a phone renders as a bottom sheet
+     (same treatment as the shared HowItWorks popup above). */
+  .eq-overlay {
+    align-items: flex-end;
+    padding: 0;
+    background: rgba(12, 12, 18, 0.4);
+    z-index: 220; /* above the tab bar, like the Sheet primitive */
+  }
+  .eq-overlay .eq-modal {
+    width: 100%;
+    max-width: none;
+    max-height: 78dvh;
+    overflow-y: auto;
+    border: none;
+    border-radius: 22px 22px 0 0;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    animation: m-sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* ---- Mobile: SPX ---- */
+  /* The desktop sections give way to the card layer under the breakpoint. */
+  .ms-desktop {
+    display: none;
+  }
+  .ms-mobile {
+    display: block;
+  }
+
+  .ms-intro {
+    margin: 0 0 13px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .ms-intro .mono {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Section chips (horizontal scroll), one per SPX_SECTIONS entry. */
+  .ms-chips {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 -16px 13px;
+    padding: 0 16px 4px;
+  }
+  .ms-chips::-webkit-scrollbar {
+    display: none;
+  }
+  .ms-chip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 8px 13px;
+    border: 1px solid var(--line-2);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ms-chip-num {
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+  .ms-chip.on {
+    border-color: var(--brand);
+    background: var(--brand-050);
+    color: var(--brand);
+  }
+
+  /* Aggregate/Compounders segmented toggle + the "Full" landscape button. */
+  .ms-toggle-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .ms-seg {
+    flex: 1 1 auto;
+    display: flex;
+    gap: 4px;
+    background: var(--surface-3);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .ms-seg button {
+    flex: 1 1 0;
+    min-height: 36px;
+    padding: 8px 4px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ms-seg button.on {
+    background: var(--surface);
+    color: var(--brand);
+    box-shadow: 0 1px 2px rgba(26, 26, 34, 0.12);
+  }
+
+  /* Section head (mirrors the desktop .section-head, phone-sized). */
+  .ms-head {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    padding: 4px 2px 12px;
+  }
+  .ms-head-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--brand);
+  }
+  .ms-head-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+  .ms-head-note {
+    margin-left: auto;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    color: var(--faint);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  /* Category cards (label + count pill + 3-up metric grid). */
+  .ms-card {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font-sans);
+    color: var(--ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ms-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .ms-card-label {
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .ms-pill {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand);
+    background: var(--brand-050);
+    padding: 2px 9px;
+    border-radius: 20px;
+  }
+  /* Inline P/E history row on the NTM P/E section's cards. */
+  .ms-spark {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .ms-spark-cap {
+    font-size: 9px;
+    letter-spacing: 0.6px;
+    color: var(--faint);
+    font-weight: 600;
+  }
+
+  /* Drill-down sheet: category metrics + member-stock list. */
+  .ms-drill-sub {
+    margin: 0 0 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .ms-drill-sub .mono {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .ms-drill-metrics {
+    margin-bottom: 16px;
+  }
+  .ms-members-head {
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    color: var(--faint);
+    font-weight: 700;
+    padding: 0 2px 8px;
+  }
+  .ms-member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 10px 12px;
+    background: var(--surface-2);
+    border-radius: 9px;
+    margin-bottom: 6px;
+  }
+  .ms-member-tk {
+    flex: 1 1 auto;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .ms-member-pe {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    margin-right: 12px;
+  }
+  .ms-member-ytd {
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .ms-cat-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    border: 1px solid var(--line-2);
+    border-radius: 11px;
+    color: var(--brand);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* Top-bar Filter button + the "Browse categories" sheet list. */
+  .ms-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--line-2);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--brand);
+    cursor: pointer;
+  }
+  .ms-browse-group {
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    color: var(--faint);
+    font-weight: 700;
+    padding: 10px 2px 6px;
+  }
+  .ms-browse-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 44px;
+    padding: 11px 12px;
+    background: var(--surface-2);
+    border-radius: 9px;
+    margin-bottom: 6px;
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .ms-browse-item .mono {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand);
+  }
+
+  /* Full-table overlay: the reused desktop table loses its card chrome and
+     pins both header rows; .row-head is already sticky-left in the base
+     layer, so only the top axis needs wiring here. */
+  .ms-full-scroll .table-wrap {
+    overflow: visible;
+    border: none;
+    border-radius: 0;
+  }
+  .ms-full-scroll .data-table .group-row th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    height: 26px;
+    box-sizing: border-box;
+    background: var(--surface);
+  }
+  .ms-full-scroll .data-table thead tr:not(.group-row) th {
+    top: 26px;
+  }
+  .ms-full-scroll .data-table thead .row-head {
+    z-index: 4;
+  }
+
+  /* ---- Mobile: Morning Notes ---- */
+  /* Top-bar mono date button (opens the calendar bottom sheet). */
+  .mn-date-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 8px 11px;
+    border: 1px solid var(--line-2);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* One-liner + the mono AI-GENERATED byline beneath it. */
+  .news-one-liner {
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.5;
+    margin: 0 0 6px;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  .mn-meta {
+    display: block;
+    margin: 0 0 20px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: var(--faint);
+    font-weight: 600;
+  }
+
+  /* 01 — portfolio-mention cards: ticker header, notes, brand-tinted take. */
+  .news-position-row {
+    display: block;
+    padding: 13px 14px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .news-position-ticker {
+    gap: 9px;
+    margin-bottom: 9px;
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    min-width: 0;
+    padding-top: 0;
+  }
+  .news-position-logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+  .news-position-notes {
+    display: block;
+  }
+  .news-take {
+    margin-top: 10px;
+    padding: 9px 11px;
+    border: 1px solid var(--brand-100);
+    border-left: 1px solid var(--brand-100);
+    border-radius: 9px;
+    background: var(--brand-050);
+    color: var(--ink-2);
+  }
+  .news-take-label {
+    display: block;
+    margin: 0 0 4px;
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 9px;
+    letter-spacing: 0.8px;
+  }
+
+  /* 02 — theme cards: headline, brand-numbered points, indented details. */
+  .news-theme-card {
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .news-theme-headline {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+  }
+  .news-theme-point {
+    color: var(--ink);
+    margin: 0 0 9px;
+  }
+  .news-theme-point::marker {
+    color: var(--brand);
+    font-weight: 700;
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 12px;
+  }
+  .news-theme-jargon li {
+    color: var(--muted);
+  }
+
+  /* Inline horizontal bar chart: mono caption + green/red bars + mono labels. */
+  .news-chart {
+    margin: 11px 0 0;
+    padding: 12px 13px;
+    background: var(--surface-2);
+    border: none;
+    border-radius: 10px;
+  }
+  .news-chart-title {
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 9.5px;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .news-chart-bars {
+    gap: 8px;
+  }
+  .news-chart-row {
+    grid-template-columns: 64px 1fr auto;
+    gap: 9px;
+  }
+  .news-chart-label {
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .news-chart-track {
+    height: 8px;
+    background: var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .news-chart-bar {
+    height: 8px;
+    border-radius: 4px;
+  }
+  .news-chart-value {
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 11.5px;
+    font-weight: 700;
+    min-width: 36px;
+    text-align: right;
+  }
+  .news-chart-value.pos {
+    color: var(--green);
+  }
+  .news-chart-value.neg {
+    color: var(--red);
+  }
+  .news-theme-sources {
+    margin-top: 11px;
+  }
+  .news-source-tag {
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 9.5px;
+    letter-spacing: 0.3px;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 3px 7px;
+  }
+
+  /* Calendar inside the bottom sheet: a finger-sized month grid; only days
+     with a note are tappable (brand-tinted + dotted), selected = brand fill. */
+  .mn-cal-sheet .news-cal-header {
+    margin-bottom: 10px;
+  }
+  .mn-cal-sheet .news-cal-nav {
+    width: 36px;
+    height: 36px;
+  }
+  .mn-cal-sheet .news-cal-grid {
+    gap: 4px;
+  }
+  .mn-cal-sheet .news-cal-day {
+    aspect-ratio: 1;
+    width: auto;
+    height: auto;
+    border-radius: 9px;
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .mn-cal-sheet .news-cal-day.has-note {
+    background: var(--brand-050);
+    color: var(--brand);
+  }
+  .mn-cal-sheet .news-cal-day.selected {
+    background: var(--brand);
+    color: #fff;
+    font-weight: 800;
+  }
+
+  /* ---- Mobile: Twitter Themes ---- */
+  /* Top-bar "Accounts" button (opens the followed-accounts bottom sheet). */
+  .mt-accounts-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 8px 12px;
+    border: 1px solid var(--line-2);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* The desktop tables/links give way to the chip + row renderings; the
+     "see post" anchors target hidden table rows, so they go too. */
+  .tw-port-table,
+  .tw-port-btn,
+  .tw-tweets-table,
+  .tw-legend,
+  .tw-see-post {
+    display: none;
+  }
+  .tw-headline {
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  /* 01 — portfolio-mention chips (monogram + ticker + post count). */
+  .mt-mentions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .mt-mention {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 9px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .mt-tile {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--brand-050);
+    color: var(--brand);
+    font-family: var(--font-mono, "JetBrains Mono", monospace);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .mt-mention-text {
+    display: flex;
+    flex-direction: column;
+  }
+  .mt-mention-tk {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .mt-mention-ct {
+    font-size: 9.5px;
+    color: var(--faint);
+    font-weight: 600;
+  }
+
+  /* 02 / 03 — summary items + recurring-theme cards as standalone cards. */
+  .tw-daily-item,
+  .tw-recur-card {
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .tw-recur-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  /* 04 — latest-tweet rows: sentiment dot + @handle + X glyph + summary. */
+  .mt-tweets {
+    display: block;
+  }
+  .mt-tweet {
+    display: flex;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 13px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow-sm);
+  }
+  .mt-tweet > .tw-sent-dot {
+    flex: 0 0 auto;
+    margin-top: 5px;
+  }
+  .mt-tweet-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .mt-tweet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .mt-tweet-handle {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--brand);
+    text-decoration: none;
+  }
+  .mt-tweet-x {
+    display: inline-flex;
+    color: var(--faint);
+    padding: 4px;
+    margin: -4px;
+  }
+  .mt-tweet-sum {
+    margin: 0 0 7px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+  .mt-tweet-sum:last-child {
+    margin-bottom: 0;
+  }
+  .mt-tweet-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  /* ---- Mobile: Diligence ---- */
+  /* Top-bar brand "+ Add" button (opens the add bottom sheet). */
+  .md-topadd {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 9px;
+    background: var(--brand);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* The inline add form (and its error) is desktop-only; the phone adds
+     through the dashed button / top-bar + Add → bottom sheet. */
+  .dil-add,
+  .content > .dil-error,
+  .dil-remove {
+    display: none;
+  }
+
+  /* Subtitle line + dashed add affordance. */
+  .md-sub {
+    display: block;
+    margin: 0 0 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .md-sub .mono {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .md-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 48px;
+    padding: 13px;
+    border: 1.5px dashed var(--line-strong);
+    border-radius: 11px;
+    background: var(--surface);
+    color: var(--brand);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .md-add-plus {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  /* List rows become standalone cards (drag handle + monogram + ticker +
+     name + the teal MS-Lists "Open" affordance). */
+  .dil-wrap {
+    margin-top: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+  .dil-row {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    padding-right: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .dil-row:not(:last-child) {
+    border-bottom: 1px solid var(--line);
+  }
+  .dil-link {
+    gap: 11px;
+    padding: 11px 13px 11px 6px;
+  }
+  .dil-logo {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+  .dil-ticker {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    min-width: 0;
+  }
+  .dil-name {
+    flex-basis: auto;
+  }
+  /* The old ≤640px reflow hid this; the design keeps the teal Open cue. */
+  .dil-open {
+    display: inline-flex;
+    color: #03787c;
+    font-weight: 700;
+  }
+  /* Synced-to-team note with a green status dot. */
+  .dil-note {
+    margin: 16px 2px 0;
+    text-align: center;
+  }
+  .dil-note::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    margin-right: 6px;
+  }
+
+  /* Add sheet: stacked inputs + a full-width brand submit. */
+  .md-sheet-lead {
+    margin: 0 0 14px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .md-sheet-form {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .md-sheet-form .dil-in {
+    width: 100%;
+    padding: 12px 13px;
+    font-size: 14px;
+  }
+  .md-sheet-form .dil-error {
+    margin: 0;
+  }
+  .md-sheet-submit {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 3px;
+    border: none;
+    border-radius: 11px;
+    background: var(--brand);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .md-sheet-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-sheet,
+  .m-sheet-scrim,
+  .hiw-modal,
+  .me-full,
+  .eq-overlay .eq-modal,
+  .content {
+    animation: none !important;
+  }
+  .livedot {
+    animation: none !important;
+  }
 }
