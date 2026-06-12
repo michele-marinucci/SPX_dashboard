@@ -42,9 +42,13 @@ def load_prior() -> dict | None:
 
 
 def persist(payload: dict) -> None:
+    # Atomic write so a crash mid-dump can't leave a truncated tweets.json
+    # (load_prior() would treat it as missing and drop the whole archive).
     os.makedirs(DATA_DIR, exist_ok=True)
-    with open(TWEETS_JSON, "w") as f:
+    tmp = TWEETS_JSON + ".tmp"
+    with open(tmp, "w") as f:
         json.dump(payload, f, indent=2, default=str)
+    os.replace(tmp, TWEETS_JSON)
     db.publish_twitter(payload)  # no-op when Supabase isn't configured
 
 

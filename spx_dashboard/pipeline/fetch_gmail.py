@@ -31,6 +31,7 @@ import email
 import imaplib
 import os
 import sys
+import time
 from email.message import Message
 
 IMAP_HOST = "imap.gmail.com"
@@ -106,9 +107,7 @@ def fetch_latest_xlsx(out_path: str) -> int:
                     continue
                 with open(out_path, "wb") as f:
                     f.write(payload)
-                epoch_ms = (
-                    int(__import__("time").mktime(internal) * 1000) if internal else 0
-                )
+                epoch_ms = int(time.mktime(internal) * 1000) if internal else 0
                 global LAST_EMAIL_EPOCH_MS
                 LAST_EMAIL_EPOCH_MS = epoch_ms
                 print(epoch_ms)  # stdout: timestamp for change detection

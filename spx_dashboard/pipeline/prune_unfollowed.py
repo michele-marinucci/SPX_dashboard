@@ -56,15 +56,20 @@ def main() -> int:
                 topic["tweet_ids"] = [i for i in topic["tweet_ids"] if i not in drop_ids]
         # Refresh the cached followed list to the canonical set.
         store["followed_handles"] = sorted(followed)
-        STORE.write_text(json.dumps(store, ensure_ascii=False, indent=2) + "\n")
+        tmp = STORE.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(store, ensure_ascii=False, indent=2) + "\n")
+        tmp.replace(STORE)
         print(f"Pruned {len(drop_ids)} unfollowed tweet(s) from {STORE.name} "
               f"({len(tweets)} -> {len(keep)}).")
 
     # Mirror the deletion into Supabase (by handle, so any stray is swept too).
-    if db.enabled():
+    if db.enabled() and followed:
         in_list = ",".join(f'"{h}"' for h in sorted(followed))
+        # `params=` so requests URL-encodes the filter (handles are normalized,
+        # but quotes/commas in a handle must never reach PostgREST raw).
         r = requests.delete(
-            f"{db.URL}/rest/v1/tweets?handle=not.in.({in_list})",
+            f"{db.URL}/rest/v1/tweets",
+            params={"handle": f"not.in.({in_list})"},
             headers=db._headers({"Prefer": "return=minimal"}),
             timeout=db.TIMEOUT,
         )

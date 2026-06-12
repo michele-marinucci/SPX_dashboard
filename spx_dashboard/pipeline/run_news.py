@@ -186,7 +186,16 @@ def _summarize(newsletters: list[dict], positions: list[str]) -> dict:
         if raw.startswith("json"):
             raw = raw[4:]
         raw = raw.strip()
-    return json.loads(raw)
+    summary = json.loads(raw)
+    # Fail loudly (workflow goes red) rather than archiving a malformed note.
+    if not isinstance(summary, dict):
+        raise ValueError(f"LLM summary is not a JSON object: {type(summary).__name__}")
+    if not isinstance(summary.get("date"), str):
+        summary["date"] = dt.date.today().isoformat()
+    for key in ("top_themes", "positions"):
+        if not isinstance(summary.get(key), list):
+            raise ValueError(f"LLM summary field {key!r} is missing or not a list")
+    return summary
 
 
 # ---------------------------------------------------------------------------
@@ -424,9 +433,13 @@ def _load_archive() -> list[dict]:
 
 
 def _save_archive(entries: list[dict]) -> None:
+    # Atomic write: a crash mid-dump would otherwise leave invalid JSON, and
+    # the next run's _load_archive() would silently reset the whole archive.
     os.makedirs(DATA_DIR, exist_ok=True)
-    with open(MORNING_NEWS_JSON, "w") as f:
+    tmp = MORNING_NEWS_JSON + ".tmp"
+    with open(tmp, "w") as f:
         json.dump(entries, f, indent=2)
+    os.replace(tmp, MORNING_NEWS_JSON)
 
 
 # ---------------------------------------------------------------------------
