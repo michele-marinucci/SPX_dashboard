@@ -270,7 +270,7 @@ export function TwitterMonitor({
     <>
       <button
         type="button"
-        className="btn"
+        className="btn-primary"
         onClick={() => setManageOpen(true)}
         title="Add or remove followed accounts"
       >

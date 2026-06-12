@@ -189,13 +189,24 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       `${stocks.length} names · ${stocks.filter((c) => c.port === 1).length} owned · ${priceNote}`,
     );
 
+    // Fit-to-slide: PowerPoint honors rowH only as a minimum, so size the font
+    // to the row height the table budget allows — otherwise rows grow to fit
+    // the text and the table spills past the footer.
+    const tableTop = 0.52;
+    const nRows =
+      2 +
+      order.reduce((a, g) => a + 1 + byGrp[g].length, 0) +
+      (indexRows.length ? 1 + indexRows.length : 0);
+    const rowH = Math.floor(((FOOTER_Y - tableTop - 0.05) / nRows) * 1000) / 1000;
+    const font = Math.max(5, Math.min(6.5, Math.floor((rowH * 72 - 2) / 1.2)));
+
     const h1Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
       fill: { color: NAVY },
       align: "center",
       valign: "middle",
-      fontSize: 6.5,
+      fontSize: font,
     };
     const h1: TCell[] = [
       cell("", h1Opts),
@@ -213,7 +224,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       fill: { color: NAVY },
       align: "right",
       valign: "middle",
-      fontSize: 6.5,
+      fontSize: font,
     };
     const h2: TCell[] = [
       cell("Company", { ...h2Opts, align: "left" }),
@@ -231,7 +242,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const rows: pptxgen.TableRow[] = [h1, h2];
 
     const grpRow = (label: string): TCell[] => [
-      cell(label, { colspan: 22, bold: true, color: INK, align: "left", fill: { color: GRP_FILL }, fontSize: 6.5 }),
+      cell(label, { colspan: 22, bold: true, color: INK, align: "left", fill: { color: GRP_FILL }, fontSize: font }),
     ];
 
     const valRow = (c: Company): TCell[] => {
@@ -303,10 +314,6 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       });
     }
 
-    // Fit: title strip is 0.52" tall; size every row so the table ends above
-    // the footer band. 46 rows → ~0.14" each; 6.5pt text + 1pt margins fits.
-    const tableTop = 0.52;
-    const rowH = Math.floor(((FOOTER_Y - tableTop - 0.05) / rows.length) * 1000) / 1000;
     const numW = (CONTENT_W - 1.0 - 0.62) / 20;
     slide.addTable(rows, {
       x: MARGIN,
@@ -315,7 +322,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       colW: [1.0, 0.62, ...Array(20).fill(numW)],
       rowH,
       fontFace: FONT,
-      fontSize: 6.5,
+      fontSize: font,
       color: INK,
       align: "right",
       valign: "middle",
@@ -333,13 +340,20 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       `NTM – YE${yy(y2)} IRR decomposition · '${yy(y0)}–'${yy(y3)} CAGR · ${priceNote}`,
     );
 
+    // Fit-to-slide (see buildValSlide): size the font to the available row
+    // height so PowerPoint can't expand rows past the footer.
+    const tableTop = 0.52;
+    const nRows = 2 + order.reduce((a, g) => a + 1 + byGrp[g].length, 0);
+    const rowH = Math.floor(((FOOTER_Y - tableTop - 0.05) / nRows) * 1000) / 1000;
+    const font = Math.max(5, Math.min(8, Math.floor((rowH * 72 - 2) / 1.2)));
+
     const h1Opts: pptxgen.TableCellProps = {
       bold: true,
       color: "FFFFFF",
       fill: { color: NAVY },
       align: "center",
       valign: "middle",
-      fontSize: 8,
+      fontSize: font,
     };
     const h1: TCell[] = [
       cell("", h1Opts),
@@ -353,7 +367,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       fill: { color: NAVY },
       align: "right",
       valign: "middle",
-      fontSize: 8,
+      fontSize: font,
     };
     const h2: TCell[] = [
       cell("Company", { ...h2Opts, align: "left" }),
@@ -365,7 +379,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
     const rows: pptxgen.TableRow[] = [h1, h2];
 
     const grpRow = (label: string): TCell[] => [
-      cell(label, { colspan: 11, bold: true, color: INK, align: "left", fill: { color: GRP_FILL }, fontSize: 8 }),
+      cell(label, { colspan: 11, bold: true, color: INK, align: "left", fill: { color: GRP_FILL }, fontSize: font }),
     ];
 
     const decompRow = (c: Company): TCell[] => {
@@ -399,8 +413,6 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       byGrp[g].forEach((c) => rows.push(decompRow(c)));
     });
 
-    const tableTop = 0.52;
-    const rowH = Math.floor(((FOOTER_Y - tableTop - 0.05) / rows.length) * 1000) / 1000;
     const numW = (CONTENT_W - 1.5 - 0.85) / 9;
     slide.addTable(rows, {
       x: MARGIN,
@@ -409,7 +421,7 @@ export async function addEquitiesSlides(pptx: pptxgen, today: Date) {
       colW: [1.5, 0.85, ...Array(9).fill(numW)],
       rowH,
       fontFace: FONT,
-      fontSize: 8,
+      fontSize: font,
       color: INK,
       align: "right",
       valign: "middle",

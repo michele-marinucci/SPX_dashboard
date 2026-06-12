@@ -141,6 +141,16 @@ export class Row {
     );
     return this;
   }
+  // A live Excel formula (pass the expression WITHOUT the leading "="). The
+  // optional cached value is stored so the cell shows a number on open even
+  // before a recalc — important for Bloomberg (=BDP) formulas, which only
+  // resolve on a terminal with the add-in.
+  formula(f: string, style: number, cached?: number | null): this {
+    const ref = colLetter(this.col++) + this.r;
+    const v = cached != null && isFinite(cached) ? `<v>${cached}</v>` : "";
+    this.cells.push(`<c r="${ref}" s="${style}"><f>${esc(f)}</f>${v}</c>`);
+    return this;
+  }
   skip(n = 1): this {
     this.col += n;
     return this;

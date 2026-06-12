@@ -26,6 +26,7 @@ import json
 import os
 import smtplib
 import sys
+from zoneinfo import ZoneInfo
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -469,8 +470,17 @@ def main() -> int:
     _save_archive(archive)
     print(f"UPDATED: morning_news.json ({len(archive)} entries in archive)", file=sys.stderr)
 
+    # Always refresh/store the note (above), but only email on weekdays. The
+    # markets are closed on weekends, so a Saturday/Sunday blast is just noise —
+    # the note still lands in the archive and on the site. Weekday is evaluated
+    # in US Eastern time so it matches the 9am-ET schedule regardless of the
+    # runner's UTC clock.
     if newsletters:
-        _send_email(summary)
+        weekday_et = dt.datetime.now(ZoneInfo("America/New_York")).weekday()  # Mon=0 … Sun=6
+        if weekday_et < 5:
+            _send_email(summary)
+        else:
+            print("Weekend (ET) — note saved, skipping email.", file=sys.stderr)
 
     return 0
 

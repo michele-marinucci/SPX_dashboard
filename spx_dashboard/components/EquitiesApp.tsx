@@ -374,23 +374,23 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
   const irrSorted = [...stocks].sort(
     (a, b) => (derived.get(b.ticker)?.irr[y2] ?? -1e9) - (derived.get(a.ticker)?.irr[y2] ?? -1e9),
   );
+  // Focus tab lists portfolio holdings first, then everything else — each block
+  // kept in IRR order. Array.prototype.sort is stable in modern engines, so
+  // partitioning by `port` preserves the IRR ranking within each group.
+  const focusSorted = [...irrSorted].sort(
+    (a, b) => (a.port === 1 ? 0 : 1) - (b.port === 1 ? 0 : 1),
+  );
 
   // Signal row: NTM P/E vs target (diverging), 3-yr IRR bullet vs book median,
   // MoM, and 1/3/6M perf as sparkbars. Fewer numerals, more glance value.
   const signalRow = (c: Company) => {
     const d = derived.get(c.ticker)!;
-    const pf = perfOf(c);
     const pe = d.mendoPe[y1];
     const tgt = c.model.target_mult[String(y1)] ?? null;
     const prem = pe != null && tgt ? pe / tgt - 1 : null;
     const premW = prem == null ? 0 : Math.min(46, Math.abs(prem) * 150);
     const irr = d.irr[y2];
     const irrW = irr == null ? 0 : Math.max(0, Math.min(100, (irr / irrMax) * 100));
-    const perfMax = Math.max(
-      0.0001,
-      ...[pf.m1, pf.m3, pf.m6].map((v) => (v == null ? 0 : Math.abs(v))),
-    );
-    const bars = [pf.m1, pf.m3, pf.m6];
     return (
       <tr key={c.ticker} className="eq-row">
         {tickCell(c)}
@@ -429,49 +429,13 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
           </div>
         </td>
         {num(fx(d.mom[y2]), undefined, "mom")}
-        <td className="eq-sep">
-          {/* Diverging sparkbars: positive (green) grow up from the x-axis,
-              negative (red) grow down below it, so direction reads at a glance. */}
-          <div className="eq-spark">
-            {bars.map((v, i) => {
-              const h = v == null ? 0 : Math.min(14, (Math.abs(v) / perfMax) * 13 + 2);
-              const up = v != null && v >= 0;
-              const down = v != null && v < 0;
-              return (
-                <span
-                  key={i}
-                  className="eq-sparkcol"
-                  title={`${["1M", "3M", "6M"][i]}: ${v == null ? "n/a" : (v * 100).toFixed(0) + "%"}`}
-                >
-                  <span className="eq-sparkcol-top">
-                    {up && (
-                      <span
-                        className="eq-sparkbar"
-                        style={{ height: `${h}px`, background: "var(--green)" }}
-                      />
-                    )}
-                    {v == null && <span className="eq-sparkbar eq-sparkbar-na" />}
-                  </span>
-                  <span className="eq-sparkcol-bot">
-                    {down && (
-                      <span
-                        className="eq-sparkbar"
-                        style={{ height: `${h}px`, background: "var(--red)" }}
-                      />
-                    )}
-                  </span>
-                </span>
-              );
-            })}
-          </div>
-        </td>
       </tr>
     );
   };
 
   // ---- Focus: detail panel for one name ---------------------------------- //
   const focusSel =
-    (focusTicker && stocks.find((c) => c.ticker === focusTicker)) || irrSorted[0] || null;
+    (focusTicker && stocks.find((c) => c.ticker === focusTicker)) || focusSorted[0] || null;
 
   const subtitle = (
     <>
@@ -665,7 +629,7 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
 
       {view === "focus" ? (
         <FocusLayout
-          stocks={irrSorted}
+          stocks={focusSorted}
           selected={focusSel}
           onSelect={(t) => setFocusTicker(t)}
           derived={derived}
@@ -687,12 +651,11 @@ export function EquitiesApp({ initial }: { initial: Company[] }) {
                 <th className="eq-sep">NTM P/E vs target</th>
                 <th className="eq-sep">IRR vs median</th>
                 <th className="eq-num eq-sep">MoM</th>
-                <th className="eq-sep">1·3·6M</th>
               </tr>
             </thead>
             <tbody>
               {groups.map(([grp, rows]) => (
-                <GroupRows key={grp} label={grp} span={6}>
+                <GroupRows key={grp} label={grp} span={5}>
                   {rows.map(signalRow)}
                 </GroupRows>
               ))}
@@ -1111,11 +1074,20 @@ function FocusLayout({
   const [y0, y1, y2, y3] = years;
   const d = selected ? derived.get(selected.ticker) ?? null : null;
   const dc = d?.decomp;
+  const yr = (y: number) => String(y).slice(2);
+  // YoY revenue growth into `y` (needs the prior year's revenue) and gross
+  // margin for `y`, read straight from the model the same way the grid does.
+  const revGrow = (y: number) => {
+    const prev = selected?.model.revs[String(y - 1)];
+    const cur = selected?.model.revs[String(y)];
+    return prev != null && cur != null && prev !== 0 ? cur / prev - 1 : null;
+  };
+  const gMargin = (y: number) => selected?.model.gm[String(y)] ?? null;
 
   return (
     <div className="eq-focus">
       <div className="eq-focus-list">
-        <div className="eq-focus-list-head">Names · sorted by IRR</div>
+        <div className="eq-focus-list-head">Names · portfolio first</div>
         {stocks.map((c) => {
           const dr = derived.get(c.ticker);
           const irr = dr?.irr[y2] ?? null;
@@ -1196,14 +1168,12 @@ function FocusLayout({
             <div className="eq-val-grid">
               {(
                 [
-                  ["EV/GP NTM", fFx(d.evGp[y0]), "var(--ink)"],
-                  ["EV/GP +1", fFx(d.evGp[y1]), "var(--ink)"],
-                  ["P/E NTM", fFx(d.mendoPe[y1]), "var(--ink)"],
-                  ["P/E +2", fFx(d.mendoPe[y3]), "var(--ink)"],
-                  ["Target mult", fFx(selected.model.target_mult[String(y1)] ?? null), "var(--brand)"],
-                  ["NTM IRR", fFp(d.irr[y1]), "var(--ink)"],
-                  ["+2y IRR", fFp(d.irr[y2]), "#15803d"],
-                  ["MoM +3y", fFx(d.mom[y3]), "var(--ink)"],
+                  [`Rev gr '${yr(y0)}`, fFp(revGrow(y0)), "var(--ink)"],
+                  [`Rev gr '${yr(y1)}`, fFp(revGrow(y1)), "var(--ink)"],
+                  [`GM '${yr(y0)}`, fFp(gMargin(y0)), "var(--ink)"],
+                  [`GM '${yr(y1)}`, fFp(gMargin(y1)), "var(--ink)"],
+                  ["Target P/E", fFx(selected.model.target_mult[String(y1)] ?? null), "var(--brand)"],
+                  ["NTM P/E", fFx(d.mendoPe[y1]), "var(--ink)"],
                 ] as const
               ).map(([k, v, c]) => (
                 <div className="eq-val-cell" key={k}>
@@ -1591,7 +1561,7 @@ function EditModal({
                 // the bottom of the same grid, visually elevated and locked
                 // behind an explicit confirm.
                 {
-                  label: "Target multiple",
+                  label: "NTM P/E",
                   unit: "×",
                   format: fmtFixed(1),
                   keys: years.map((y) => `target_mult.${y}`),

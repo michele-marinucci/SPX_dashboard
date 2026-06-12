@@ -79,7 +79,7 @@ function bullets(slide: pptxgen.Slide, items: { title?: string; body: string }[]
 // levels, diverging red/green on deltas, with per-column scales computed from
 // the category rows only (totals excluded) and totals left unshaded.
 
-const SPX = `${TOOL_NAMES.spx} · Aggregate S&P 500`;
+const SPX = TOOL_NAMES.spx;
 
 type HeatKind = "blue" | "rg" | "none";
 
@@ -342,13 +342,42 @@ function twitterSection(pptx: pptxgen) {
   }
 }
 
-// ---- Morning Notes (positions first, then themes) --------------------------- //
+// ---- Morning Notes --------------------------------------------------------- //
+//
+// Every weekday note (Mon–Fri) of the week the latest note belongs to, each
+// rendered with the same depth the web page shows — headline + key points +
+// sub-details — and split across as many slides as the content needs so it is
+// never clipped off the bottom of a slide.
+
+// Monday (UTC) of the week containing the given YYYY-MM-DD date.
+function mondayOf(iso: string): Date {
+  const d = new Date(iso + "T12:00:00Z");
+  const back = (d.getUTCDay() + 6) % 7; // days since Monday (Sun→6)
+  d.setUTCDate(d.getUTCDate() - back);
+  return d;
+}
+
 function morningNewsSection(pptx: pptxgen) {
   const notes = morningNewsRaw as MorningNote[];
   if (!notes?.length) return;
-  const latest = [...notes].sort((a, b) => (b.date || "").localeCompare(a.date || ""))[0];
-  const dateLabel = latest.date
-    ? new Date(latest.date + "T12:00:00").toLocaleDateString("en-US", {
+  const sorted = [...notes].sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+  const latest = sorted[sorted.length - 1];
+  if (!latest?.date) return;
+
+  const monday = mondayOf(latest.date);
+  const weekIso = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(monday);
+    d.setUTCDate(d.getUTCDate() + i);
+    return d.toISOString().slice(0, 10);
+  });
+  const byDate = new Map(sorted.map((n) => [n.date, n]));
+  const week = weekIso.map((iso) => byDate.get(iso)).filter((n): n is MorningNote => !!n);
+  (week.length ? week : [latest]).forEach((note) => addMorningNoteSlides(pptx, note));
+}
+
+function addMorningNoteSlides(pptx: pptxgen, note: MorningNote) {
+  const dateLabel = note.date
+    ? new Date(note.date + "T12:00:00").toLocaleDateString("en-US", {
         weekday: "long",
         year: "numeric",
         month: "long",
@@ -356,13 +385,14 @@ function morningNewsSection(pptx: pptxgen) {
       })
     : "";
 
-  if (latest.positions?.length) {
+  // Positions in focus — one paginated table per day.
+  if (note.positions?.length) {
     const header: Row = [
       { text: "Ticker", options: { align: "left" } },
       { text: "Name", options: { align: "left" } },
       { text: "Notes", options: { align: "left" } },
     ];
-    const body: Row[] = latest.positions.map((p) => [
+    const body: Row[] = note.positions.map((p) => [
       { text: p.ticker, options: { align: "left", bold: true } },
       { text: p.name || "—", options: { align: "left" } },
       { text: p.notes, options: { align: "left", fontSize: 9 } },
@@ -373,33 +403,88 @@ function morningNewsSection(pptx: pptxgen) {
     });
   }
 
-  const s1 = sectionSlide(pptx, TOOL_NAMES.morningNews, dateLabel);
-  const runs: pptxgen.TextProps[] = [];
-  if (latest.one_liner) {
-    runs.push({
-      text: latest.one_liner,
-      options: { italic: true, color: INK, fontSize: 12, paraSpaceAfter: 12, breakLine: true },
+  // Themes — group each theme's runs into a block with a rough line estimate,
+  // then pack blocks onto slides up to a line budget that fits the ~5.6" box.
+  const estLines = (s: string, perLine = 105) => Math.max(1, Math.ceil((s?.length || 0) / perLine));
+  const blocks: { runs: pptxgen.TextProps[]; lines: number }[] = [];
+
+  if (note.one_liner) {
+    blocks.push({
+      runs: [
+        {
+          text: note.one_liner,
+          options: { italic: true, color: INK, fontSize: 12, paraSpaceAfter: 12, breakLine: true },
+        },
+      ],
+      lines: estLines(note.one_liner) + 1,
     });
   }
-  (latest.top_themes || []).forEach((th) => {
-    runs.push({
-      text: th.headline,
-      options: { bold: true, color: INK, bullet: { code: "2022" }, breakLine: true },
+
+  (note.top_themes || []).forEach((th) => {
+    const runs: pptxgen.TextProps[] = [
+      {
+        text: th.headline,
+        options: { bold: true, color: INK, bullet: { code: "2022" }, breakLine: true },
+      },
+    ];
+    let lines = estLines(th.headline) + 1;
+    // Prefer the structured points (what the web page renders); fall back to
+    // the legacy single-paragraph `detail` for older notes.
+    const points = th.points?.length
+      ? th.points
+      : th.detail
+      ? [{ text: th.detail, details: [] as string[] }]
+      : [];
+    points.forEach((pt) => {
+      runs.push({
+        text: pt.text,
+        options: { color: MUTED, indentLevel: 1, fontSize: 10, paraSpaceAfter: 4, breakLine: true },
+      });
+      lines += estLines(pt.text);
+      (pt.details || []).forEach((sub) => {
+        runs.push({
+          text: sub,
+          options: { color: MUTED, indentLevel: 2, fontSize: 9.5, paraSpaceAfter: 3, breakLine: true },
+        });
+        lines += estLines(sub);
+      });
     });
-    runs.push({
-      text: th.detail,
-      options: { color: MUTED, indentLevel: 1, fontSize: 10, paraSpaceAfter: 10, breakLine: true },
+    // Extra breathing room after the last run of a theme.
+    const last = runs[runs.length - 1];
+    last.options = { ...last.options, paraSpaceAfter: 12 };
+    blocks.push({ runs, lines: lines + 1 });
+  });
+
+  const BUDGET = 26; // ~lines that fit the 5.6" content box at these sizes
+  let cur: pptxgen.TextProps[] = [];
+  let used = 0;
+  const flush = () => {
+    if (!cur.length) return;
+    const s = sectionSlide(pptx, TOOL_NAMES.morningNews, dateLabel);
+    s.addText(cur, { x: MARGIN, y: 1.3, w: CONTENT_W, h: 5.6, fontFace: FONT, fontSize: 11, valign: "top" });
+    cur = [];
+    used = 0;
+  };
+  blocks.forEach((b) => {
+    if (used > 0 && used + b.lines > BUDGET) flush();
+    cur.push(...b.runs);
+    used += b.lines;
+  });
+  flush();
+
+  // Keep the week complete even for a day with no themes.
+  if (!blocks.length) {
+    const s = sectionSlide(pptx, TOOL_NAMES.morningNews, dateLabel);
+    s.addText("No themes for this day.", {
+      x: MARGIN,
+      y: 1.3,
+      w: CONTENT_W,
+      h: 1,
+      fontFace: FONT,
+      fontSize: 11,
+      color: MUTED,
     });
-  });
-  s1.addText(runs, {
-    x: MARGIN,
-    y: 1.3,
-    w: CONTENT_W,
-    h: 5.6,
-    fontFace: FONT,
-    fontSize: 11,
-    valign: "top",
-  });
+  }
 }
 
 // ---- title ----------------------------------------------------------------- //
@@ -485,10 +570,9 @@ export async function buildHubDeck(): Promise<Buffer> {
   dividerSlide(pptx, TOOL_NAMES.equities, "Valuation, IRRs & decomposition · prior-day closes");
   await addEquitiesSlides(pptx, new Date());
 
-  // 2) SPX Monitor — Aggregate S&P 500 only (live-overlaid like the web page).
-  // Page order mirrors /spx (lib/toolMeta.ts), then the AI-beneficiary
-  // categories with their member companies.
-  dividerSlide(pptx, TOOL_NAMES.spx, "Aggregate S&P 500");
+  // 2) SPX Monitor (live-overlaid like the web page). Page order mirrors /spx
+  // (lib/toolMeta.ts), then the AI-beneficiary categories with their members.
+  dividerSlide(pptx, TOOL_NAMES.spx, "AI beneficiary & software tracker");
   const spxData = await loadSpxDashboard();
   const t = spxData.tables;
   const sec = (id: string) => {

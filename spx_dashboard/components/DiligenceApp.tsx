@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HowItWorks } from "@/components/HowItWorks";
-import { DiligenceLink, logoCandidates, normTicker, rootTicker } from "@/lib/diligence";
+import { DiligenceLink, logoCandidates, normTicker } from "@/lib/diligence";
 
 // The Microsoft Lists app glyph: a teal rounded tile with list rows and a
 // check. Inlined so the "open" affordance reads clearly instead of a faint ↗.
@@ -137,11 +137,8 @@ function LogoMark({ ticker }: { ticker: string }) {
 
 export function DiligenceApp({
   initialLinks,
-  names,
 }: {
   initialLinks: DiligenceLink[];
-  // Ticker → company name, for auto-filling the name when a known symbol is added.
-  names: Record<string, string>;
 }) {
   const [links, setLinks] = useState<DiligenceLink[]>(initialLinks);
   // null until we know whether Supabase is configured. When false, edits persist
@@ -222,14 +219,6 @@ export function DiligenceApp({
     }
   };
 
-  // Suggest the company name as soon as a known ticker is typed (unless the
-  // user has already typed a name themselves).
-  const onTickerChange = (raw: string) => {
-    setTicker(raw);
-    const known = names[rootTicker(raw)];
-    if (known && !name.trim()) setName(known);
-  };
-
   const add = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -239,7 +228,7 @@ export function DiligenceApp({
       if (!t) return setError("Enter a ticker.");
       if (!u) return setError("Paste the Microsoft List link.");
       if (!/^https?:\/\//i.test(u)) return setError("Link must start with http(s)://");
-      const entry: DiligenceLink = { ticker: t, name: name.trim() || names[rootTicker(t)] || "", url: u };
+      const entry: DiligenceLink = { ticker: t, name: name.trim(), url: u };
 
       if (dbEnabled) {
         setBusy(true);
@@ -266,7 +255,7 @@ export function DiligenceApp({
       setUrl("");
       setName("");
     },
-    [ticker, url, name, dbEnabled, links, names, arrange],
+    [ticker, url, name, dbEnabled, links, arrange],
   );
 
   const remove = useCallback(
@@ -321,8 +310,8 @@ export function DiligenceApp({
           name&apos;s Microsoft List.
         </li>
         <li>
-          <b>Add a link</b> — enter a ticker and paste its Microsoft List URL.
-          The company name auto-fills for tracked S&amp;P names.
+          <b>Add a link</b> — enter a ticker, optionally a company name, and
+          paste its Microsoft List URL.
         </li>
         <li>
           <b>Shared</b> — adds and removes are saved to the team database, so
@@ -344,7 +333,7 @@ export function DiligenceApp({
         <input
           className="dil-in dil-in-ticker"
           value={ticker}
-          onChange={(e) => onTickerChange(e.target.value)}
+          onChange={(e) => setTicker(e.target.value)}
           placeholder="Ticker"
           aria-label="Ticker"
           autoCapitalize="characters"
@@ -417,7 +406,7 @@ export function DiligenceApp({
                 >
                   <LogoMark ticker={l.ticker} />
                   <span className="dil-ticker">{l.ticker}</span>
-                  <span className="dil-name">{names[rootTicker(l.ticker)] || l.name || ""}</span>
+                  <span className="dil-name">{l.name || ""}</span>
                   <span className="dil-open">
                     <MsListsIcon />
                     Open list
