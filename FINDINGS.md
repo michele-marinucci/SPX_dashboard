@@ -49,10 +49,12 @@ all touched pipeline files.
 These were flagged during the audit but left alone, either because they're by
 design or because "fixing" them would change behavior:
 
-1. **Login rate limiting is per-instance** (in-memory map). On a multi-instance
-   serverless deploy, the 10-failures/15-min window applies per instance.
-   Acceptable for an internal tool with a strong shared password; a shared
-   store (Redis/Upstash) would be needed to make it global.
+1. ~~**Login rate limiting is per-instance** (in-memory map).~~ **FIXED** —
+   failed attempts now persist in Supabase (`login_attempts` table), so the
+   10-failures/15-min window holds across every serverless instance and
+   restart. Falls back to the old in-memory window when Supabase isn't
+   configured or a call fails, so login never breaks. Requires running
+   `supabase/login_throttle.sql` once in the Supabase SQL editor.
 2. **Excel IRR recalculates with `TODAY()`** while the site computes the year
    fraction in UTC at render time. The exported workbook is a *live model* by
    design, so a few-bps drift vs. the site snapshot (timezones, or simply
