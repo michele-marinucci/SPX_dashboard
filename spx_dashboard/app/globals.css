@@ -5448,6 +5448,19 @@ th.tw-link-col { text-align: center; }
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
+  /* Total lines (Total AI Capex Beneficiaries / Total SPX): same card anatomy,
+     tinted like the desktop totals row and not tappable. */
+  .ms-card-total {
+    background: var(--total-bg);
+    border-color: var(--line-strong);
+    cursor: default;
+  }
+  .ms-card-total .ms-card-label {
+    font-weight: 800;
+  }
+  .ms-card-total .me-metric {
+    background: var(--surface);
+  }
   .ms-card-top {
     display: flex;
     align-items: center;

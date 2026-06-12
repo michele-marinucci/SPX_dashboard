@@ -6,6 +6,7 @@ import {
   MsAgg,
   MsGroup,
   MsLabels,
+  MsTotal,
   SpxFilterButton,
   SpxMobile,
 } from "@/components/SpxMobile";
@@ -170,6 +171,26 @@ function msAggFor(t: AggregateTables, label: string, group: string): MsAgg | nul
   };
 }
 
+// A total row (e.g. "Total AI Capex Beneficiaries", "Total SPX") resolved the
+// same way as a category, for both the aggregate and compounders tables.
+// msAggFor's candidate list tries the exact label first, so total labels hit.
+function msTotalFor(
+  t: AggregateTables,
+  tc: AggregateTables | null,
+  label: string,
+  counts: { count: number; compounderCount: number },
+): MsTotal | null {
+  const agg = msAggFor(t, label, "");
+  if (!agg) return null;
+  return {
+    label,
+    count: counts.count,
+    compounderCount: counts.compounderCount,
+    agg,
+    comp: tc ? msAggFor(tc, label, "") : null,
+  };
+}
+
 // Nav groups + per-category aggregates + compact member rows for the
 // drill-down sheet (the same per-stock data the /category/[slug] page uses).
 function msGroups(
@@ -183,6 +204,12 @@ function msGroups(
   );
   return nav.map((g) => ({
     group: g.group,
+    // The workbook's per-group total row (e.g. "Total AI Capex Beneficiaries"),
+    // shown as a tinted, non-tappable card after the group's categories.
+    total: msTotalFor(t, tc, `Total ${g.group}`, {
+      count: g.items.reduce((a, i) => a + i.count, 0),
+      compounderCount: g.items.reduce((a, i) => a + i.compounderCount, 0),
+    }),
     categories: g.items.map((item) => {
       const cat = bySlug.get(item.slug);
       return {
@@ -291,6 +318,10 @@ export default async function SpxMonitorPage() {
       <SpxMobile
         asOf={asOf}
         groups={msGroups(nav, d.tables.categories, t, tc)}
+        grandTotal={msTotalFor(t, tc, "Total SPX", {
+          count: totalStocks,
+          compounderCount: totalCompounders,
+        })}
         totalStocks={totalStocks}
         totalCompounders={totalCompounders}
         labels={msLabels(t)}
