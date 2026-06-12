@@ -31,7 +31,6 @@ export const dynamic = "force-dynamic";
 
 // Columns A..V, mirroring the on-screen Summary view.
 const N_COLS = 22;
-const LAST = "V";
 
 function summarySheet(
   companies: Company[],
@@ -43,9 +42,10 @@ function summarySheet(
   const [y0, y1, y2, y3, y4] = years;
   const yr = (y: number) => String(y).slice(2); // "27"
   const rows: string[] = [];
-  const merges: string[] = [`A1:${LAST}1`, `A2:${LAST}2`];
 
-  // Title + subtitle band.
+  // Title + subtitle band. No merged cells anywhere in this workbook — the
+  // long labels simply overflow into the empty cells to their right, which
+  // keeps every cell independently selectable/copyable.
   rows.push(new Row(1).str("Equities Dashboard — Summary", S.TITLE).xml());
   rows.push(new Row(2).str(asOfNote, S.SUBTITLE).xml());
   rows.push(new Row(3).xml()); // spacer
@@ -61,9 +61,6 @@ function summarySheet(
     .str("MoM", S.GROUP_HEAD).skip(3)
     .str("Recent Perf", S.GROUP_HEAD).skip(2);
   rows.push(gh.xml());
-  merges.push(
-    "A4:A5", "B4:B5", "C4:D4", "E4:I4", "J4:L4", "M4:O4", "P4:S4", "T4:V4",
-  );
 
   const ch = new Row(5)
     .skip(2) // A/B covered by the merged group header
@@ -80,8 +77,6 @@ function summarySheet(
   let r = 6;
   const sectorBand = (label: string) => {
     rows.push(new Row(r).str(label, S.SECTOR).xml());
-    // Fill the band across the row so the sector fill carries the full width.
-    merges.push(`A${r}:${LAST}${r}`);
     r++;
   };
 
@@ -153,12 +148,11 @@ function summarySheet(
     { min: 2, max: 2, width: 11 },
     { min: 3, max: N_COLS, width: 8.5 },
   ];
-  return sheetXml(rows, { cols, merges, freezeRows: 5, freezeCols: 1 });
+  return sheetXml(rows, { cols, freezeRows: 5, freezeCols: 1 });
 }
 
 function editLogSheet(edits: EditRecord[]): string {
   const rows: string[] = [];
-  const merges = ["A1:F1", "A2:F2"];
   rows.push(new Row(1).str("Equities Dashboard — Edit Log", S.TITLE).xml());
   rows.push(
     new Row(2)
@@ -206,7 +200,7 @@ function editLogSheet(edits: EditRecord[]): string {
     { min: 4, max: 4, width: 18 },
     { min: 5, max: 6, width: 16 },
   ];
-  return sheetXml(rows, { cols, merges, freezeRows: 4 });
+  return sheetXml(rows, { cols, freezeRows: 4 });
 }
 
 // The year-end target-price formula for a company, mirroring lib/equities
@@ -266,7 +260,6 @@ function modelSheet(
   const colOf = new Map(keys.map((k, i) => [k, colLetter(i + 1)]));
   const L = (k: string) => colOf.get(k)!;
   const NCOLS = keys.length;
-  const LASTCOL = colLetter(NCOLS);
 
   const groupOf: Record<string, string> = {
     revs: "Revenue ($M)", gm: "Gross margin", meps: "Mendo EPS ($)",
@@ -287,7 +280,6 @@ function modelSheet(
   };
 
   const rows: string[] = [];
-  const merges: string[] = [`A1:${LASTCOL}1`, `A2:${LASTCOL}2`];
   rows.push(new Row(1).str("Equities Dashboard — Live Model", S.TITLE).xml());
   rows.push(
     new Row(2)
@@ -296,7 +288,8 @@ function modelSheet(
   );
   rows.push(new Row(3).xml());
 
-  // Group band (row 4, merged per group) + per-column header (row 5).
+  // Group band (row 4) — the label sits in the first column of each group and
+  // overflows right (no merged cells). Per-column header on row 5.
   const gh = new Row(4);
   let ci = 0;
   while (ci < keys.length) {
@@ -305,7 +298,6 @@ function modelSheet(
     while (ci + span < keys.length && g !== "" && describe(keys[ci + span]).group === g) span++;
     if (g) {
       gh.str(g, S.GROUP_HEAD).skip(span - 1);
-      if (span > 1) merges.push(`${colLetter(ci + 1)}4:${colLetter(ci + span)}4`);
     } else {
       gh.skip(span);
     }
@@ -329,7 +321,6 @@ function modelSheet(
   let r = 6;
   for (const grp of order) {
     rows.push(new Row(r).str(grp, S.SECTOR).xml());
-    merges.push(`A${r}:${LASTCOL}${r}`);
     r++;
     for (const c of stocks) {
       if (c.grp !== grp) continue;
@@ -380,8 +371,11 @@ function modelSheet(
               const n0 = `((DATE(${y0},12,31)-TODAY())/365)`;
               let divs = `${PR(`dps_${y0}`)}*${n0}`;
               for (let j = 1; j <= k; j++) divs += `+${PR(`dps_${y0 + j}`)}`;
+              // No IFERROR wrapper: it was swallowing the live RRI result (e.g.
+              // while BDP prices were still loading) and leaving the IRR cells
+              // blank. Let RRI compute/raise directly so the value shows.
               row.formula(
-                `IFERROR(RRI((DATE(${y},12,31)-TODAY())/365,${PR("price")},${PR(`tpx_${y}`)}+${divs}),"")`,
+                `RRI((DATE(${y},12,31)-TODAY())/365,${PR("price")},${PR(`tpx_${y}`)}+${divs})`,
                 S.PERCENT, d.irr[y],
               );
               break;
@@ -424,7 +418,7 @@ function modelSheet(
     { min: 2, max: 3, width: 15 },
     { min: 4, max: NCOLS, width: 8.5 },
   ];
-  return sheetXml(rows, { cols, merges, freezeRows: 5, freezeCols: 1 });
+  return sheetXml(rows, { cols, freezeRows: 5, freezeCols: 1 });
 }
 
 export async function GET() {
