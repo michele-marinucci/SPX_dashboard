@@ -60,7 +60,7 @@ export function DashboardFrame({
               </ul>
             </HowItWorks>
             <a
-              href="/SPX_inputs.xlsx"
+              href="/api/spx/export"
               download="SPX_inputs.xlsx"
               className="btn-primary"
               title="Download the Excel file powering this site"
