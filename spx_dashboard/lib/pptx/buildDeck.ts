@@ -46,18 +46,28 @@ function bullets(slide: pptxgen.Slide, items: { title?: string; body: string }[]
   const runs: pptxgen.TextProps[] = [];
   items.forEach((it) => {
     if (it.title) {
+      // Title + body live in ONE bulleted paragraph: the body is a soft line
+      // break (softBreakBefore), so it inherits the bullet's hanging indent and
+      // sits under the title. A plain `indentLevel` run with no bullet gets no
+      // left margin from PowerPoint and renders flush-left — the old bug.
       runs.push({
         text: it.title,
-        options: { bold: true, color: INK, bullet: { code: "2022" }, breakLine: true },
+        options: {
+          bold: true,
+          color: INK,
+          bullet: { code: "2022" },
+          paraSpaceBefore: 6,
+          paraSpaceAfter: 8,
+        },
       });
       runs.push({
         text: it.body,
-        options: { color: MUTED, indentLevel: 1, paraSpaceAfter: 10, breakLine: true },
+        options: { color: MUTED, fontSize: 10, softBreakBefore: true, breakLine: true },
       });
     } else {
       runs.push({
         text: it.body,
-        options: { color: INK, bullet: { code: "2022" }, paraSpaceAfter: 8, breakLine: true },
+        options: { color: INK, bullet: { code: "2022" }, paraSpaceAfter: 6, breakLine: true },
       });
     }
   });
@@ -403,9 +413,12 @@ function addMorningNoteSlides(pptx: pptxgen, note: MorningNote) {
     });
   }
 
-  // Themes — group each theme's runs into a block with a rough line estimate,
-  // then pack blocks onto slides up to a line budget that fits the ~5.6" box.
-  const estLines = (s: string, perLine = 105) => Math.max(1, Math.ceil((s?.length || 0) / perLine));
+  // Themes — nested bullets: headline · key points · sub-details. Each level is
+  // a real bullet so PowerPoint applies the hanging indent (a plain indentLevel
+  // run with no bullet gets no left margin and floats flush-left). Spacing is
+  // tight so a day's note stays dense — usually one slide — instead of sprawling
+  // with whitespace.
+  const estLines = (s: string, perLine = 100) => Math.max(1, Math.ceil((s?.length || 0) / perLine));
   const blocks: { runs: pptxgen.TextProps[]; lines: number }[] = [];
 
   if (note.one_liner) {
@@ -413,7 +426,7 @@ function addMorningNoteSlides(pptx: pptxgen, note: MorningNote) {
       runs: [
         {
           text: note.one_liner,
-          options: { italic: true, color: INK, fontSize: 12, paraSpaceAfter: 12, breakLine: true },
+          options: { italic: true, color: INK, fontSize: 11.5, paraSpaceAfter: 8, breakLine: true },
         },
       ],
       lines: estLines(note.one_liner) + 1,
@@ -424,7 +437,15 @@ function addMorningNoteSlides(pptx: pptxgen, note: MorningNote) {
     const runs: pptxgen.TextProps[] = [
       {
         text: th.headline,
-        options: { bold: true, color: INK, bullet: { code: "2022" }, breakLine: true },
+        options: {
+          bold: true,
+          color: INK,
+          bullet: { code: "2022" },
+          fontSize: 11.5,
+          paraSpaceBefore: 8,
+          paraSpaceAfter: 2,
+          breakLine: true,
+        },
       },
     ];
     let lines = estLines(th.headline) + 1;
@@ -438,24 +459,35 @@ function addMorningNoteSlides(pptx: pptxgen, note: MorningNote) {
     points.forEach((pt) => {
       runs.push({
         text: pt.text,
-        options: { color: MUTED, indentLevel: 1, fontSize: 10, paraSpaceAfter: 4, breakLine: true },
+        options: {
+          color: INK,
+          bullet: { code: "2013" },
+          indentLevel: 1,
+          fontSize: 10,
+          paraSpaceAfter: 2,
+          breakLine: true,
+        },
       });
       lines += estLines(pt.text);
       (pt.details || []).forEach((sub) => {
         runs.push({
           text: sub,
-          options: { color: MUTED, indentLevel: 2, fontSize: 9.5, paraSpaceAfter: 3, breakLine: true },
+          options: {
+            color: MUTED,
+            bullet: { code: "00B7" },
+            indentLevel: 2,
+            fontSize: 9,
+            paraSpaceAfter: 1,
+            breakLine: true,
+          },
         });
         lines += estLines(sub);
       });
     });
-    // Extra breathing room after the last run of a theme.
-    const last = runs[runs.length - 1];
-    last.options = { ...last.options, paraSpaceAfter: 12 };
     blocks.push({ runs, lines: lines + 1 });
   });
 
-  const BUDGET = 26; // ~lines that fit the 5.6" content box at these sizes
+  const BUDGET = 32; // ~lines that fit the 5.6" content box at these sizes
   let cur: pptxgen.TextProps[] = [];
   let used = 0;
   const flush = () => {
