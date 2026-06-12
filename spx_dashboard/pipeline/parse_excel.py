@@ -297,7 +297,16 @@ def _series_cols(ws, start_letter: str) -> list[int]:
 
 
 def _norm_ticker(v: Any) -> str:
-    return str(v).strip().upper() if v is not None else ""
+    # Match the Data sheet's "Is compounder?" formula, which is an EXACT
+    # MATCH() against the Compounders list. We trim only ASCII whitespace
+    # (Bloomberg exports add stray spaces) and uppercase for case-insensitivity
+    # — but deliberately keep non-breaking spaces (\xa0) significant. Some
+    # Compounders-sheet rows are padded with nbsp so Excel's MATCH skips them;
+    # stripping the nbsp here would over-match those parked names (it inflated
+    # the SPX compounder count to 154 vs Excel's 131).
+    if v is None:
+        return ""
+    return str(v).strip(" \t\r\n").upper()
 
 
 def read_compounder_tickers(wb) -> set[str]:
