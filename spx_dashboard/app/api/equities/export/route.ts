@@ -92,7 +92,7 @@ function summarySheet(
     const d = compute(c, q?.price ?? null, today);
     const pf = perfOf(c);
     const row = new Row(r)
-      .str(c.ticker + (c.port === 1 ? " ◆" : ""), S.TICKER)
+      .str(c.ticker, c.port === 1 ? S.TICKER_OWN : S.TICKER)
       .num(d.price, currencyStyle(c.currency))
       .num(d.evGp[y0], S.MULTIPLE).num(d.evGp[y1], S.MULTIPLE)
       .num(d.mendoPe[y0], S.MULTIPLE).num(d.mendoPe[y1], S.MULTIPLE)
@@ -336,7 +336,7 @@ function modelSheet(
       const priceF = c.px_scale && c.px_scale !== 1 ? `${bdp}*${c.px_scale}` : bdp;
 
       for (const key of keys) {
-        if (key === "ticker") { row.str(c.ticker + (c.port === 1 ? " ◆" : ""), S.TICKER); continue; }
+        if (key === "ticker") { row.str(c.ticker, c.port === 1 ? S.TICKER_OWN : S.TICKER); continue; }
         if (key === "bbg") { row.str(c.bbg, S.TEXT); continue; }
         if (key === "price") { row.formula(priceF, currencyStyle(c.currency), d.price); continue; }
         const mm = key.match(/^([a-z]+)_(\d{4})$/);
