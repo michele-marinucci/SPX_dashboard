@@ -462,7 +462,13 @@ export function TwitterMonitor({
                     table below is the desktop rendering. */}
                 <div className="mt-mentions">
                   {portfolioHits.map(({ disp, tweets }) => (
-                    <Link key={disp} href="/dashboard" className="mt-mention">
+                    // Scroll to the first tweet for this ticker; fall back
+                    // gracefully if no anchor exists yet.
+                    <a
+                      key={disp}
+                      href={tweets[0] ? `#tw-${tweets[0].id}` : undefined}
+                      className="mt-mention"
+                    >
                       <span className="mt-tile" aria-hidden="true">
                         {disp.slice(0, 2)}
                       </span>
@@ -472,7 +478,7 @@ export function TwitterMonitor({
                           {tweets.length} {tweets.length === 1 ? "post" : "posts"}
                         </span>
                       </span>
-                    </Link>
+                    </a>
                   ))}
                 </div>
                 <table className="tw-table tw-port-table">
