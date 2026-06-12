@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-11T00:55:46.535163+00:00",
+  "generated_at": "2026-06-12T12:55:27.273259+00:00",
   "themes": [
     {
       "key": "digital-semis",
@@ -113,178 +113,260 @@
     "VSAT"
   ],
   "daily_summary": {
-    "date": "2026-06-11",
-    "headline": "Claude Fable 5 tops AI benchmarks at 64.9 index score while TSMC posts record May revenue of NT$417B and Iran strikes drive oil above $92 amid market volatility.",
+    "date": "2026-06-12",
+    "headline": "TSMC revenue strength and AI supply interventions stand out amid heavy big-tech capex and memory expansion signals.",
     "items": [
       {
         "theme": "digital-semis",
         "label": "Digital Semis",
-        "summary": "TSMC May revenue hit record NT$417.0B (+30.1% YoY) with Taiwan semiconductor exports surging +58.3% YoY to US$25.5B. SMIC relies on quad-patterning DUV without EUV, extending multipatterning at throughput cost. NT$427.3B June revenue needed for 2Q guidance midpoint.",
+        "points": [
+          {
+            "text": "TSMC May revenue rose 30.1% YoY to record NT$417B on sustained AI demand.",
+            "details": [
+              "June run-rate points to another record at NT$427.3B."
+            ]
+          },
+          {
+            "text": "Nvidia directly intervening on HVLP4 copper foil and T-glass supply for AI PCBs.",
+            "details": []
+          },
+          {
+            "text": "TSMC advancing CoPoS packaging; first adopter likely Nvidia Feynman in 2H28.",
+            "details": []
+          }
+        ],
+        "summary": "TSMC May revenue rose 30.1% YoY to record NT$417B on sustained AI demand. Nvidia directly intervening on HVLP4 copper foil and T-glass supply for AI PCBs. TSMC advancing CoPoS packaging; first adopter likely Nvidia Feynman in 2H28.",
         "tickers": [
-          "TSM"
+          "TSM",
+          "NVDA"
         ],
         "tweet_ids": [
           "2064582376924262789",
-          "2064516062411153745",
-          "2064439017416896837"
+          "2065221955322843194",
+          "2064945553725886763"
         ]
       },
       {
         "theme": "memory",
         "label": "Memory & Storage",
-        "summary": "Nvidia AI ramp triggers DRAM/NAND shortages as CSPs lock 2027-2028 supply; SK Hynix ramps 375-layer 3D NAND with molybdenum at M15 fab by year-end. MU HBM4 orders confirmed after SemiAnalysis report accuracy validated.",
+        "points": [
+          {
+            "text": "SK Hynix plans to triple wafer capacity by 2034 to meet AI memory demand.",
+            "details": [
+              "US ADR listing targeted as early as August 2026."
+            ]
+          },
+          {
+            "text": "Memory-per-token optimizations report covers software, architecture and hardware angles.",
+            "details": []
+          }
+        ],
+        "summary": "SK Hynix plans to triple wafer capacity by 2034 to meet AI memory demand. Memory-per-token optimizations report covers software, architecture and hardware angles.",
         "tickers": [
-          "NVDA",
-          "MU"
+          "NVDA"
         ],
         "tweet_ids": [
-          "2064838255582097523",
-          "2064682548907962749",
-          "2064669178318246015"
+          "2064958733185327611",
+          "2065063293425705177"
         ]
       },
       {
         "theme": "hardware-components",
         "label": "Hardware & Networking",
-        "summary": "Lumentum sees photonic supercycle with $50-100M incremental CPO revenue in Q4 and >$1B quarterly run-rate from scale-up/out plus OCS. NVDA highlights CPO adoption while CRDO ramps; NPO positioned as lower-risk step versus full CPO.",
+        "points": [
+          {
+            "text": "Amkor investing 1T won to expand advanced packaging capacity in Gwangju.",
+            "details": []
+          },
+          {
+            "text": "Lumentum CEO flags photonic supercycle with quarterly revenue trajectory above $1B.",
+            "details": []
+          }
+        ],
+        "summary": "Amkor investing 1T won to expand advanced packaging capacity in Gwangju. Lumentum CEO flags photonic supercycle with quarterly revenue trajectory above $1B.",
         "tickers": [
-          "LITE",
-          "NVDA",
-          "CRDO"
+          "AMKR",
+          "TSM",
+          "LITE"
         ],
         "tweet_ids": [
-          "2064699600720871746",
-          "2064702530274070624",
-          "2064716940485030124"
-        ]
-      },
-      {
-        "theme": "software-infrastructure",
-        "label": "Infrastructure Software",
-        "summary": "Claude Fable 5 leads Artificial Analysis Intelligence Index at 64.9, scores 53% on Humanity\u2019s Last Exam (+7 pts vs Opus 4.8), and hits 77% on ProofBench. New Claude Platform features include scheduled deployments, env vars in vaults, and dynamic workflows for agentic tasks; Mythos 5 launches with lifted safeguards for cyber use.",
-        "tickers": [],
-        "tweet_ids": [
-          "2064500150069030992",
-          "2064500152430383489",
-          "2064741182853296339"
+          "2064968238908530904",
+          "2064699600720871746"
         ]
       },
       {
         "theme": "big-tech",
         "label": "AI Buildout Funders",
-        "summary": "MSFT research in Nature Methods uses AI to map cancer cell behavior for personalized therapies. META AI traffic reached 27.79M visits in May (+103.84% YoY); GOOGL signals AI buildout continuing through 2035 with 5+ years of heavy capex ahead.",
+        "points": [
+          {
+            "text": "Big Tech raised record $159B in bonds during 2026 to fund AI infrastructure.",
+            "details": [
+              "Names include AMZN, GOOGL, META, MSFT, ORCL."
+            ]
+          },
+          {
+            "text": "Meta faces $50B D&A and 70% of revenue in capex next year.",
+            "details": []
+          },
+          {
+            "text": "Google internal view sees 5+ years of AI capex and shift to 200MW inference sites.",
+            "details": []
+          }
+        ],
+        "summary": "Big Tech raised record $159B in bonds during 2026 to fund AI infrastructure. Meta faces $50B D&A and 70% of revenue in capex next year. Google internal view sees 5+ years of AI capex and shift to 200MW inference sites.",
         "tickers": [
-          "MSFT",
+          "AMZN",
+          "GOOGL",
           "META",
-          "GOOGL"
+          "MSFT",
+          "ORCL"
         ],
         "tweet_ids": [
-          "2064395257148834152",
-          "2064695865634124009",
+          "2065194240846733591",
+          "2065216909855838684",
           "2064697559558365538"
         ]
       },
       {
-        "theme": "other",
-        "label": "Other",
-        "summary": "Iran strikes close Strait of Hormuz, push WTI oil above $92/bbl and S&P 500 futures to daily lows with $3.3T erased since June 2 high. Mature-node MCUs from ST, Infineon, TI see 5-10% price hikes on tightening supply.",
+        "theme": "design-semicap",
+        "label": "EDA & Semicap",
+        "points": [
+          {
+            "text": "TEL running at full capacity with double shifts on DRAM and logic demand; pushing price increases.",
+            "details": []
+          }
+        ],
+        "summary": "TEL running at full capacity with double shifts on DRAM and logic demand; pushing price increases.",
         "tickers": [],
         "tweet_ids": [
-          "2064844098356322339",
-          "2064832032648110423",
-          "2064850680876339286"
+          "2065202679606030628"
         ]
       }
     ]
   },
   "recurring": [
     {
-      "topic": "Claude Fable 5 / Mythos model releases and pricing shift",
-      "summary": "Discussion exploded on June 9 with Anthropic's launch of Fable 5 (Mythos-class) topping benchmarks; by June 10 focus shifted to usage-based pricing after June 22, ending subsidized access and signaling pre-IPO monetization changes.",
-      "days_seen": 4,
-      "tickers": [],
+      "topic": "NVIDIA AI supply chain & packaging",
+      "summary": "Discussion began with NVDA direct intervention in HVLP4 copper foil/T-glass for AI PCBs and TEL capacity constraints, then evolved into NPO vs CPO trade-offs, Rubin thermal redesign delays, and long-term memory/HBM lock-ups by CSPs through 2028.",
+      "days_seen": 7,
+      "tickers": [
+        "NVDA",
+        "TSM"
+      ],
       "tweet_ids": [
-        "2064467466450088078",
-        "2064394160522559632"
+        "2065221955322843194",
+        "2064838255582097523",
+        "2064702530274070624",
+        "2064945553725886763"
       ]
     },
     {
-      "topic": "Iran conflict, Strait of Hormuz closure and oil spike",
-      "summary": "Breaking updates on US strikes and Hormuz blockade began June 7-8; by June 9-10 coverage evolved to oil surging above $90-107/bbl, market volatility, and potential deal timelines.",
+      "topic": "Iran conflict & oil price volatility",
+      "summary": "Initial headlines of US strikes and Hormuz closure drove oil above $92-107; narrative shifted within days to Trump-brokered MOU/deal, blockade lift, and rapid oil collapse below $87-90 that turbo-charged equities.",
       "days_seen": 5,
       "tickers": [],
       "tweet_ids": [
         "2064844098356322339",
-        "2064823842292318543",
-        "2064767738044694578"
+        "2065126208283594993",
+        "2065168567155462233",
+        "2064743201546580104"
       ]
     },
     {
-      "topic": "Nvidia memory/HBM shortages and optics (CPO/NPO) debate",
-      "summary": "June 7-8 coverage highlighted NVDA-SK Hynix multi-year HBM deals and DRAM squeeze; June 9-10 discussion shifted to NPO as interim step before CPO, with hyperscaler supply lockups through 2028.",
-      "days_seen": 5,
+      "topic": "Anthropic Claude Fable 5 / Mythos launch",
+      "summary": "Anthropic released the first public Mythos-class model (Fable 5) with SOTA benchmark leads and heavy guardrails; conversation quickly moved to usage-based pricing after June 22, IPO timing, and competitive pressure on Gemini/GPT.",
+      "days_seen": 4,
+      "tickers": [],
+      "tweet_ids": [
+        "2064414308289937869",
+        "2064394160522559632",
+        "2064468390580817972"
+      ]
+    },
+    {
+      "topic": "Memory supercycle & HBM/DRAM shortages",
+      "summary": "Talk started with SK Hynix-NVIDIA multi-year LTA and CXMT/Samsung capacity ramps, then broadened to Goldman Sachs upward revisions, 2027-28 shortages, and hyperscaler prepayments locking supply.",
+      "days_seen": 6,
       "tickers": [
         "NVDA"
       ],
       "tweet_ids": [
-        "2064838255582097523",
-        "2064757537992249734",
-        "2064475364802613343"
+        "2063758697348870336",
+        "2061044139853283730",
+        "2063639780412584354"
       ]
     },
     {
-      "topic": "TSMC revenue, capacity and China export controls",
-      "summary": "May revenue records and 2030 visibility noted early; later dates added warnings on tightening US export rules and need for massive June capex to meet guidance.",
-      "days_seen": 4,
+      "topic": "TSMC advanced packaging & CoWoS ramp",
+      "summary": "Coverage moved from record May/June revenue and Southern Taiwan fab land grabs to COUPE substrate CPO mass-production in 2H26 and ABF/T-glass supply tightness driven by AI demand.",
+      "days_seen": 5,
       "tickers": [
         "TSM"
       ],
       "tweet_ids": [
-        "2064582376924262789",
-        "2064516062411153745",
-        "2064519924765389021"
+        "2064886810065736169",
+        "2064627959349317854",
+        "2065083257327415415"
       ]
     },
     {
-      "topic": "Agentic AI coding/tools and model scaffolding evolution",
-      "summary": "June 8-9 posts focused on Claude Code dynamic workflows and agent loops; June 10 discussion turned to inference scaling, open-source vs frontier, and practical limits of sub-agents.",
-      "days_seen": 4,
-      "tickers": [],
-      "tweet_ids": [
-        "2064741182853296339",
-        "2064793892638375988",
-        "2064788844424425801"
-      ]
-    },
-    {
-      "topic": "Hyperscaler AI capex and data-center spend forecasts",
-      "summary": "Early June highlighted $255B H1 2026 financing and $750B full-year spend; later posts questioned sustainability amid power bottlenecks and insider selling risks.",
+      "topic": "Big Tech AI capex & bond issuance",
+      "summary": "Initial focus on record $159B 2026 bond issuance for AI buildout expanded to hyperscaler $255B+ H1 financing and $750B full-year data-center spend expectations.",
       "days_seen": 3,
       "tickers": [
+        "AMZN",
         "GOOGL",
+        "META",
         "MSFT"
       ],
       "tweet_ids": [
-        "2064758463151186407",
-        "2064697559558365538"
+        "2065194240846733591",
+        "2064758463151186407"
+      ]
+    },
+    {
+      "topic": "CPO/NPO optics transition",
+      "summary": "Debate opened on NVDA scaling NPO because full CPO was delayed, then shifted to Lumentum incremental revenue, pluggable viability, and power-delivery implications for 800V racks.",
+      "days_seen": 5,
+      "tickers": [
+        "NVDA",
+        "LITE"
+      ],
+      "tweet_ids": [
+        "2064475364802613343",
+        "2064693364327354460",
+        "2064848479638482978"
+      ]
+    },
+    {
+      "topic": "SpaceX IPO & valuation chatter",
+      "summary": "Rumors of a June 12 IPO at $135/share ($1.75T valuation, $75B raise) surfaced repeatedly alongside questions on 2x leverage and employee lock-up mechanics.",
+      "days_seen": 3,
+      "tickers": [],
+      "tweet_ids": [
+        "2065149775369113907",
+        "2064496544750145681"
       ]
     }
   ],
   "ticker_moves": {
     "AAOI": null,
     "AAPL": null,
+    "ADBE": null,
     "AEHR": null,
     "AMAT": null,
     "AMD": null,
     "AMGN": null,
+    "AMKR": null,
     "AMZN": null,
     "AON": null,
     "ARM": null,
     "ASML": null,
     "AVGO": null,
     "BAND": null,
-    "BE": null,
+    "BE": -14.6,
     "BRK.B": null,
+    "CBRS": null,
     "COF": null,
     "COHR": null,
     "CRDO": null,
@@ -350,23 +432,2170 @@
   },
   "tweets": [
     {
+      "id": "2065221955322843194",
+      "url": "https://x.com/jukan05/status/2065221955322843194",
+      "handle": "jukan05",
+      "author_name": "Jukan",
+      "posted_at": "2026-06-11T23:57:38Z",
+      "text": "\u25b6 NVIDIA takes PCB material competition upstream as HVLP4 copper foil gap widens\n\n- With high-end PCB orders rising on expanding AI infrastructure demand, new bottlenecks are emerging in the upstream CCL supply chain; following T-glass fiberglass cloth, HVLP4 copper foil is expected to become the key constraint from 2H onward\n\n- According to industry sources, NVIDIA and its major customers are once again directly intervening in material supply coordination to keep next-generation AI server mass production and shipment schedules on track\n\n- PCB material demand is shifting from upgrades centered on consumer electronics and traditional networking equipment toward high-value AI/HPC applications, with high-end CCL demand advancing from M6 to M7, M8, and on to M9\n\n- CCL makers are enforcing quota-based allocation, requiring IC substrate and PCB makers to take only what they actually consume; the bottlenecks lie in upstream materials with high technical barriers and limited expansion flexibility, such as specialty-formulation fiberglass cloth and ultra-low-profile copper foil\n\n- Fiberglass cloth and copper foil have always sat at the very top of the PCB supply chain's upstream, where CCL makers such as EMC (Elite Material) and Doosan Electro-Materials traditionally led material development and production planning\n\n- NVIDIA-led customers are now bypassing CCL makers to engage directly with upstream material suppliers, managing fiberglass cloth and copper foil themselves to clear PCB bottlenecks before they disrupt finished-product shipments\n\n- NVIDIA is giving fiberglass cloth and copper foil suppliers clearer order visibility to strengthen their confidence in capacity expansion, and is shifting toward a direct consignment (buyer-furnished material) model that locks in key material capacity more than a year in advance\n\n- In high-end fiberglass cloth, Low DK2 and T-glass are the main shortage items, triggering aggressive price hikes across the supply chain\n\n- T-glass fiberglass cloth for IC substrates is especially tight, with Nittobo controlling more than half of global capacity; given yield issues at new entrants such as Taiwan Glass, the 2026 supply-demand gap is estimated at over 40%\n\n- The T-glass supply gap is projected to remain as high as 25% even in 2027, acting as a key constraint on ABF substrate capacity expansion\n\n- As major AI server and high-speed computing platforms rapidly migrate from HVLP2/HVLP3 to HVLP4, HVLP4 copper foil demand is climbing, with the 2026 supply shortfall expected at 1,500 tons\n\n- Mitsui Kinzoku and Co-Tech are aggressively expanding capacity, but the HVLP4 shortfall is projected to widen to 2,500 tons in 2027",
+      "views": 67704,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "NVIDIA intervenes directly on HVLP4 copper foil and T-glass supply for AI PCBs.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "NVDA"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065221919868346862",
+      "url": "https://x.com/GavinSBaker/status/2065221919868346862",
+      "handle": "gavinsbaker",
+      "author_name": "Gavin Baker",
+      "posted_at": "2026-06-11T23:57:30Z",
+      "text": "Super fun chopping it up with Brad, Clark and my colleague Foxy.",
+      "views": 82206,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Super fun discussion with Brad, Clark and Foxy.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065221622244549107",
+      "url": "https://x.com/bgurley/status/2065221622244549107",
+      "handle": "bgurley",
+      "author_name": "Bill Gurley",
+      "posted_at": "2026-06-11T23:56:19Z",
+      "text": "Matthew & I had this debate live a few years ago. My take is the process is archaic & unnecessary. One can simply match demand/bids as the mechanism for choosing allocation (which is how it opens the next day). Having humans guess and allocate is silly.",
+      "views": 120,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "IPO allocation process archaic; demand/bids matching better mechanism.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065220583114068016",
+      "url": "https://x.com/altcap/status/2065220583114068016",
+      "handle": "altcap",
+      "author_name": "Brad Gerstner",
+      "posted_at": "2026-06-11T23:52:11Z",
+      "text": "Pod up! \ud83d\ude80\ud83c\uddfa\ud83c\uddf8\ud83d\udcb0",
+      "views": 62945,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Pod up with US and money emojis.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065216909855838684",
+      "url": "https://x.com/contrariancurse/status/2065216909855838684",
+      "handle": "contrariancurse",
+      "author_name": "SuspendedCap",
+      "posted_at": "2026-06-11T23:37:35Z",
+      "text": "$META going to have to choke down almost 50b of D&A next year and they\u2019ll spend 70% of revenue of capex \n\nWhy is this stock going down?!",
+      "views": 27569,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "$META faces $50B D&A and 70% revenue capex next year; questions stock drop.",
+      "sentiment": "negative",
+      "themes": [],
+      "tickers": [
+        "META"
+      ],
+      "portfolio": [
+        "META"
+      ],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065215808293220418",
+      "url": "https://x.com/bgurley/status/2065215808293220418",
+      "handle": "bgurley",
+      "author_name": "Bill Gurley",
+      "posted_at": "2026-06-11T23:33:13Z",
+      "text": "How will it trade? Who gets to sell?",
+      "views": 24422,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Questions how it will trade and who gets to sell.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065214674086318386",
+      "url": "https://x.com/contrariancurse/status/2065214674086318386",
+      "handle": "contrariancurse",
+      "author_name": "SuspendedCap",
+      "posted_at": "2026-06-11T23:28:42Z",
+      "text": "And boy does the IGV / MSFT / ORCL / META look sick. My goodness",
+      "views": 23092,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "IGV / MSFT / ORCL / META chart looks sick.",
+      "sentiment": "negative",
+      "themes": [],
+      "tickers": [
+        "META",
+        "MSFT",
+        "ORCL"
+      ],
+      "portfolio": [
+        "MSFT",
+        "META"
+      ],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065211708239642763",
+      "url": "https://x.com/techfundies/status/2065211708239642763",
+      "handle": "techfundies",
+      "author_name": "TechStockFundamentals",
+      "posted_at": "2026-06-11T23:16:55Z",
+      "text": "Well. This was wrong. SaaS shorts win again.",
+      "views": 8437,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "SaaS shorts win again.",
+      "sentiment": "negative",
+      "themes": [
+        "software-application"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065205055075045438",
+      "url": "https://x.com/wccftech/status/2065205055075045438",
+      "handle": "wccftech",
+      "author_name": "Wccftech",
+      "posted_at": "2026-06-11T22:50:29Z",
+      "text": "Persona 4 Revival, Fable, Final Fantasy VII Revelation and lots more collide in 2027, the most stacked RPG year ever.\nhttps://wccftech.com/persona-4-fable-ff7-revelation-2027-most-stacked-rpgs/",
+      "views": 1373,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "2027 stacked RPG year: Persona 4, Fable, FF7 Revelation.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065204603017179353",
+      "url": "https://x.com/contrariancurse/status/2065204603017179353",
+      "handle": "contrariancurse",
+      "author_name": "SuspendedCap",
+      "posted_at": "2026-06-11T22:48:41Z",
+      "text": "I genuinely do not care about the Iran headlines, pure noise \n\nCan\u2019t believe people are trading the same headline a dozen times that hard",
+      "views": 11379,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Iran headlines pure noise; won't trade them.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065202679606030628",
+      "url": "https://x.com/jukan05/status/2065202679606030628",
+      "handle": "jukan05",
+      "author_name": "Jukan",
+      "posted_at": "2026-06-11T22:41:03Z",
+      "text": "According to a Chinese sell-side team\u2019s meeting with a Japanese semiconductor equipment company, TEL clearly stated during the discussion that it is pushing for price increases.\n\nTEL also said it has received explicit requests from DRAM and advanced logic customers for earlier deliveries and additional orders. All of its factories are running at full capacity, and the company has fully shifted from single-shift to double-shift production.\n\nEven on the back-end side, based on communications with wafer fabs, some equipment categories are also becoming tight. These include DISCO\u2019s dicing and grinding tools, as well as EVG\u2019s bonding equipment.",
+      "views": 118031,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "TEL pushing price increases; full capacity, double shifts on DRAM/logic demand.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065200843507355788",
+      "url": "https://x.com/kimmonismus/status/2065200843507355788",
+      "handle": "kimmonismus",
+      "author_name": "Chubby\u2668\ufe0f",
+      "posted_at": "2026-06-11T22:33:45Z",
+      "text": "Anthropic rn",
+      "views": 14726,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKkRMyRW0AAm28_.jpg"
+      ],
+      "summary": "Anthropic rn.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065200331160523176",
+      "url": "https://x.com/kimmonismus/status/2065200331160523176",
+      "handle": "kimmonismus",
+      "author_name": "Chubby\u2668\ufe0f",
+      "posted_at": "2026-06-11T22:31:43Z",
+      "text": "Really curious for Gemini 3.5 Pro. The competition is currently fierce. It needs to be a big release.",
+      "views": 40581,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Curious for big Gemini 3.5 Pro release amid fierce competition.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065194240846733591",
+      "url": "https://x.com/KobeissiLetter/status/2065194240846733591",
+      "handle": "kobeissiletter",
+      "author_name": "The Kobeissi Letter",
+      "posted_at": "2026-06-11T22:07:31Z",
+      "text": "The AI buildout is fueling record Big Tech borrowing:\n\nAlphabet $GOOGL, Amazon $AMZN, Meta $META, Microsoft $MSFT, and Oracle $ORCL have issued a record $159 billion in corporate bonds in 2026.\n\nThis already surpasses the full-year 2025 total by +47% or +$51 billion.\n\nTo put this into perspective, between 2020 and 2024, these companies issued a total of ~$150 billion in debt.\n\nOracle alone has issued $43 billion since September 2025.\n\nMeanwhile, AI-related global debt issuance is expected to more than double to a record ~$570 billion in 2026, according to Morgan Stanley.\n\nAI is reshaping global credit markets.",
+      "views": 128919,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKibtuHXYAAATau.jpg"
+      ],
+      "summary": "Big Tech issued record $159B bonds in 2026 for AI buildout.",
+      "sentiment": "positive",
+      "themes": [
+        "big-tech"
+      ],
+      "tickers": [
+        "AMZN",
+        "GOOGL",
+        "META",
+        "MSFT",
+        "ORCL"
+      ],
+      "portfolio": [
+        "MSFT",
+        "AMZN",
+        "META"
+      ],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065186641828778196",
+      "url": "https://x.com/altcap/status/2065186641828778196",
+      "handle": "altcap",
+      "author_name": "Brad Gerstner",
+      "posted_at": "2026-06-11T21:37:19Z",
+      "text": "\ud83c\uddfa\ud83c\uddf8\ud83d\udcb0\ud83d\ude80",
+      "views": 187873,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKkETdOXAAAIAME.jpg"
+      ],
+      "summary": "US money and rocket emojis posted.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "Table compares split-adj. IPO vs. current prices for NVDA, AAPL, GOOG, MSFT, AMZN, TSLA. Shows massive long-term tech returns.",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065178590195388540",
+      "url": "https://x.com/wccftech/status/2065178590195388540",
+      "handle": "wccftech",
+      "author_name": "Wccftech",
+      "posted_at": "2026-06-11T21:05:19Z",
+      "text": "Onimusha: Way of the Sword ditches weapon-swapping for single-katana mastery, as CAPCOM rebuilds the 20-year-dormant series around Mifune.\nhttps://wccftech.com/onimusha-way-of-the-sword-interview-katana-mastery/",
+      "views": 1901,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Onimusha Way of the Sword rebuilds series around single-katana Mifune.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065178047326961700",
+      "url": "https://x.com/atelicinvest/status/2065178047326961700",
+      "handle": "atelicinvest",
+      "author_name": "Unemployed Capital Allocator",
+      "posted_at": "2026-06-11T21:03:10Z",
+      "text": "the rate limit gets pretty harsh on enterprise tier after you sign that legal agreement, too.",
+      "views": 1215,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Enterprise tier rate limits harsh after legal agreement.",
+      "sentiment": "negative",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065176586371080497",
+      "url": "https://x.com/WisemanCap/status/2065176586371080497",
+      "handle": "wisemancap",
+      "author_name": "Kaushik",
+      "posted_at": "2026-06-11T20:57:21Z",
+      "text": "I am sticking my neck out here. $1k stock!",
+      "views": 6090,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Sticking neck out: $1k stock.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065176322310099236",
+      "url": "https://x.com/modestproposal1/status/2065176322310099236",
+      "handle": "modestproposal1",
+      "author_name": "modest proposal",
+      "posted_at": "2026-06-11T20:56:19Z",
+      "text": "Start a new thread, what could go wrong, there's no way this stupid observation will keep happening. Today was a 7.5% spread, the largest yet, and the 6th time in the last 10 days it exceeded 5%.",
+      "views": 3228,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKj6iJ7WsAAPjqC.png"
+      ],
+      "summary": "7.5% spread today; 6th time >5% in 10 days.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065175102485045430",
+      "url": "https://x.com/atelicinvest/status/2065175102485045430",
+      "handle": "atelicinvest",
+      "author_name": "Unemployed Capital Allocator",
+      "posted_at": "2026-06-11T20:51:28Z",
+      "text": "at the end of the day, the 'market is broken' commentary is the equivalent of yelling at bunch of toddlers that they're being disruptive.\n\nthey're not wrong. your expectation / understanding of toddler brain and behaviour is just wildly off.",
+      "views": 859,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Market is broken commentary equals yelling at toddlers.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065174930527072623",
+      "url": "https://x.com/atelicinvest/status/2065174930527072623",
+      "handle": "atelicinvest",
+      "author_name": "Unemployed Capital Allocator",
+      "posted_at": "2026-06-11T20:50:47Z",
+      "text": "the mistake is in thinking that publicly listed companies should *always* trade on fundamentals. \n\nit clearly does not.",
+      "views": 896,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Public companies do not always trade on fundamentals.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065174654235631730",
+      "url": "https://x.com/atelicinvest/status/2065174654235631730",
+      "handle": "atelicinvest",
+      "author_name": "Unemployed Capital Allocator",
+      "posted_at": "2026-06-11T20:49:41Z",
+      "text": "i'm sure this is just some rehash of some actually thoughtful papers / books - but good enough scaffolding to get started.",
+      "views": 222,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Scaffolding from papers/books good enough to start.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065174588418621548",
+      "url": "https://x.com/atelicinvest/status/2065174588418621548",
+      "handle": "atelicinvest",
+      "author_name": "Unemployed Capital Allocator",
+      "posted_at": "2026-06-11T20:49:25Z",
+      "text": "con't",
+      "views": 481,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKj5V_1bsAA5xgO.png"
+      ],
+      "summary": "Continuation of prior post.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "Table shows 6-layer framework analyzing markets from real economy/fundamentals to policy reactions/narratives. Takeaway: multi-layered lens for assessing price drivers.",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065174433828876732",
+      "url": "https://x.com/kimmonismus/status/2065174433828876732",
+      "handle": "kimmonismus",
+      "author_name": "Chubby\u2668\ufe0f",
+      "posted_at": "2026-06-11T20:48:48Z",
+      "text": "Energy will be the biggest bottleneck in the very near future.\n\nChina has 36 nuclear reactors under construction right now, close to half of everything being built worldwide. They build in batches of 6 to 10 identical units, run one standardized design across sites, and source most components domestically. Average build time dropped to about 6 years. The global average sits closer to 9.\n\nChina also installed about 315 GW of new solar in 2025, roughly 1.8x the entire US solar fleet ever built, almost all of which went up in the last 15 years.\ue056\ue03b\ue0c1\n\nYou see my point, right?\ue0fb\ue0f9\ue11d",
+      "views": 13555,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKj3PB3XAAAP_0F.jpg"
+      ],
+      "summary": "China leads nuclear and solar buildout; energy bottleneck ahead.",
+      "sentiment": "neutral",
+      "themes": [
+        "power"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065174288664285421",
+      "url": "https://x.com/atelicinvest/status/2065174288664285421",
+      "handle": "atelicinvest",
+      "author_name": "Unemployed Capital Allocator",
+      "posted_at": "2026-06-11T20:48:14Z",
+      "text": "this isn't perfect, but, gets across the point",
+      "views": 725,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKj5Efka8AAwBYZ.png"
+      ],
+      "summary": "Post gets across the point imperfectly.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "Asset price decomposition: values cash flows + scarcity/liquidity/policy/narrative/forced flows, net of fragility discount. Shows non-fundamental drivers heavily influence pricing.",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065169576116072536",
+      "url": "https://x.com/MacroEdgeRes/status/2065169576116072536",
+      "handle": "macroedgeres",
+      "author_name": "MacroEdge",
+      "posted_at": "2026-06-11T20:29:30Z",
+      "text": "Iran crude exports collapsing per @Rory_Johnston \n\n#MacroEdge",
+      "views": 6016,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKj0vFaXcAIwVxC.png"
+      ],
+      "summary": "Iran crude exports collapsing.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065168945380999673",
+      "url": "https://x.com/KobeissiLetter/status/2065168945380999673",
+      "handle": "kobeissiletter",
+      "author_name": "The Kobeissi Letter",
+      "posted_at": "2026-06-11T20:27:00Z",
+      "text": "BREAKING: President Trump says that Iran's Supreme Leader has approved a deal between the US and Iran and a signing is \"coming soon.\"\n\nDetails of the deal per President Trump:\n\n1. US Naval blockade is lifted once the deal is signed\n2. Memorandum of Understanding has been approved by \"everyone in Iran\"\n3. Kharg Island operation by US Military is now \"off the table\"\n4. Formal Strait of Hormuz reopening deal expected by as early as Saturday or Monday\n5. Trump declines to set a deadline for the deal, calling Iran \"rational and confident\" that a deal will be reached\n\nUS oil prices extend losses on the news.",
+      "views": 802544,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Trump: Iran deal approved; blockade lifted, strikes off, signing soon.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065168567155462233",
+      "url": "https://x.com/WisemanCap/status/2065168567155462233",
+      "handle": "wisemancap",
+      "author_name": "Kaushik",
+      "posted_at": "2026-06-11T20:25:30Z",
+      "text": "lol $ADBE numbers and guide are good and it sells off",
+      "views": 25815,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "ADBE numbers/guide good yet sells off.",
+      "sentiment": "negative",
+      "themes": [
+        "software-application"
+      ],
+      "tickers": [
+        "ADBE"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065164796819907030",
+      "url": "https://x.com/KobeissiLetter/status/2065164796819907030",
+      "handle": "kobeissiletter",
+      "author_name": "The Kobeissi Letter",
+      "posted_at": "2026-06-11T20:10:31Z",
+      "text": "BREAKING: The S&P 500 closes 1.75% higher, adding +$1.2 trillion in market cap, as President Trump says a deal with Iran is coming shortly.",
+      "views": 208893,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjwQn7W4AA0VRb.png"
+      ],
+      "summary": "S&P 500 +1.75%, +$1.2T market cap on Iran deal news.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065164611377062362",
+      "url": "https://x.com/MacroEdgeRes/status/2065164611377062362",
+      "handle": "macroedgeres",
+      "author_name": "MacroEdge",
+      "posted_at": "2026-06-11T20:09:46Z",
+      "text": "Trump: Strait of Hormuz is open, you just didn't notice \n\nKharg Island operation off the table\n\n#MacroEdge",
+      "views": 7988,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Trump: Strait of Hormuz open; Kharg Island operation off table.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065164152834756798",
+      "url": "https://x.com/MacroEdgeRes/status/2065164152834756798",
+      "handle": "macroedgeres",
+      "author_name": "MacroEdge",
+      "posted_at": "2026-06-11T20:07:57Z",
+      "text": "Trump: Iran deal is a very strong MOU, they want to make the deal more than I do \n\n#MacroEdge",
+      "views": 12852,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Trump: Iran deal strong MOU; Iran wants it more.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065162224969412839",
+      "url": "https://x.com/contrariancurse/status/2065162224969412839",
+      "handle": "contrariancurse",
+      "author_name": "SuspendedCap",
+      "posted_at": "2026-06-11T20:00:17Z",
+      "text": "Consumables starting to fucking buck",
+      "views": 17460,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Consumables starting to buck.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065160328439120246",
+      "url": "https://x.com/elerianm/status/2065160328439120246",
+      "handle": "elerianm",
+      "author_name": "Mohamed A. El-Erian",
+      "posted_at": "2026-06-11T19:52:45Z",
+      "text": "In response to signs of an imminent US-Iran deal, Brent and WTI crude are both trading below $90, pushing Brent to its lowest level since mid-March (CNBC data below).\nNeedless to say, the sharp drop in oil prices is turbocharging the stock market and driving down yields.\n#economy #oil #energy #markets",
+      "views": 28461,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjsVjUWQAApOl5.jpg"
+      ],
+      "summary": "Brent/WTI below $90 on Iran deal signs; turbocharges stocks, lowers yields.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065157886930559153",
+      "url": "https://x.com/MacroEdgeRes/status/2065157886930559153",
+      "handle": "macroedgeres",
+      "author_name": "MacroEdge",
+      "posted_at": "2026-06-11T19:43:03Z",
+      "text": "Trump: The stock market has risen by 1000 points. This means they like this deal.\n\n#MacroEdge",
+      "views": 11256,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Trump: Stock market +1000 points means they like the deal.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065156428432633957",
+      "url": "https://x.com/MacroEdgeRes/status/2065156428432633957",
+      "handle": "macroedgeres",
+      "author_name": "MacroEdge",
+      "posted_at": "2026-06-11T19:37:15Z",
+      "text": "Trump: Deal signing over the weekend, maybe next week, details soon \n\n#MacroEdge",
+      "views": 8091,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Trump: Deal signing weekend or next week; details soon.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065154276104843596",
+      "url": "https://x.com/WisemanCap/status/2065154276104843596",
+      "handle": "wisemancap",
+      "author_name": "Kaushik",
+      "posted_at": "2026-06-11T19:28:42Z",
+      "text": "U.S.-Iran MOU likely to be signed next week - CBS",
+      "views": 7283,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "U.S.-Iran MOU likely signed next week per CBS.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065152247567167552",
+      "url": "https://x.com/wccftech/status/2065152247567167552",
+      "handle": "wccftech",
+      "author_name": "Wccftech",
+      "posted_at": "2026-06-11T19:20:39Z",
+      "text": "Maxsun Intel Arc Pro B70 32G graphics card hands-on impressions: Big Battlemage stuns with big uplifts over B580.\nhttps://wccftech.com/review/maxsun-intel-arc-pro-b70-32g-graphics-card-hands-on-impressions/",
+      "views": 1697,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Maxsun Intel Arc Pro B70 32G hands-on: big uplifts over B580.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "INTC"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065149775369113907",
+      "url": "https://x.com/The_AI_Investor/status/2065149775369113907",
+      "handle": "the_ai_investor",
+      "author_name": "The AI Investor",
+      "posted_at": "2026-06-11T19:10:49Z",
+      "text": "SpaceX is expected to begin trading on June 12 under the ticker SPCX, at a valuation of roughly $1.75 trillion. The IPO is priced at $135 per share, with 555.6 million shares being sold to raise approximately $75 billion. Total shares outstanding after the IPO are expected to be about 12.9 billion.  \n\nKey numbers:\n\nShare Price: $135\nShares Offered: 555.6M\nShares Outstanding: ~12.9B\nCapital Raised: ~$75B\nValuation: ~$1.75T\nRevenue (2025): $18.7B\nGrowth: +33% YoY\nStarlink Revenue: $11.4B (~61% of total revenue)",
+      "views": 6482,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "SpaceX IPO June 12 at $135/share; $1.75T valuation, $75B raise.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065146599840616512",
+      "url": "https://x.com/atelicinvest/status/2065146599840616512",
+      "handle": "atelicinvest",
+      "author_name": "Unemployed Capital Allocator",
+      "posted_at": "2026-06-11T18:58:12Z",
+      "text": "https://t.co/w0yqczg2Vi",
+      "views": 10993,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjf42vaAAAT8Dd.jpg"
+      ],
+      "summary": "Link shared without text.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "Meme: engineer demands silence from influencers (non-finance).",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065146569553547424",
+      "url": "https://x.com/KobeissiLetter/status/2065146569553547424",
+      "handle": "kobeissiletter",
+      "author_name": "The Kobeissi Letter",
+      "posted_at": "2026-06-11T18:58:05Z",
+      "text": "Rising Treasury yields are now the biggest threat to the equity market:\n\nThe 3-month correlation between the 10-year Treasury yield and the S&P 500 is down to -0.62, the lowest in at least 15 years.\n\nThis means that when Treasury yields rise, stock prices fall, and when yields fall, stocks rise.\n\nBy comparison, during the 2022 bear market, this correlation never crossed -0.50, making the current reading the most extreme negative relationship in decades.\n\nFollowing the 2008 Financial Crisis, yields and equity prices moved in the same direction, supported by strong economic growth and earnings expectations.\n\nCurrently, rising yields reflect surging inflation fears rather than growth optimism, weighing on stock valuations rather than signaling economic strength.\n\nKeep watching the bond market.",
+      "views": 131103,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKib4ATWwAEkZ6o.jpg"
+      ],
+      "summary": "Rising yields biggest equity threat; 15-year low -0.62 correlation.",
+      "sentiment": "negative",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065140122610237731",
+      "url": "https://x.com/wccftech/status/2065140122610237731",
+      "handle": "wccftech",
+      "author_name": "Wccftech",
+      "posted_at": "2026-06-11T18:32:28Z",
+      "text": "ASUS and MSI finally bring AMD\u2019s EXPO Ultra Low Latency to 600-series boards, closing the gap with AM5\u2019s 800 lineup.\nhttps://wccftech.com/asus-and-msi-finally-bring-amds-expo-ultra-low-latency-to-600-series-boards-closing-the-gap-with-am5s-800-lineup/",
+      "views": 2221,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "ASUS/MSI bring AMD EXPO Ultra Low Latency to 600-series boards.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "AMD"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065138091644645867",
+      "url": "https://x.com/altcap/status/2065138091644645867",
+      "handle": "altcap",
+      "author_name": "Brad Gerstner",
+      "posted_at": "2026-06-11T18:24:24Z",
+      "text": "Incredibly important!  Thanks to @FLOTUS for leading the charge to make certain every child directly shares in the upside of America!  \ud83c\uddfa\ud83c\uddf8\ud83e\udd0d\ud83d\ude4f",
+      "views": 2727,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Thanks FLOTUS for ensuring every child shares in America's upside.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065136460131684694",
+      "url": "https://x.com/artificialanlys/status/2065136460131684694",
+      "handle": "artificialanlys",
+      "author_name": "Artificial Analysis",
+      "posted_at": "2026-06-11T18:17:55Z",
+      "text": "Vote on Ideogram 4.0 now in the Artificial Analysis Image Arena! https://artificialanalysis.ai/image/arena",
+      "views": 2479,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Vote on Ideogram 4.0 now in Artificial Analysis Image Arena.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065136397036798457",
+      "url": "https://x.com/artificialanlys/status/2065136397036798457",
+      "handle": "artificialanlys",
+      "author_name": "Artificial Analysis",
+      "posted_at": "2026-06-11T18:17:40Z",
+      "text": "Text to Image Prompt [6/6] (Ideogram 4.0 Quality): A group of four steampunk anime characters: a woman in a top hat and goggles holding a mechanical compass, a man in a leather trench coat adjusting his steam-powered arm, a young girl tinkering with a small robot, and a pilot standing beside an airship with brass detailing.",
+      "views": 2761,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjWm2Ba0AAKyj9.jpg"
+      ],
+      "summary": "Text-to-image prompt example for Ideogram 4.0 Quality output.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "AI image model comparison (Ideogram, Luma, FLUX, Seedream) on identical steampunk prompt; visual quality benchmark, not finance-relevant.",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065136307651903613",
+      "url": "https://x.com/artificialanlys/status/2065136307651903613",
+      "handle": "artificialanlys",
+      "author_name": "Artificial Analysis",
+      "posted_at": "2026-06-11T18:17:18Z",
+      "text": "Text to Image Prompt [5/6] (Ideogram 4.0 Quality): Snowy Himalayan peaks where a Yeti is having a snowball fight with a group of red pandas. A snow leopard watches the fun from a nearby ledge, while Tibetan prayer flags flutter in the mountain breeze.",
+      "views": 287,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjWhn5bMAAKrjc.jpg"
+      ],
+      "summary": "Text-to-image prompt example for Ideogram 4.0 Quality output.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "AI image gen model comparison (Ideogram/FLUX/etc.): Yeti vs. red pandas in Himalayas. Not finance-relevant.",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065136201733226974",
+      "url": "https://x.com/artificialanlys/status/2065136201733226974",
+      "handle": "artificialanlys",
+      "author_name": "Artificial Analysis",
+      "posted_at": "2026-06-11T18:16:53Z",
+      "text": "Text to Image Prompt [4/6] (Ideogram 4.0 Quality): Clumsy robot trying to cook in a cartoon kitchen",
+      "views": 339,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjWbXNbcAAh4q0.jpg"
+      ],
+      "summary": "Text-to-image prompt example for Ideogram 4.0 Quality output.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "Comparison of 4 AI image models generating a clumsy cartoon robot cooking in a kitchen.",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065136093494952444",
+      "url": "https://x.com/artificialanlys/status/2065136093494952444",
+      "handle": "artificialanlys",
+      "author_name": "Artificial Analysis",
+      "posted_at": "2026-06-11T18:16:27Z",
+      "text": "Text to Image Prompt [3/6] (Ideogram 4.0 Quality): A busy street in Tokyo at night with neon signs and billboards all showing the word 'Arcadia' in different fonts and colors.",
+      "views": 329,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjWVMUaUAA3jgf.jpg"
+      ],
+      "summary": "Text-to-image prompt example for Ideogram 4.0 Quality output.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "AI image model comparison: four renders of neon Tokyo street with repeated \"Arcadia\" signs. Shows text rendering quality/variations across Ideogram, Luma, FLUX, Seedream.",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065135982891225149",
+      "url": "https://x.com/artificialanlys/status/2065135982891225149",
+      "handle": "artificialanlys",
+      "author_name": "Artificial Analysis",
+      "posted_at": "2026-06-11T18:16:01Z",
+      "text": "Text to Image Prompt [2/6] (Ideogram 4.0 Quality): An advertising poster for a gourmet vegan restaurant, \"Green Gastronomy,\" featuring a tantalizing display of dishes arranged artistically on a rustic table, surrounded by fresh ingredients and herbs, styled in a vibrant, appetizing watercolor.",
+      "views": 994,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjWOp6bYAAXR3L.jpg"
+      ],
+      "summary": "Text-to-image prompt example for Ideogram 4.0 Quality output.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "AI-generated ad variations for vegan restaurant \"Green Gastronomy\". Not finance-relevant.",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065135874468356563",
+      "url": "https://x.com/artificialanlys/status/2065135874468356563",
+      "handle": "artificialanlys",
+      "author_name": "Artificial Analysis",
+      "posted_at": "2026-06-11T18:15:35Z",
+      "text": "Text to Image Prompt [1/6] (Ideogram 4.0 Quality): Create a vintage-style recruitment poster for the \"Lunar Ranger Corps,\" featuring a dynamic, comic book-style illustration of an astronaut exploring the moon's surface, with the text \"Enlist Now for the Adventure of a Lifetime!\"",
+      "views": 1229,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjWIbHasAAykzm.jpg"
+      ],
+      "summary": "Text-to-image prompt example for Ideogram 4.0 Quality output.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "AI-generated vintage \"Lunar Ranger Corps\" recruitment posters from four image models. Non-finance content.",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065135515171709056",
+      "url": "https://x.com/artificialanlys/status/2065135515171709056",
+      "handle": "artificialanlys",
+      "author_name": "Artificial Analysis",
+      "posted_at": "2026-06-11T18:14:09Z",
+      "text": "Ideogram 4.0 is Ideogram\u2019s first open weights release and debuts at #8 on our Open Weights Text to Image Leaderboard\n\nIdeogram 4.0 is the latest release from @ideogram_ai. Alongside their first party API, Ideogram is releasing 4.0 with open weights and a commercial license.\n\nThe model generates 2K x 2K outputs (~4MP), with strong text rendering across languages, bounding box layout control, and transparent backgrounds. Ideogram 4.0 uses structured JSON prompts that specify composition and individual scene elements, with a prompt enhancer that expands natural language prompts into this structured format. Note that the prompt enhancer is only available via the Ideogram proprietary API, though it is free to use.\n\nWe benchmarked the Quality tier of the model served via Ideogram's API, where it ranks #8 in Open Weights Text to Image, and #31 in Text to Image. It places ahead of closed source models including Seedream 3.0 and Luma UNI 1.\n\nWhile Ideogram 4.0 places near the top of our design, layout, and text rendering categories, it ranks further down overall on a balanced benchmark across all use cases including cartoon, anime, and photorealism. The model also has a more stylized look, which typically means it performs less favorably on our benchmarks. Ideogram states the open weights model accessible to the public is essentially the same model with additional safety training and quantization, so we expect a small quality difference.\n\nIdeogram 4.0 is available across three API tiers: Turbo at $30/1k images, Default at $60/1k images, and Quality at $100/1k images. The weights are free to download for evaluation and non-commercial use, with commercial self-hosting requiring a separate license.\n\nCongratulations to @ideogram_ai on the launch!\n\nSee below for example generations and a link to vote on Ideogram 4.0 for yourself in the Artificial Analysis Image Arena \ud83e\uddf5",
+      "views": 11738,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjVzfAbEAAGYQy.jpg"
+      ],
+      "summary": "Ideogram 4.0 open weights release ranks #8 on Open Weights Text to Image Leaderboard.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "media_summary": "AI image gen model Elo leaderboard (non-finance).",
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065134340556881984",
+      "url": "https://x.com/atelicinvest/status/2065134340556881984",
+      "handle": "atelicinvest",
+      "author_name": "Unemployed Capital Allocator",
+      "posted_at": "2026-06-11T18:09:29Z",
+      "text": "He's not wrong tho. Everyone whose business depends on SEO is actually getting fucked. See trip etc",
+      "views": 2129,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "SEO-dependent businesses getting hurt; cites Trip etc.",
+      "sentiment": "negative",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065128488177455609",
+      "url": "https://x.com/artificialanlys/status/2065128488177455609",
+      "handle": "artificialanlys",
+      "author_name": "Artificial Analysis",
+      "posted_at": "2026-06-11T17:46:14Z",
+      "text": "Read the full report - detection quality, latency, and the recall vs. over-refusal tradeoff across current guardrail and moderation models, plus guidance on choosing one for your use case:\n\nhttps://artificialanalysis.ai/articles/guardrail-safety-benchmark",
+      "views": 2360,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Full report on guardrail and moderation model benchmarks released.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065128033103614388",
+      "url": "https://x.com/KobeissiLetter/status/2065128033103614388",
+      "handle": "kobeissiletter",
+      "author_name": "The Kobeissi Letter",
+      "posted_at": "2026-06-11T17:44:25Z",
+      "text": "BREAKING: The S&P 500 surges over +100 points after President Trump says the time and place of an Iran deal signing will be \u201cannounced shortly.\"",
+      "views": 913235,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjPAJ-W0AACUyV.jpg"
+      ],
+      "summary": "S&P 500 surges +100 points on imminent Iran deal announcement.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065127653150196117",
+      "url": "https://x.com/atelicinvest/status/2065127653150196117",
+      "handle": "atelicinvest",
+      "author_name": "Unemployed Capital Allocator",
+      "posted_at": "2026-06-11T17:42:55Z",
+      "text": "The market is never really broken. It just is what it is.\n\nA market is precisely what the name suggests - a place where multiple parties come together to transact. \n\nWhat you mean when you say a market is broken, is that there are actors / forces that you cannot quite understand or predict, and it's behaving in unusual ways.\n\nThis distinction might seem trivial, but it's important. \n\nBecause broken comes with all sorts of implicit connotations - that it is wrong; that it will be fixed soon; that it is unfair.\n\nNone of these things need be true. Especially not on your timeline.\n\nIs the market weird as fuck? Yes. Are prices acting in a way that I do not understand? Yes. \n\nIs the market broken? Not really. \n\nWhat is broken is my grip on the reality of the situation.\n\nUntil you can pinpoint exactly what is going on, and when it might all change, best just leave it in 'things not understood' bucket.",
+      "views": 3868,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Market not broken; just misunderstood by observers.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065127329714618562",
+      "url": "https://x.com/KobeissiLetter/status/2065127329714618562",
+      "handle": "kobeissiletter",
+      "author_name": "The Kobeissi Letter",
+      "posted_at": "2026-06-11T17:41:38Z",
+      "text": "BREAKING: US oil prices collapse below $87/barrel after President Trump cancels scheduled strikes on Iran.",
+      "views": 1507832,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjOXL9W8AAEDrD.jpg"
+      ],
+      "summary": "US oil collapses below $87 on cancelled Iran strikes.",
+      "sentiment": "negative",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065126208283594993",
+      "url": "https://x.com/KobeissiLetter/status/2065126208283594993",
+      "handle": "kobeissiletter",
+      "author_name": "The Kobeissi Letter",
+      "posted_at": "2026-06-11T17:37:10Z",
+      "text": "BREAKING: President Trump says he has cancelled scheduled strikes on Iran and the time and place of a deal signing will be \u201cannounced shortly.\u201d",
+      "views": 596319,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKjNV3AWsAAHIWg.jpg"
+      ],
+      "summary": "Trump cancels Iran strikes; deal signing time/place announced shortly.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065125352335200265",
+      "url": "https://x.com/firstadopter/status/2065125352335200265",
+      "handle": "firstadopter",
+      "author_name": "tae kim",
+      "posted_at": "2026-06-11T17:33:46Z",
+      "text": "MELT UP",
+      "views": 8605,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "MELT UP.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065124959500820766",
+      "url": "https://x.com/wccftech/status/2065124959500820766",
+      "handle": "wccftech",
+      "author_name": "Wccftech",
+      "posted_at": "2026-06-11T17:32:13Z",
+      "text": "AWS Graviton5 CPUs now available: purpose-built for AI with 25% performance uplift, 192 cores, DDR5-8800 & PCIe Gen6 support.\nhttps://wccftech.com/aws-graviton5-cpus-now-available-purpose-built-for-ai-192-cores-ddr5-8800-pcie-gen6/",
+      "views": 2810,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "AWS Graviton5 available: 192 cores, 25% AI uplift, DDR5-8800.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "AMZN"
+      ],
+      "portfolio": [
+        "AMZN"
+      ],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065124541307990276",
+      "url": "https://x.com/WisemanCap/status/2065124541307990276",
+      "handle": "wisemancap",
+      "author_name": "Kaushik",
+      "posted_at": "2026-06-11T17:30:33Z",
+      "text": "\ud83e\udd23\ud83e\udd23\ud83e\udd23",
+      "views": 16186,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Laughing emojis.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065124309350363619",
+      "url": "https://x.com/WisemanCap/status/2065124309350363619",
+      "handle": "wisemancap",
+      "author_name": "Kaushik",
+      "posted_at": "2026-06-11T17:29:38Z",
+      "text": "\ud83d\ude02",
+      "views": 10536,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Laughing emoji.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065122701870809598",
+      "url": "https://x.com/coatuemgmt/status/2065122701870809598",
+      "handle": "coatuemgmt",
+      "author_name": "COATUE",
+      "posted_at": "2026-06-11T17:23:14Z",
+      "text": "Short dramas have quietly scaled into a mainstream format, and most of the US still hasn't noticed.\n\nSerialized, vertical, and made for the phone. Episodes run one to two minutes, seasons run 100 to 150.\n\nIn China it's already obvious. More viewing time now goes to short dramas than to long-form streaming. And AI is moving in fast: on Douyin's top 5,000 titles, close to one in five are now AI-generated, up from none four months ago.\n\nCoatue sector head @lordbartonjr on why China could be the early signal for what reaches the US next.",
+      "views": 47242,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Short dramas scaled mainstream in China; AI now generates 1 in 5 top titles.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065118626424971337",
+      "url": "https://x.com/WisemanCap/status/2065118626424971337",
+      "handle": "wisemancap",
+      "author_name": "Kaushik",
+      "posted_at": "2026-06-11T17:07:03Z",
+      "text": "Yeah sell everything and buy!",
+      "views": 13632,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Yeah sell everything and buy.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065110665556050377",
+      "url": "https://x.com/wccftech/status/2065110665556050377",
+      "handle": "wccftech",
+      "author_name": "Wccftech",
+      "posted_at": "2026-06-11T16:35:25Z",
+      "text": "Louis Rossmann threatens Samsung with lawsuit after company offers $330 refund for a 4TB SSD now selling at $949.\nhttps://wccftech.com/louis-rossmann-threatens-samsung-with-lawsuit-after-company-offers-330-refund-for-a-4tb-ssd-now-selling-at-949/",
+      "views": 10250,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Louis Rossmann threatens Samsung lawsuit over 4TB SSD refund.",
+      "sentiment": "negative",
+      "themes": [
+        "memory"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065109070328005050",
+      "url": "https://x.com/firstadopter/status/2065109070328005050",
+      "handle": "firstadopter",
+      "author_name": "tae kim",
+      "posted_at": "2026-06-11T16:29:04Z",
+      "text": "Promoting the anti-social aspect advantage is pretty funny.\n\n\u201cI never got my driver's license, and I rely on Waymo to commute to an office every day,\" said Sarah Paige Roland, a Waymo rider in Phoenix. \"I get privacy, time back, a safe ride, and I'm not obligated to talk to someone that I don't want to talk to. Adding cash back and priority pickups on top of that makes Premier a no-brainer for someone like me.\"",
+      "views": 4888,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKi9shhXgAAxrV9.jpg"
+      ],
+      "summary": "Waymo Premier promotes anti-social privacy and no-talking advantage.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065107530913865890",
+      "url": "https://x.com/vikramskr/status/2065107530913865890",
+      "handle": "vikramskr",
+      "author_name": "Vikram Sekar",
+      "posted_at": "2026-06-11T16:22:57Z",
+      "text": "Korean Semiconductor Equipment Company Earnings (Unit: KRW billions)\n\nTranslated from The Elec, I blame all translation errors on Fable 5.",
+      "views": 5338,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKi8DBPa4AQMd_q.jpg"
+      ],
+      "summary": "Korean Semiconductor Equipment Company Earnings (KRW billions) translated.",
+      "sentiment": "neutral",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065104227194781833",
+      "url": "https://x.com/WisemanCap/status/2065104227194781833",
+      "handle": "wisemancap",
+      "author_name": "Kaushik",
+      "posted_at": "2026-06-11T16:09:50Z",
+      "text": "Buy the dip guys $AMZN $META $MSFT $GOOGL $NVDA $AVGO",
+      "views": 23030,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Buy the dip: $AMZN $META $MSFT $GOOGL $NVDA $AVGO.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [
+        "AMZN",
+        "AVGO",
+        "GOOGL",
+        "META",
+        "MSFT",
+        "NVDA"
+      ],
+      "portfolio": [
+        "MSFT",
+        "AMZN",
+        "META"
+      ],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065103585554133088",
+      "url": "https://x.com/firstadopter/status/2065103585554133088",
+      "handle": "firstadopter",
+      "author_name": "tae kim",
+      "posted_at": "2026-06-11T16:07:17Z",
+      "text": "Seems like people are missing the \u201cmove would be in anticipation of similar cuts the company expects at Anthropic, the people said\u201d point \ud83e\udd37\u200d\u2642\ufe0f",
+      "views": 5258,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Notes market missing Anthropic cut anticipation point.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065101851390009686",
+      "url": "https://x.com/altcap/status/2065101851390009686",
+      "handle": "altcap",
+      "author_name": "Brad Gerstner",
+      "posted_at": "2026-06-11T16:00:23Z",
+      "text": "\ud83c\uddfa\ud83c\uddf8\ud83c\uddfa\ud83c\uddf8\ud83d\udc4f\ud83d\udc4f\ud83d\udcaf\ud83d\udcaf @WhiteHouse @SecScottBessent",
+      "views": 26167,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "US flags and applause for @WhiteHouse @SecScottBessent.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065096865214021951",
+      "url": "https://x.com/wccftech/status/2065096865214021951",
+      "handle": "wccftech",
+      "author_name": "Wccftech",
+      "posted_at": "2026-06-11T15:40:34Z",
+      "text": "Halo: Campaign Evolved stumbles on Unreal Engine 5, as RTX 5090 barely cracks 100 FPS at 1440p ultra. https://wccftech.com/halo-campaign-evolved-stumbles-unreal-engine-5-rtx-5090/",
+      "views": 11418,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Halo Campaign Evolved: RTX 5090 barely 100 FPS 1440p ultra.",
+      "sentiment": "negative",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065092512050786441",
+      "url": "https://x.com/The_AI_Investor/status/2065092512050786441",
+      "handle": "the_ai_investor",
+      "author_name": "The AI Investor",
+      "posted_at": "2026-06-11T15:23:17Z",
+      "text": "#49 Rising in technology, not bad but still a long way to go.\n\nhttps://theaiinvestorx.substack.com/",
+      "views": 3662,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKiusfYacAAFh_z.jpg"
+      ],
+      "summary": "Ranking #49 in technology; long way to go.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065085977912017381",
+      "url": "https://x.com/firstadopter/status/2065085977912017381",
+      "handle": "firstadopter",
+      "author_name": "tae kim",
+      "posted_at": "2026-06-11T14:57:19Z",
+      "text": "Jeff Bezos: AI is going to lead to \"labor scarcity.\" AI is going to increase productivity and \"raise the standard of living.\"",
+      "views": 10061,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Jeff Bezos: AI leads to labor scarcity, higher productivity and living standards.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065083257327415415",
+      "url": "https://x.com/wccftech/status/2065083257327415415",
+      "handle": "wccftech",
+      "author_name": "Wccftech",
+      "posted_at": "2026-06-11T14:46:30Z",
+      "text": "NVIDIA DLSS continues to be the Switch 2 secret weapon, as without it, the system struggles to match the PS4 in games like Kingdom Hearts 3. https://wccftech.com/switch-2-punches-above-weight-dlss-kingdom-hearts-3-clutch/",
+      "views": 2237,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Switch 2 needs DLSS to match PS4 in Kingdom Hearts 3.",
+      "sentiment": "neutral",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "NVDA"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065063293425705177",
+      "url": "https://x.com/RihardJarc/status/2065063293425705177",
+      "handle": "rihardjarc",
+      "author_name": "Rihard Jarc",
+      "posted_at": "2026-06-11T13:27:10Z",
+      "text": "I just published my article on Memory per Token Optimizations:\n\n1. Software optimization techniques for lowering HBM (potential and % captured already).\n2. Architectures moving from transformer to hybrid\n2. Hardware angles (SRAM accelerators like Groq and $CBRS). Balance between memory and interconnects.\n3. Decode and prefill the split-up of hardware and what that opens up as older hardware ( $NVDA GPUs) gets a new life.",
+      "views": 9878,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Published Memory per Token Optimizations report covering software, architecture, hardware.",
+      "sentiment": "neutral",
+      "themes": [
+        "memory"
+      ],
+      "tickers": [
+        "CBRS",
+        "NVDA"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065060243810496644",
+      "url": "https://x.com/jukan05/status/2065060243810496644",
+      "handle": "jukan05",
+      "author_name": "Jukan",
+      "posted_at": "2026-06-11T13:15:03Z",
+      "text": "The Information: Google is considering producing the I/O die for TPU v10 on Samsung Foundry\u2019s 2nm process.\n\nhttps://www.theinformation.com/articles/google-turns-samsung-future-ai-chip-capacity-tightens?rc=lx3hes",
+      "views": 86040,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Google considering Samsung 2nm for TPU v10 I/O die.",
+      "sentiment": "neutral",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065057196807991320",
+      "url": "https://x.com/WisemanCap/status/2065057196807991320",
+      "handle": "wisemancap",
+      "author_name": "Kaushik",
+      "posted_at": "2026-06-11T13:02:57Z",
+      "text": "ServiceNow and IBM expand partnership for enterprise AI deployment",
+      "views": 7018,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "ServiceNow and IBM expand enterprise AI deployment partnership.",
+      "sentiment": "positive",
+      "themes": [
+        "software-application"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065056456529879415",
+      "url": "https://x.com/wccftech/status/2065056456529879415",
+      "handle": "wccftech",
+      "author_name": "Wccftech",
+      "posted_at": "2026-06-11T13:00:00Z",
+      "text": "AMD's marketing chief boasts '15 out of 15' on Amazon's best-seller CPU chart, leaving Intel without a single spot. \ud83d\udd17 https://wccftech.com/amds-marketing-chief-boasts-15-out-of-15-on-amazons-best-seller-cpu-chart-leaving-intel-without-a-single-top-spot/",
+      "views": 17935,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKiKV-ibwAAT9Dz.jpg"
+      ],
+      "summary": "AMD claims 15/15 Amazon best-seller CPU chart; Intel zero.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "AMD",
+        "INTC"
+      ],
+      "portfolio": [
+        "AMZN"
+      ],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065051491627381094",
+      "url": "https://x.com/elerianm/status/2065051491627381094",
+      "handle": "elerianm",
+      "author_name": "Mohamed A. El-Erian",
+      "posted_at": "2026-06-11T12:40:17Z",
+      "text": "US PPI inflation for May came in hotter than expected at the headline level but softer at the core level (please see the Bloomberg table below).\nEchoing yesterday\u2019s CPI data, this suggests that the PPI spillover from energy into broader prices remains relatively muted for now.\nIt also suggests that the pass-through from PPI to CPI is being offset by margin pressure.\n#economy #inflation #markets",
+      "views": 53978,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKiIpirW0AAMrRd.png"
+      ],
+      "summary": "US May PPI hotter headline, softer core; limited energy spillover.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065047046734721443",
+      "url": "https://x.com/elerianm/status/2065047046734721443",
+      "handle": "elerianm",
+      "author_name": "Mohamed A. El-Erian",
+      "posted_at": "2026-06-11T12:22:37Z",
+      "text": "As expected, the ECB hiked rates by 25 basis points\u2014the first increase since 2023.\nIt would not surprise me if the ECB were to hike again this year, highlighting a world of greater dispersion among systemically important central banks.\n#economy #centralbanks #ecb #markets #inflation",
+      "views": 31359,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "ECB hikes 25bp first since 2023; expects possible further hikes.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065043996997460157",
+      "url": "https://x.com/elerianm/status/2065043996997460157",
+      "handle": "elerianm",
+      "author_name": "Mohamed A. El-Erian",
+      "posted_at": "2026-06-11T12:10:30Z",
+      "text": "After yesterday's US CPI report for May, we get the PPI numbers this morning.\nThe consensus forecast is looking for a monthly gain of 0.7%, taking annual headline inflation to 6.4% (from 6.0% in April).\nCore PPI inflation is expected to edge higher from 5.2% to 5.4% on the back of a 0.5% monthly gain.\n#economy #inflation #ppi #markets",
+      "views": 27033,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Consensus expects US May PPI +0.7% MoM, headline 6.4%.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065041866584621462",
+      "url": "https://x.com/elerianm/status/2065041866584621462",
+      "handle": "elerianm",
+      "author_name": "Mohamed A. El-Erian",
+      "posted_at": "2026-06-11T12:02:02Z",
+      "text": "... and this from Bloomberg.",
+      "views": 27753,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKiAnuWXcAAMe4m.png"
+      ],
+      "summary": "Links to Bloomberg chart.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065032816857866695",
+      "url": "https://x.com/southernvalue95/status/2065032816857866695",
+      "handle": "southernvalue95",
+      "author_name": "SouthernValue",
+      "posted_at": "2026-06-11T11:26:04Z",
+      "text": "Why doesn\u2019t he just say it\u2019s ~$7B of cost (depreciation) and generates $20B of token revenue",
+      "views": 2354,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Questions why not state ~$7B depreciation vs $20B token revenue.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065031590456025270",
+      "url": "https://x.com/southernvalue95/status/2065031590456025270",
+      "handle": "southernvalue95",
+      "author_name": "SouthernValue",
+      "posted_at": "2026-06-11T11:21:12Z",
+      "text": "Nobody is talking abt a peak. Just potentially a digestion and rationalization to align spend w value. Which is needed if % of global GDP needs to be spent on tokens to make semis valuations work.",
+      "views": 193,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Digestion needed to align AI spend with value for semis valuations.",
+      "sentiment": "neutral",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065015068618576271",
+      "url": "https://x.com/elerianm/status/2065015068618576271",
+      "handle": "elerianm",
+      "author_name": "Mohamed A. El-Erian",
+      "posted_at": "2026-06-11T10:15:33Z",
+      "text": "The ECB is expected to initiate interest rate hikes today.\nWhile this may draw criticism from some given the current growth context, the Bank actually has little choice. \nUnlike the Fed\u2019s dual mandate of inflation and employment, the ECB has a single mandate: price stability.\n#ECB #centralbanks #Inflation #Economy",
+      "views": 63168,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "ECB must hike despite growth; single price stability mandate.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2065012584411980233",
+      "url": "https://x.com/elerianm/status/2065012584411980233",
+      "handle": "elerianm",
+      "author_name": "Mohamed A. El-Erian",
+      "posted_at": "2026-06-11T10:05:40Z",
+      "text": "Further to my earlier posts on how the global economy is handling disruptions to oil supplies, this from the WSJ:\n\"A sharp fall in China\u2019s crude oil imports during the Iran war has been instrumental in holding down oil prices and keeping the global economy humming.\u00a0\"\n#economy #oil #energy #markets @wsj",
+      "views": 46022,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKhmAG5WQAABbMq.jpg",
+        "https://pbs.twimg.com/media/HKhmAG3XUAAzzUo.jpg"
+      ],
+      "summary": "China's falling crude imports held down oil prices amid Iran war.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064984921857245586",
+      "url": "https://x.com/citrini/status/2064984921857245586",
+      "handle": "citrini",
+      "author_name": "Citrini",
+      "posted_at": "2026-06-11T08:15:45Z",
+      "text": "Why do you think that the average PE target needs something more complex than what AI in its current form is already capable of",
+      "views": 5970,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Questions why PE targets need more than current AI capabilities.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064982482240385143",
+      "url": "https://x.com/similarweb/status/2064982482240385143",
+      "handle": "similarweb",
+      "author_name": "Similarweb",
+      "posted_at": "2026-06-11T08:06:03Z",
+      "text": "Gen AI website traffic share update  \n\n\ud83d\uddd3\ufe0f 12 months ago:  \nChatGPT: 76.4%   \nGemini: 8.9% \nDeepSeek: 5.3% \nGrok: 2.8%  \nCopilot: 1.9%\nPerplexity: 1.8%  \nClaude: 1.6%\n\n\ud83d\uddd3\ufe0f 6 months ago:\nChatGPT: 65.2%\nGemini: 20.3%\nDeepSeek: 3.8%\nGrok: 3.8%\nPerplexity: 2.1%\nClaude: 2.0%\nCopilot: 1.8%\n\n\ud83d\uddd3\ufe0f 3 months ago:\nChatGPT: 56.7%\nGemini: 25.5%\nClaude: 6.0%\nGrok: 3.7%\nDeepSeek: 3.4%\nCopilot: 2.0%\nPerplexity: 1.6%\n\n\ud83d\uddd3\ufe0f 1 month ago:\nChatGPT: 52.7%\nGemini: 27.3%\nClaude: 8.9%\nDeepSeek: 4.0\nGrok: 2.8%\nCopilot: 2.0\nPerplexity: 1.3%",
+      "views": 70617,
+      "has_media": true,
+      "media_urls": [
+        "https://pbs.twimg.com/media/HKhITSpXcAA8oMC.png"
+      ],
+      "summary": "Gen AI traffic share: ChatGPT 52.7%, Gemini 27.3%, Claude 8.9% last month.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064981446096208121",
+      "url": "https://x.com/citrini/status/2064981446096208121",
+      "handle": "citrini",
+      "author_name": "Citrini",
+      "posted_at": "2026-06-11T08:01:56Z",
+      "text": "I know everyone hated this because stocks should go up in a straight line forever, but it\u2019s actually a good thing the market has had some weakness and a chance to revisit the 50 day. Building up the wall of worry to take it down is an integral part of continued bull markets.",
+      "views": 214706,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Market weakness and 50-day revisit builds wall of worry for bull markets.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064978390621331959",
+      "url": "https://x.com/citrini/status/2064978390621331959",
+      "handle": "citrini",
+      "author_name": "Citrini",
+      "posted_at": "2026-06-11T07:49:48Z",
+      "text": "The knicks saved the stock market",
+      "views": 84851,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Knicks saved the stock market.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064968238908530904",
+      "url": "https://x.com/dnystedt/status/2064968238908530904",
+      "handle": "dnystedt",
+      "author_name": "Dan Nystedt",
+      "posted_at": "2026-06-11T07:09:28Z",
+      "text": "Rumor: A surge in TSMC orders prompted Amkor to invest 1 trillion won (US$650 million) in the first phase of a long term 6-plant expansion at its Gwangju chip packaging campus in South Korea, media report. $TSM $AMKR https://www.digitimes.com.tw/tech/dt/n/shwnws.asp?id=758445&wpidx=4",
+      "views": 20090,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Amkor invests 1T won in Gwangju packaging expansion; $TSM $AMKR.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "AMKR",
+        "TSM"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064959498410979489",
+      "url": "https://x.com/The_AI_Investor/status/2064959498410979489",
+      "handle": "the_ai_investor",
+      "author_name": "The AI Investor",
+      "posted_at": "2026-06-11T06:34:44Z",
+      "text": "SK hynix could list U.S. ADRs as soon as August 2026, with possible SEC approval week of June 22. - Reuters",
+      "views": 6982,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "SK hynix may list US ADRs as soon as August 2026.",
+      "sentiment": "neutral",
+      "themes": [
+        "memory"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064958733185327611",
+      "url": "https://x.com/The_AI_Investor/status/2064958733185327611",
+      "handle": "the_ai_investor",
+      "author_name": "The AI Investor",
+      "posted_at": "2026-06-11T06:31:41Z",
+      "text": "SK Hynix plans to roughly triple its wafer capacity by around 2034 to keep up with rising AI memory demand, Chairman Chey Tae-won told Nikkei.\n\nEarlier, SK Group Chairman Chey Tae-won said SK hynix plans to double wafer production capacity over the next five years, while warning the memory bottleneck could continue until/through 2030.",
+      "views": 10799,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "SK hynix to triple wafer capacity by 2034 for AI memory demand.",
+      "sentiment": "positive",
+      "themes": [
+        "memory"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064945553725886763",
+      "url": "https://x.com/The_AI_Investor/status/2064945553725886763",
+      "handle": "the_ai_investor",
+      "author_name": "The AI Investor",
+      "posted_at": "2026-06-11T05:39:19Z",
+      "text": "TSMC's CoPoS:\n\n\"Mass production in 2H28. It is designed to improve the economics of ultra-large packages above the 9.5x reticle-size class, with NVIDIA\u2019s Feynman AI chip a potential first adopter.\"",
+      "views": 6146,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "TSMC CoPoS mass production 2H28; potential first adopter NVIDIA Feynman.",
+      "sentiment": "neutral",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "NVDA",
+        "TSM"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064934763924750772",
+      "url": "https://x.com/citrini/status/2064934763924750772",
+      "handle": "citrini",
+      "author_name": "Citrini",
+      "posted_at": "2026-06-11T04:56:27Z",
+      "text": "Seems like pretty run of the mill competitive dynamics?",
+      "views": 5517,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Run of the mill competitive dynamics.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064926406530998573",
+      "url": "https://x.com/nicbstme/status/2064926406530998573",
+      "handle": "nicbstme",
+      "author_name": "Nicolas Bustamante",
+      "posted_at": "2026-06-11T04:23:14Z",
+      "text": "We are entering the age of just-in-time software. Some of my coworkers are visiting San Francisco this week, so I asked Claude Fable to design an extremely detailed HTML map of San Francisco so I can explain the city to them.\n\nThe HTML is wild. It has all the street names, their exact dimensions, the relief of the city, the fog, the sun exposure etc.\n\nEverything it real. I was super surprised but it went and found the city's actual data, then built a cartographic engine around it. So I have: \n\n- Every street from the SF Public Works centerline survey: 15,905 segments, 2,502 named streets, 54,989 surveyed vertices, with the official address ranges per block\n- The relief from 14,151 municipal elevation contour points, interpolated into a 168,000-vertex terrain model\n- 9,672 buildings with lidar-measured heights from an SF Planning study\n- Every Muni Metro line, the cable cars and BART from the official GTFS feed: real route shapes, real 10-minute headways, real speeds. 76 little trams move on the map at their scheduled pace, and the K dims when it passes under 175 meters of Twin Peaks because it knows the tunnel portals (wtf!)\n- Fog modeled as marine-layer advection over the terrain, calibrated on NREL satellite irradiance and a decade of ASOS weather observations.\n\nClaude did totally overkilled stuff like the fog model's 50% line landed at longitude -122.437 which is... Divisadero Street (every San Franciscan knows the fog stops there)\n\nThe whole thing is one self-contained HTML file, 1.2 MB, with a WebGL engine. No libraries, no API calls, no network. It runs offline forever.\n\nWe talk about scaling and benchmarks all day. Sometimes the bitter lesson is simpler: give the machine real data and real verification loops, and it builds you the city.\n\nI'm spending the evening exploring the map; it's too good!",
+      "views": 144502,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Claude Fable built detailed offline HTML SF map with real municipal data.",
+      "sentiment": "positive",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064901077128888713",
+      "url": "https://x.com/bgurley/status/2064901077128888713",
+      "handle": "bgurley",
+      "author_name": "Bill Gurley",
+      "posted_at": "2026-06-11T02:42:35Z",
+      "text": "In same piece he wants looser regulations on other industries (FDA).",
+      "views": 59,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Wants looser FDA regulations in same piece.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064889881277747640",
+      "url": "https://x.com/The_AI_Investor/status/2064889881277747640",
+      "handle": "the_ai_investor",
+      "author_name": "The AI Investor",
+      "posted_at": "2026-06-11T01:58:06Z",
+      "text": "Jensen: \u201cEach gigawatt is about $50 billion that generates $300 billion to $400 billion in intelligence.\u201d\n\nIs this too good to be true ?",
+      "views": 25743,
+      "has_media": true,
+      "media_urls": [],
+      "summary": "Jensen: 1GW ~$50B capex generates $300-400B intelligence.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "NVDA"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064886810065736169",
+      "url": "https://x.com/dnystedt/status/2064886810065736169",
+      "handle": "dnystedt",
+      "author_name": "Dan Nystedt",
+      "posted_at": "2026-06-11T01:45:53Z",
+      "text": "TSMC secured land for more advanced semiconductor fabs, 22 total plots in the Southern Taiwan Science Park, after signing surface rights agreements with the Tainan City Government, media report, adding the plots are in Tainan\u2019s Anding District. $TSM #semiconductors",
+      "views": 4616,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "TSMC secures 22 plots in Southern Taiwan Science Park for advanced fabs.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "TSM"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064886686107218314",
+      "url": "https://x.com/dnystedt/status/2064886686107218314",
+      "handle": "dnystedt",
+      "author_name": "Dan Nystedt",
+      "posted_at": "2026-06-11T01:45:24Z",
+      "text": "AI related cargo revenue continued to soar in May at Taiwan\u2019s top 2 airlines, media report. \nChina Airlines: NT$8.26 billion, up 53.5% year-on-year \nEva Air: NT$6.48 billion, up 41.5%\n#ChinaAirlines #EvaAir #semicondutors #AIservers\nhttps://money.udn.com/money/story/10871/9558949?from=edn_maintab_cate",
+      "views": 3487,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "China Airlines and Eva Air AI cargo revenue up 53.5% and 41.5% YoY.",
+      "sentiment": "positive",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064886381370020076",
+      "url": "https://x.com/dnystedt/status/2064886381370020076",
+      "handle": "dnystedt",
+      "author_name": "Dan Nystedt",
+      "posted_at": "2026-06-11T01:44:11Z",
+      "text": "Is 800 VDC delayed to 2028? Taiwan data center parts suppliers and systems assembly firms say there\u2019s been no word from Nvidia about any sort of delay, after rumors surfaced that mass production had been pushed back by a year, media report. $NVDA https://www.digitimes.com.tw/tech/dt/n/shwnws.asp?CnlID=1&Cat=40&id=0000758400_47E5GLM0LAB3XU1XJW5JH",
+      "views": 5671,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "No confirmation of 800VDC delay from Nvidia; $NVDA.",
+      "sentiment": "neutral",
+      "themes": [
+        "digital-semis"
+      ],
+      "tickers": [
+        "NVDA"
+      ],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064876868395041065",
+      "url": "https://x.com/alexeheath/status/2064876868395041065",
+      "handle": "alexeheath",
+      "author_name": "Alex Heath",
+      "posted_at": "2026-06-11T01:06:23Z",
+      "text": "Notes from a room full of AI leaders who can't agree on where the spending curve goes next. https://sources.news/p/tokenmaxxing-versus-valuemaxxing",
+      "views": 2184,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Notes from AI leaders disagreeing on next AI spending curve direction.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064871104208850954",
+      "url": "https://x.com/citrini/status/2064871104208850954",
+      "handle": "citrini",
+      "author_name": "Citrini",
+      "posted_at": "2026-06-11T00:43:29Z",
+      "text": "KOSPI 5000 era",
+      "views": 35671,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "KOSPI 5000 era.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064861262878515265",
+      "url": "https://x.com/citrini/status/2064861262878515265",
+      "handle": "citrini",
+      "author_name": "Citrini",
+      "posted_at": "2026-06-11T00:04:22Z",
+      "text": "In previous cycles, consulting astrologer girlfriends, toll-free psychics and Etsy witches was something that only happened after index drawdowns of 15% or more. \n\nHow things have changed\u2026",
+      "views": 134099,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Astrologer/psychic use now after smaller drawdowns than prior cycles.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
+      "id": "2064860207012786206",
+      "url": "https://x.com/citrini/status/2064860207012786206",
+      "handle": "citrini",
+      "author_name": "Citrini",
+      "posted_at": "2026-06-11T00:00:11Z",
+      "text": "How many times has the nasdaq lost the 50 day since it bottomed in 2022",
+      "views": 4519,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Asks how many times Nasdaq lost 50-day since 2022 bottom.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
+      "seen_count": 1
+    },
+    {
       "id": "2064860015748415647",
       "url": "https://x.com/citrini/status/2064860015748415647",
       "handle": "citrini",
       "author_name": "Citrini",
       "posted_at": "2026-06-10T23:59:25Z",
       "text": "I give it a year until we see a new breed of AI native private equity firms that acquire companies just so they can move their workflows from Claude to open source Chinese models and flip them.",
-      "views": 30512,
+      "views": 365925,
       "has_media": false,
       "media_urls": [],
-      "summary": "Predicts AI-native PE firms will acquire companies to switch from Claude to Chinese open-source models.",
+      "summary": "Predicts new AI-native PE firms flipping companies to Chinese open-source models.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064859099909492816",
@@ -375,17 +2604,17 @@
       "author_name": "Citrini",
       "posted_at": "2026-06-10T23:55:47Z",
       "text": "Pump it? It should get cut in half\u2026",
-      "views": 4370,
+      "views": 100196,
       "has_media": false,
       "media_urls": [],
-      "summary": "Argues valuation should be cut in half.",
+      "summary": "Suggests it should get cut in half.",
       "sentiment": "negative",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064858963288510625",
@@ -432,13 +2661,13 @@
       "author_name": "Conch Shell Capital",
       "posted_at": "2026-06-10T23:53:03Z",
       "text": "Dom Rizzo (PM on TRowe Global Tech Fund) on @WilfredFrost's podcast\n\n\"If you grew up covering semis, you grew up in Sparta. If you grew up covering software, you grew up in Athens.\"\n\nThe point: software's seat model meant revenue renewed itself - sell once, collect forever. Semis fight for EVERY design win, EVERY cycle.\n\nAI ends the easy life. Usage-based pricing means revenue only flows if agents actually hit your product. You're either in the token path ($SNOW feeding Codex) or you're the data pipe agents read for free ($CRM risk).\n\nSeats were a moat you built once. Tokens are a position you defend daily. Everyone lives in Sparta now.",
-      "views": 893,
+      "views": 9369,
       "has_media": false,
       "media_urls": [],
-      "summary": "Software now faces usage-based pricing like semis; everyone lives in Sparta now.",
+      "summary": "AI shifts software to usage-based; everyone now lives in Sparta.",
       "sentiment": "neutral",
       "themes": [
-        "software-infrastructure"
+        "software-application"
       ],
       "tickers": [
         "CRM",
@@ -446,8 +2675,8 @@
       ],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064857827479310792",
@@ -539,12 +2768,14 @@
       "author_name": "SuspendedCap",
       "posted_at": "2026-06-10T23:04:12Z",
       "text": "Larry needs to pack it the fuck in on AI infra \n\nOhhhh wowowwww 70b you big swinging dick you\n\nAMZN is going to sell that much Trainium in 27. YOU\u2019RE OUT. Zero differentiation business that you will chase into the hole and get no where",
-      "views": 8869,
+      "views": 28590,
       "has_media": false,
       "media_urls": [],
-      "summary": "Criticizes AMZN's AI infra efforts; claims Trainium sales will be insignificant with no differentiation.",
+      "summary": "Criticizes AMZN Trainium push; zero differentiation.",
       "sentiment": "negative",
-      "themes": [],
+      "themes": [
+        "digital-semis"
+      ],
       "tickers": [
         "AMZN"
       ],
@@ -552,8 +2783,8 @@
         "AMZN"
       ],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064844121009774817",
@@ -600,17 +2831,17 @@
       "author_name": "SuspendedCap",
       "posted_at": "2026-06-10T22:35:36Z",
       "text": "Too much supply\nAI cost / implementation FUD\nJammed expects into niche supply chain bottlenecks \nTrump losing credibility on Iran \nRates unmoored even though consumers are in the fucking gutter, can\u2019t hike otherwise we die \nTop part of the insides absolutely blowing their brains out and potentially imploding their financial models",
-      "views": 6091,
+      "views": 11754,
       "has_media": false,
       "media_urls": [],
-      "summary": "Lists risks: excess AI supply, cost FUD, bottlenecks, Iran/Trump issues, rates, top insiders selling.",
+      "summary": "Lists risks: supply, FUD, bottlenecks, Iran, rates, insiders.",
       "sentiment": "negative",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064838255582097523",
@@ -645,17 +2876,19 @@
       "author_name": "Austin Lyons",
       "posted_at": "2026-06-10T22:19:11Z",
       "text": "https://www.chipstrat.com/p/are-agentic-cpus-a-commodity-its",
-      "views": 539,
+      "views": 1176,
       "has_media": false,
       "media_urls": [],
-      "summary": "Links to Chipstrat article on whether agentic CPUs are a commodity.",
+      "summary": "Link to Chipstrat article on agentic CPUs.",
       "sentiment": "neutral",
-      "themes": [],
+      "themes": [
+        "digital-semis"
+      ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064834790398837087",
@@ -664,10 +2897,10 @@
       "author_name": "Austin Lyons",
       "posted_at": "2026-06-10T22:19:11Z",
       "text": "Not all AI-driven CPU sockets have the same value. \nOne socket has a moat. Others could see a price war.\n\nAnd not everyone is competing for each socket. \nYet every company will tell you they'll win. \nNot always apples to apples.\n\nHere's a mental model to help you think it through:",
-      "views": 1157,
+      "views": 2587,
       "has_media": false,
       "media_urls": [],
-      "summary": "Not all AI-driven CPU sockets have equal value; some face price wars while others have moats.",
+      "summary": "Not all AI CPU sockets equal value; moats and price wars differ.",
       "sentiment": "neutral",
       "themes": [
         "digital-semis"
@@ -675,8 +2908,8 @@
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064834674023633040",
@@ -750,17 +2983,17 @@
       "author_name": "Brad Gerstner",
       "posted_at": "2026-06-10T21:36:11Z",
       "text": "Endorse.  As tweeted last week - needs to be voluntary & directly into citizen accts like @TrumpAccounts or a pooled trust acct exclusively for future account holders. Out of reach of gov\u2019t. \ud83c\uddfa\ud83c\uddf8\ud83d\ude80",
-      "views": 11999,
+      "views": 21405,
       "has_media": false,
       "media_urls": [],
-      "summary": "Endorses voluntary direct payments into citizen accounts like @TrumpAccounts, out of gov't reach.",
-      "sentiment": "neutral",
+      "summary": "Endorses voluntary citizen accounts for America 250 upside sharing.",
+      "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064823842292318543",
@@ -929,21 +3162,21 @@
       "author_name": "Mohamed A. El-Erian",
       "posted_at": "2026-06-10T20:37:06Z",
       "text": "Thank you, Frank Holland, for the interesting conversation on Closing Bell.\nI thoroughly enjoyed it\u2014though I could have done without your prediction of the Spurs in six!\n@FrankCNBC @CNBC @CNBCClosingBell #economy #markets #economy",
-      "views": 14663,
+      "views": 20833,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKes7rqXsAEBIwb.jpg",
         "https://pbs.twimg.com/media/HKes7ruWMAAtxjV.jpg",
         "https://pbs.twimg.com/media/HKes7ryXkAAXiHV.jpg"
       ],
-      "summary": "Thanks Frank Holland for conversation on Closing Bell; enjoyed despite Spurs prediction.",
+      "summary": "Enjoyed CNBC Closing Bell interview with Frank Holland.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064808613181317585",
@@ -952,17 +3185,17 @@
       "author_name": "modest proposal",
       "posted_at": "2026-06-10T20:35:10Z",
       "text": "Oh god, this thread may actually end longer than the ads one",
-      "views": 7090,
+      "views": 10229,
       "has_media": false,
       "media_urls": [],
-      "summary": "Oh god, this thread may actually end longer than the ads one",
+      "summary": "Thread may exceed ads length.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064806672359735442",
@@ -990,17 +3223,19 @@
       "author_name": "modest proposal",
       "posted_at": "2026-06-10T20:25:08Z",
       "text": "Public markets finally serving their intended purpose, raising enough equity for every company to turn into a consulting firm or datacenter operator",
-      "views": 5487,
+      "views": 8222,
       "has_media": false,
       "media_urls": [],
-      "summary": "Public markets enabling companies to become consulting or datacenter operators.",
+      "summary": "Public markets raising equity for datacenter/consulting pivots.",
       "sentiment": "neutral",
-      "themes": [],
+      "themes": [
+        "construction"
+      ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064804422920896920",
@@ -1047,17 +3282,17 @@
       "author_name": "Bill Gurley",
       "posted_at": "2026-06-10T20:16:07Z",
       "text": "\ud83e\udd23\ud83e\udd23\ud83e\udd23",
-      "views": 38763,
+      "views": 70872,
       "has_media": false,
       "media_urls": [],
-      "summary": "Laughs at prior content.",
+      "summary": "Laughing emojis.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064803642348057072",
@@ -1085,17 +3320,17 @@
       "author_name": "Brad Gerstner",
       "posted_at": "2026-06-10T20:06:35Z",
       "text": "24 days.  We celebrate America 250 and a new American birthright.  Every child a direct shareholder in America.  Free $$. Free lifetime investment acct for all kids under 18. Claim it now!  \ud83c\uddfa\ud83c\uddf8\ud83d\ude80\ud83e\udd0d",
-      "views": 16057,
+      "views": 28417,
       "has_media": false,
       "media_urls": [],
-      "summary": "Celebrates America 250 with free lifetime investment accounts for all kids under 18.",
-      "sentiment": "neutral",
+      "summary": "24 days to America 250; free lifetime investment accounts for kids under 18.",
+      "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064800351325491611",
@@ -1104,17 +3339,17 @@
       "author_name": "Brad Gerstner",
       "posted_at": "2026-06-10T20:02:20Z",
       "text": "Grt kicking it around w GB.  @BG2Pod  \ud83d\ude80\ud83d\ude80\ud83d\ude80",
-      "views": 16167,
+      "views": 27700,
       "has_media": true,
       "media_urls": [],
-      "summary": "Enjoyed discussion with GB on @BG2Pod.",
+      "summary": "Great discussion with GB on @BG2Pod.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064798633586053364",
@@ -1142,20 +3377,22 @@
       "author_name": "Apoorv Agrawal",
       "posted_at": "2026-06-10T19:36:40Z",
       "text": "Class 7: Inference is up. Way up.\n\n@tuhinone @ @baseten joined MS&E 435 breaking down how to serve AI at scale: why open source is the rebellion against frontier labs, why renting GPUs beats owning (for now), and why compute is going heterogeneous.\n\nFull class:",
-      "views": 967,
+      "views": 6817,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKeeuKTbUAAphr9.jpg"
       ],
-      "summary": "Class 7 covers inference scaling, open source vs frontier labs, renting GPUs, heterogeneous compute.",
+      "summary": "Class 7: Inference demand rising; open source, GPU rental, heterogeneous compute discussed.",
       "sentiment": "neutral",
-      "themes": [],
+      "themes": [
+        "digital-semis"
+      ],
       "tickers": [],
-      "media_summary": "Title slide: Stanford lecture on AI supercycle economics/inference (no data/chart shown).",
+      "media_summary": "Lecture title slide on AI supercycle economics, focusing on inference costs. Takeaway: Highlights growing capex/investment opportunities in AI infrastructure.",
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064793208778035323",
@@ -1204,17 +3441,17 @@
       "author_name": "modest proposal",
       "posted_at": "2026-06-10T19:18:04Z",
       "text": "What is the cleanest way to understand the verbal tics that each of the models has developed? \n\nI also want the load-bearing explanation for why the two are so different stylistically.",
-      "views": 5596,
+      "views": 7744,
       "has_media": false,
       "media_urls": [],
-      "summary": "Seeks cleanest way to understand model verbal tics and stylistic differences.",
+      "summary": "Seeks cleanest way to understand model verbal tics.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064788844424425801",
@@ -1264,19 +3501,19 @@
       "author_name": "Rihard Jarc",
       "posted_at": "2026-06-10T19:14:09Z",
       "text": "Wow, according to Dario if scaling laws hold for 1-2 year more we are at \u201cASI\u201d?",
-      "views": 23511,
+      "views": 30861,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKeZ8jQW0AAtBUs.jpg"
       ],
-      "summary": "Dario claims scaling laws imply ASI in 1-2 years if they hold.",
+      "summary": "Dario: scaling laws imply ASI in 1-2 years if hold.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064787984113938853",
@@ -1323,17 +3560,17 @@
       "author_name": "Ben Thompson",
       "posted_at": "2026-06-10T18:58:08Z",
       "text": "Maybe the apology was censored because we don\u2019t have Title II-based net neutrality, which the same people told me would lead to the end of the Internet",
-      "views": 178,
+      "views": 334,
       "has_media": false,
       "media_urls": [],
-      "summary": "Apology may have been censored due to lack of Title II net neutrality.",
+      "summary": "Apology possibly censored due to lack of Title II net neutrality.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064782439164043648",
@@ -1441,17 +3678,19 @@
       "author_name": "Brad Gerstner",
       "posted_at": "2026-06-10T18:19:24Z",
       "text": "No SaaSpocalypse here! \ud83e\udd37\u200d\u2642\ufe0f",
-      "views": 41842,
+      "views": 123369,
       "has_media": false,
       "media_urls": [],
-      "summary": "Declares no SaaSpocalypse is occurring.",
+      "summary": "No SaaSpocalypse here with shrug emoji.",
       "sentiment": "neutral",
-      "themes": [],
+      "themes": [
+        "software-application"
+      ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064772524307788279",
@@ -1544,17 +3783,17 @@
       "author_name": "Kevin Weil \ud83c\uddfa\ud83c\uddf8",
       "posted_at": "2026-06-10T17:55:05Z",
       "text": "This is so cool\u2014and super important for accelerating AI's impact on science and health.",
-      "views": 8450,
+      "views": 11364,
       "has_media": false,
       "media_urls": [],
-      "summary": "Praises new AI application for science and health acceleration.",
+      "summary": "Accelerating AI impact on science and health is cool and important.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064767738044694578",
@@ -1624,17 +3863,17 @@
       "author_name": "Rihard Jarc",
       "posted_at": "2026-06-10T17:32:07Z",
       "text": "This is a very interesting market for an active stock picker. The market changes sentiment and narratives on a dime, causing violent daily/weekly moves. \n\nAt the same time, the market lacks a fundamental understanding of AI and of the winner-and-loser dynamics, as the majority of volume in this space is now made by \"generalist\" investors. Because of this, the narrative around a stock or tech subsector swings between winners and losers on a weekly basis, causing confusion for many. Adding to that, the rapid development of AI means clarity beyond a 3-month period is rare.\n\nFor an active investor with a strong fundamental understanding of this space and mid- to long-term clarity, this will be one of the best periods to accumulate mispriced names and sectors.",
-      "views": 14348,
+      "views": 20040,
       "has_media": false,
       "media_urls": [],
-      "summary": "Current volatile market offers excellent opportunities for informed active stock pickers.",
+      "summary": "Active stock picking favored by rapid AI narrative swings and mispricing.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064762161155710985",
@@ -1727,16 +3966,37 @@
       "author_name": "Claude",
       "posted_at": "2026-06-10T17:12:13Z",
       "text": "Michael Truell (@mntruell) fell in love with coding at 12. The company he co-founded, @cursor_ai, went from 15 people to 700 in two years.\n\nToday, over 60% of the Fortune 500 build with its AI coding platform.",
-      "views": 338280,
+      "views": 599665,
       "has_media": false,
       "media_urls": [],
-      "summary": "Michael Truell co-founded Cursor; 60%+ of Fortune 500 use its AI coding platform.",
+      "summary": "Cursor AI grew from 15 to 700 people; 60%+ Fortune 500 use it.",
+      "sentiment": "positive",
+      "themes": [
+        "software-application"
+      ],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-11",
+      "last_seen": "2026-06-12",
+      "seen_count": 2
+    },
+    {
+      "id": "2064757539762295177",
+      "url": "https://x.com/claudeai/status/2064757539762295177",
+      "handle": "claudeai",
+      "author_name": "Claude",
+      "posted_at": "2026-06-10T17:12:13Z",
+      "text": "From The Problem Solvers, our series featuring founders taking on hard problems with Claude: https://claude.com/problem-solvers",
+      "views": 71296,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Links to Problem Solvers series featuring founders using Claude.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
-      "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
       "seen_count": 1
     },
     {
@@ -1756,6 +4016,25 @@
       "portfolio": [],
       "first_seen": "2026-06-11",
       "last_seen": "2026-06-11",
+      "seen_count": 1
+    },
+    {
+      "id": "2064751005380878379",
+      "url": "https://x.com/alexeheath/status/2064751005380878379",
+      "handle": "alexeheath",
+      "author_name": "Alex Heath",
+      "posted_at": "2026-06-10T16:46:15Z",
+      "text": "https://x.com/i/article/2064750162594209794",
+      "views": 27884,
+      "has_media": false,
+      "media_urls": [],
+      "summary": "Link to article shared without additional commentary.",
+      "sentiment": "neutral",
+      "themes": [],
+      "tickers": [],
+      "portfolio": [],
+      "first_seen": "2026-06-12",
+      "last_seen": "2026-06-12",
       "seen_count": 1
     },
     {
@@ -1829,12 +4108,12 @@
       "author_name": "Mohamed A. El-Erian",
       "posted_at": "2026-06-10T16:15:14Z",
       "text": "After dipping, WTI oil is back above $90 in response to the US statement that it will be \u201cattacking [Iran] very hard.\u201d\nContinuing oil price volatility is adding to what is already quite a debate over the longer-term prospects--between those who anticipate a price collapse due to a supply glut and those who forecast a price surge as inventories reach very low levels.\n#economy #oil #markets #energy",
-      "views": 17456,
+      "views": 21020,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdw_r8XMAAzFi4.jpg"
       ],
-      "summary": "WTI oil back above $90 after US comments on striking Iran; volatility continues.",
+      "summary": "WTI back above $90 after US Iran attack statement; ongoing volatility.",
       "sentiment": "neutral",
       "themes": [
         "power"
@@ -1842,8 +4121,8 @@
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064741184547795408",
@@ -1852,17 +4131,17 @@
       "author_name": "Claude",
       "posted_at": "2026-06-10T16:07:14Z",
       "text": "Scheduled deployments and environment variables in vaults are available today on the Claude Platform.\n\nRead more: https://claude.com/blog/whats-new-in-claude-managed-agents",
-      "views": 36009,
+      "views": 50193,
       "has_media": false,
       "media_urls": [],
-      "summary": "Scheduled deployments and env vars in vaults now available on Claude Platform.",
+      "summary": "Scheduled deployments and vaults available on Claude Platform.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064741182853296339",
@@ -1871,17 +4150,17 @@
       "author_name": "Claude",
       "posted_at": "2026-06-10T16:07:13Z",
       "text": "Dynamic workflows in Claude Code are now generally available.\n\nFor complex tasks like codebase-wide bug hunts, Claude writes its own orchestration and runs subagents in parallel, verifying the work before it reaches you.\n\nRead more: https://claude.com/blog/introducing-dynamic-workflows-in-claude-code",
-      "views": 37597,
+      "views": 53578,
       "has_media": false,
       "media_urls": [],
-      "summary": "Dynamic workflows in Claude Code are generally available for complex agentic tasks.",
+      "summary": "Dynamic workflows in Claude Code now generally available.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064741179053252755",
@@ -1890,19 +4169,19 @@
       "author_name": "Claude",
       "posted_at": "2026-06-10T16:07:12Z",
       "text": "Environment variables in vaults let your agents use command-line tools that need API keys, without the model ever seeing them.\n\nThe sandbox only holds a placeholder. The real key is attached at the network boundary, and only for the domains you allow.",
-      "views": 27932,
+      "views": 36210,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdrk8iWsAAsL_F.png"
       ],
-      "summary": "Env vars in vaults keep API keys hidden from models during command-line tool use.",
+      "summary": "Vaults let agents use API keys securely without model seeing them.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064741176075235807",
@@ -1911,19 +4190,19 @@
       "author_name": "Claude",
       "posted_at": "2026-06-10T16:07:12Z",
       "text": "A scheduled deployment runs your agent on the schedule you set: a nightly data sync, a weekly compliance scan, a daily digest.",
-      "views": 34352,
+      "views": 44999,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdqY7wXUAAvxnp.jpg"
       ],
-      "summary": "Scheduled deployments let agents run on user-defined schedules like nightly syncs.",
+      "summary": "Scheduled deployments run agents on user-set schedule.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064741174317924421",
@@ -1932,17 +4211,17 @@
       "author_name": "Claude",
       "posted_at": "2026-06-10T16:07:11Z",
       "text": "New from Code with Claude Tokyo: scheduled deployments and environment variables in vaults are in public beta in Claude Managed Agents, and dynamic workflows in Claude Code are generally available.\n\nAgents now run on a schedule, use your tools securely, and take on bigger jobs.",
-      "views": 335290,
+      "views": 506564,
       "has_media": false,
       "media_urls": [],
-      "summary": "New Claude features: scheduled deployments, env vars, dynamic workflows now available.",
+      "summary": "New Claude features: scheduled deployments, vaults, dynamic workflows GA.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064740966750097549",
@@ -2046,7 +4325,7 @@
       "author_name": "COATUE",
       "posted_at": "2026-06-10T15:59:32Z",
       "text": "Chart of the Day:\n\nNew business formation is inflecting! GenAI might be the catalyst.",
-      "views": 4782,
+      "views": 6498,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdtYaMWwAArMM6.jpg"
@@ -2057,8 +4336,8 @@
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064738575820718199",
@@ -2088,17 +4367,17 @@
       "author_name": "Ben Thompson",
       "posted_at": "2026-06-10T15:51:25Z",
       "text": "You did concede the point in the post I replied to, which is why I replied to it.  I do tend to think that affording people one disagrees with more grace at the time of disagreement is probably prudent. To that end, setting aside pedantic points about whatever the original tweet was referring to, I'm not at all shocked by Anthropic's decisions this week, because my analysis at the time was not based on some sort of personal animus or whatever was ascribed to me, but simply incentives and long-run trends. That analysis holds in terms of this decision. People's declarations and promises change, *especially* when they hold themselves to be moral actors. Suggesting that anyone pointing that out is faking their beliefs to make a point risks missing the more important point completely.",
-      "views": 1538,
+      "views": 1917,
       "has_media": false,
       "media_urls": [],
-      "summary": "Anthropic decisions align with incentives and long-run trends rather than personal animus.",
+      "summary": "Anthropic decisions align with prior incentive analysis, not personal animus.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064736818923532681",
@@ -2171,17 +4450,17 @@
       "author_name": "Austin Lyons",
       "posted_at": "2026-06-10T15:39:53Z",
       "text": "Yo @vikramskr I bought a $7 Malbec from Costco (under the Kirkland label) and it was surprisingly decent lol",
-      "views": 4778,
+      "views": 5223,
       "has_media": false,
       "media_urls": [],
-      "summary": "Bought $7 Kirkland Malbec from Costco; found it decent.",
-      "sentiment": "neutral",
+      "summary": "Bought $7 Kirkland Malbec from Costco; surprisingly decent.",
+      "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064734041010507883",
@@ -2190,19 +4469,19 @@
       "author_name": "modest proposal",
       "posted_at": "2026-06-10T15:38:50Z",
       "text": "can't hedge for $25",
-      "views": 668,
+      "views": 817,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdogZyXMAA9jdQ.png"
       ],
-      "summary": "Cannot hedge for $25.",
+      "summary": "Can't hedge for $25.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064732384671465899",
@@ -2211,17 +4490,17 @@
       "author_name": "Ben Thompson",
       "posted_at": "2026-06-10T15:32:16Z",
       "text": "Maybe folks who pushed back on Anthropic's positioning in the Department of War debate actually foresaw *exactly* this type of behavior?",
-      "views": 14254,
+      "views": 19562,
       "has_media": false,
       "media_urls": [],
-      "summary": "Questions if critics of Anthropic's Department of War positioning foresaw current behavior.",
+      "summary": "Critics of Anthropic's positioning foresaw current behavior.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064732334486905165",
@@ -2268,17 +4547,17 @@
       "author_name": "The Inflection Economy",
       "posted_at": "2026-06-10T15:05:55Z",
       "text": "This is starting to feel consensus RE Space X\u2026",
-      "views": 1142,
+      "views": 1247,
       "has_media": false,
       "media_urls": [],
-      "summary": "SpaceX consensus valuation narrative emerging.",
+      "summary": "SpaceX consensus view starting to form.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064722698853552385",
@@ -2456,19 +4735,19 @@
       "author_name": "modest proposal",
       "posted_at": "2026-06-10T13:33:50Z",
       "text": "some are saying this is the best opening line in bloomberg history",
-      "views": 108584,
+      "views": 127441,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdL7mdXAAM6DeZ.jpg"
       ],
-      "summary": "Some call it best Bloomberg opening line in history.",
+      "summary": "Bloomberg opening line called best ever by some.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064702530274070624",
@@ -2523,23 +4802,23 @@
       "author_name": "FUNDA",
       "posted_at": "2026-06-10T13:21:59Z",
       "text": "Research| $LITE : CEO Remarks Further Prove that Optics Players Have a Supply Problem, not Demand\n\nLumentum CEO Michael Hurlston\u2019s comments at the Mizuho conference further strengthen our view on the optics cycle. The market is misreading the normal engineering ramp for CPO as a demand delay, but Lumentum management\u2019s message was exactly the opposite. The CEO described the current environment as a photonic supercycle within an AI supercycle and explicitly stated that Lumentum is poised to exceed $1 billion in quarterly revenue, nearly double the company\u2019s previous peak of around $500 million. More importantly, he emphasised that many of the real growth drivers have not yet fully shown up in the financials, including optical scale-up, optical scale-out and optical circuit switches. In other words, the current business is already strong, while several much larger optics growth vectors are only just beginning to unfold.\n\nDetailed Report",
-      "views": 4452,
+      "views": 5747,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdJVMQb0AAPEjZ.jpg"
       ],
-      "summary": "Lumentum CEO sees photonic supercycle; scale-up/out and OCS to drive >$1B quarterly revenue.",
+      "summary": "$LITE CEO confirms photonic supercycle; poised to exceed $1B quarterly revenue.",
       "sentiment": "positive",
       "themes": [
-        "hardware-components"
+        "digital-semis"
       ],
       "tickers": [
         "LITE"
       ],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064699296965103779",
@@ -2548,21 +4827,21 @@
       "author_name": "FUNDA",
       "posted_at": "2026-06-10T13:20:47Z",
       "text": "Research|Commentary on Recent Discussion on CPO/800V HVDC Delay\n\nCPO - Concerns Likely Overblown; NPO Acceleration a Key Highlight\nThere were several bearish views in the market recently on CPO and the broader optics supply chain. We believe concerns around the CPO timeline are somewhat overdone. As an important evolution path for next-generation AI scale-out networks, CPO will naturally require customer validation, system integration, reliability testing, and supply chain ramp-up. But that does not mean the project itself is experiencing a material delay. In fact, Jensen already stated very clearly at Computex that CPO will ramp on schedule. Based on what we are hearing from the supply chain, scale-out CPO remains broadly on track, with no evidence of weakening demand or any change in customer attitude.\n\nFrom what we understand, scale-out CPO deployments for NCP customers, including CoreWeave and Lambda, as well as Oracle and one major CSP, are progressing toward mass production as planned. Supply-chain feedback has also been quite positive. The current focus is more on capacity preparation, yield ramp, customer qualification, and system-level integration than on project cancellation or a meaningful pushout. Therefore, we do not think the pace of the CPO ramp should be interpreted as an inflection point for optics demand.\n\nMore importantly, the investment thesis for optics does not depend solely on the CPO path. As we discussed in our previous NPO update, the doubling of bandwidth requirements on the scale-up side is actually a very strong tailwind for optics. Whether the final architecture is CPO, NPO, or a coexistence of CPO and NPO, the key point is that AI clusters will continue to rely more heavily on optical interconnects both inside and outside the cluster. System architecture is evolving toward higher bandwidth density, lower power consumption, shorter reach, and higher levels of integration. This is structurally positive for the entire optics supply chain. $LITE $COHR $WOLF \n\nDetailed Report",
-      "views": 5932,
+      "views": 7270,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdJDlYa8AAq_8B.jpg"
       ],
-      "summary": "CPO concerns overblown; NPO acceleration and scale-up bandwidth demand support optics cycle.",
+      "summary": "CPO concerns overblown; NPO acceleration and optics demand structurally positive.",
       "sentiment": "positive",
       "themes": [
-        "hardware-components"
+        "digital-semis"
       ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064697559558365538",
@@ -2571,7 +4850,7 @@
       "author_name": "Rihard Jarc",
       "posted_at": "2026-06-10T13:13:53Z",
       "text": "Interview with a $GOOGL employee who thinks we still have at least five more years of strong capital deployment ahead in the AI buildout:\n\n1. The expert sees the AI data center build cycle as roughly at the halfway point, with the buildout expected to continue through 2035 before the next architectural shift. The current phase is transitioning from training-heavy investment to inference, and the expert sees at least five more years of strong capital deployment ahead. On the shape of spending, the expert expects the composition to shift rather than the total to decline, with heavy hardware investment dominating through 2027 and 2028 before giving way to a larger proportion of software and operational spend as AI becomes more of a commodity.\n\n2. He emphasizes that the shift from training to inference pushes compute closer to population centers to reduce latency. Training clusters were chasing 1GW facilities, while inference deployments sit closer to 200MW, spread across colocation and metro sites rather than concentrated in one place. \n\n3. The expert highlights a clear distinction between training and inference from a power design perspective. Training runs at flat, sustained load for weeks, making it predictable but requiring over-provisioned capacity, while inference is spiky and needs capacity available on demand even when mostly idle.\n\n4. According to the expert, hyperscalers would willingly pay a 5-15% premium above the equivalent volume price to secure a shorter-duration PPA, with the logic being that retaining the option to extend, restructure, or walk away after 7 years is worth paying for compared to being locked into a 20-year commitment with no flexibility. The expert sees hyperscalers holding a stronger position in most markets, since power assets without a signed contract generate no revenue, giving hyperscalers leverage in all but the most supply-constrained regions.\n\n5. The expert sees two forces driving the push for on-site power over waiting for grid connections. GPUs are expensive depreciating assets that generate no return when not running, and customer demand cannot wait, with any hyperscaler that fails to deploy quickly risking losing that customer to a faster competitor. In the near term, a small increase in power costs is not a deal breaker, but over a 5 to 10 year operating period that difference compounds, and the expert expects cost efficiency to become a much bigger priority by 2029.\n\nfound on @AlphaSenseInc",
-      "views": 29454,
+      "views": 64736,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdHYVxXkAAOVRw.png",
@@ -2579,16 +4858,18 @@
         "https://pbs.twimg.com/media/HKdHaujXoAAeCnP.png",
         "https://pbs.twimg.com/media/HKdHbwkWEAAwIAX.png"
       ],
-      "summary": "GOOGL employee sees AI buildout continuing to 2035; 5+ more years of heavy spend ahead.",
+      "summary": "GOOGL employee sees 5+ years AI capex; inference shift to 200MW sites.",
       "sentiment": "positive",
-      "themes": [],
+      "themes": [
+        "big-tech"
+      ],
       "tickers": [
         "GOOGL"
       ],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064695865634124009",
@@ -2597,12 +4878,12 @@
       "author_name": "Similarweb",
       "posted_at": "2026-06-10T13:07:09Z",
       "text": "Meta AI broke its traffic record again in May 2026:  \n\n\u2192 27.79M visits \n\u2192 Up 20.31% from April \n\u2192 Up 103.84% year-over-year",
-      "views": 2313,
+      "views": 9700,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKdF78HXcAAtSbw.png"
       ],
-      "summary": "Meta AI May 2026 traffic record: 27.79M visits, +20.31% MoM, +103.84% YoY.",
+      "summary": "Meta AI May visits 27.79M, +20% MoM, +104% YoY.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [
@@ -2612,8 +4893,8 @@
         "META"
       ],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064693364327354460",
@@ -2792,21 +5073,21 @@
       "author_name": "Austin Lyons",
       "posted_at": "2026-06-10T11:16:26Z",
       "text": "NPO is a safe step toward CPO. Don\u2019t get all the benefits\u2026 but don\u2019t take as much risk. \n\nhttps://www.naddod.com/blog/optical-interconnect-technology-analysis-lpo-npo-cpo",
-      "views": 873,
+      "views": 1138,
       "has_media": true,
       "media_urls": [
         "https://pbs.twimg.com/media/HKcsmwXXEAAt10I.jpg"
       ],
-      "summary": "NPO is safer step toward CPO with fewer benefits but less risk.",
+      "summary": "NPO safe step toward CPO without full benefits or risk.",
       "sentiment": "neutral",
       "themes": [
-        "hardware-components"
+        "digital-semis"
       ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064663985157529620",
@@ -2834,19 +5115,19 @@
       "author_name": "Vikram Sekar",
       "posted_at": "2026-06-10T10:54:42Z",
       "text": "The only thing \u201caffected\u201d by no CPO is the advanced packaging aspect. \n\nEverything else is intact in NPO. \n\nHell, industry may go pluggables since power per rack is going up due to gpu anyway. \n\nWhat\u2019s a little bit more by going with good ol pluggables\n\nAt least we know they work",
-      "views": 18807,
+      "views": 23263,
       "has_media": false,
       "media_urls": [],
-      "summary": "No CPO affects only advanced packaging; NPO and pluggables remain viable as power rises.",
+      "summary": "No CPO affects only advanced packaging; NPO and pluggables intact.",
       "sentiment": "neutral",
       "themes": [
-        "hardware-components"
+        "digital-semis"
       ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064627959349317854",
@@ -2855,11 +5136,11 @@
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-10T08:37:19Z",
       "text": "TSMC will likely set a fresh record high in June, since it needs about NT$427.3 billion this month to meet the mid-point of 2nd quarter guidance.\n-Over NT$442.3 billion to beat\n-April + May = NT$827.7 billion already",
-      "views": 2178,
+      "views": 2362,
       "has_media": false,
       "media_urls": [],
-      "summary": "TSMC needs NT$427.3B in June to hit 2Q guidance midpoint; NT$442.3B to beat.",
-      "sentiment": "neutral",
+      "summary": "TSMC likely sets June revenue record needing NT$427.3B.",
+      "sentiment": "positive",
       "themes": [
         "digital-semis"
       ],
@@ -2868,8 +5149,8 @@
       ],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064595807077044509",
@@ -2877,18 +5158,20 @@
       "handle": "dharmesh",
       "author_name": "dharmesh",
       "posted_at": "2026-06-10T06:29:33Z",
-      "text": "Woo hoo! HubSpot turns 20 years old today!\n\n@bhalligan  and I \u201cofficially\u201d founded HubSpot on June 9th, 2006. \n\nThat date is not arbitrary. It was picked for a reason. More on that in a little bit\u2026\n\nFirst, fun story:  HubSpot was the company I was never supposed to start. I had promised my wife that I wasn\u2019t going to do another startup. We had met before I ever started my first company at a time when nobody believed (including me) that I had what it took to be an entrepreneur. I was working as a software developer in Birmingham, Alabama and starting a company was not at all on my mind.\n\nI ran that first company as founder/CEO for over a decade before selling it for a life-changing amount of money. I decided to go to grad school and was thrilled that I got accepted into MIT (it had always been a dream of mine).\n\nThat\u2019s where I met Brian. One thing led to another and we figured out that we were both passionate about SMBs and decided to start a company together that focused on them. So, I convinced my wife to release me from my promise. But, I did want to make sure I finished up my graduate program (I had a graduate paper to submit in order to earn my degree). \n\nOn Friday June 9th, 2006, I graduated with a M.S. in the Management of Technology (a weird degree that is very much MIT).  That degree is no longer offered and I was the last person to graduate with it.\n\nSo, the day of my graduation, June 9th, 2006 we officially started HubSpot. We were off to the races!\n\nThat was twenty years ago today.\n\nSo many great memories over those years.\n\nI\u2019d like to thank my wife Kirsten. If she had not agreed to let me start another startup, HubSpot would not exist.  \n\nWe started with 3 customers in those early days (including my wife \u2013 who is still a paying customer) and now we have over 300,000. I am deeply grateful to our customers \u2013 past and present. You are the reason we started the company and you are the reason we continue to work hard. Our core tenet of HubSpot culture is to Solve For The Customer.\n\nI\u2019m grateful to the thousands of HubSpot solutions partners and technology partners. Without you, HubSpot would not be the platform and ecosystem it is today. Thanks for helping us Solve For The Customer.\n\nAnd last but not least, I\u2019m grateful to all the HubSpotters past and present. I\u2019m not known to be a \u201cpeople person\u201d but the truth is that HubSpot could not have become the company it is without you and it has given me great joy to see so many of you learn, develop and grow at HubSpot. Thank you.\n\nI honestly have never had more fun and been more excited for the future than I am right now. With the leadership of @yaminirangan we are writing the next chapter of HubSpot. The agentic customer platform chapter.\n\nSorry for the self-indulgent post.  Will save the \"lessons learned\" topic for another time.\n\nThanks for your support.\n\nCheers.",
-      "views": 12125,
+      "text": "Woo hoo! HubSpot turns 20 years old today!\n\n@bhalligan  and I \u201cofficially\u201d founded HubSpot on June 9th, 2006. \n\nThat date is not arbitrary. It was picked for a reason. More on that in a little bit\u2026\n\nFirst, fun story:\u00a0 HubSpot was the company I was never supposed to start. I had promised my wife that I wasn\u2019t going to do another startup. We had met before I ever started my first company at a time when nobody believed (including me) that I had what it took to be an entrepreneur. I was working as a software developer in Birmingham, Alabama and starting a company was not at all on my mind.\n\nI ran that first company as founder/CEO for over a decade before selling it for a life-changing amount of money. I decided to go to grad school and was thrilled that I got accepted into MIT (it had always been a dream of mine).\n\nThat\u2019s where I met Brian.\u00a0One thing led to another and we figured out that we were both passionate about SMBs and decided to start a company together that focused on them. So, I convinced my wife to release me from my promise. But, I did want to make sure I finished up my graduate program (I had a graduate paper to submit in order to earn my degree). \n\nOn Friday June 9th, 2006, I graduated with a M.S. in the Management of Technology (a weird degree that is very much MIT).\u00a0 That degree is no longer offered and I was the last person to graduate with it.\n\nSo, the day of my graduation, June 9th, 2006 we officially started HubSpot. We were off to the races!\n\nThat was twenty years ago today.\n\nSo many great memories over those years.\n\nI\u2019d like to thank my wife Kirsten. If she had not agreed to let me start another startup, HubSpot would not exist.\u00a0 \n\nWe started with 3 customers in those early days (including my wife \u2013 who is still a paying customer) and now we have over 300,000. I am deeply grateful to our customers \u2013 past and present. You are the reason we started the company and you are the reason we continue to work hard. Our core tenet of HubSpot culture is to Solve For The Customer.\n\nI\u2019m grateful to the thousands of HubSpot solutions partners and technology partners. Without you, HubSpot would not be the platform and ecosystem it is today. Thanks for helping us Solve For The Customer.\n\nAnd last but not least, I\u2019m grateful to all the HubSpotters past and present. I\u2019m not known to be a \u201cpeople person\u201d but the truth is that HubSpot could not have become the company it is without you and it has given me great joy to see so many of you learn, develop and grow at HubSpot. Thank you.\n\nI honestly have never had more fun and been more excited for the future than I am right now. With the leadership of @yaminirangan we are writing the next chapter of HubSpot. The agentic customer platform chapter.\n\nSorry for the self-indulgent post.  Will save the \"lessons learned\" topic for another time.\n\nThanks for your support.\n\nCheers.",
+      "views": 14055,
       "has_media": false,
       "media_urls": [],
-      "summary": "HubSpot turns 20; founded June 9 2006 after MIT graduation; now 300k+ customers.",
+      "summary": "HubSpot turns 20; founded June 9 2006 after MIT graduation.",
       "sentiment": "positive",
-      "themes": [],
+      "themes": [
+        "software-application"
+      ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064585800294232227",
@@ -2921,21 +5204,26 @@
       "author_name": "Dan Nystedt",
       "posted_at": "2026-06-10T05:36:11Z",
       "text": "TSMC\u2019s revenue soared 30.1% year-on-year in May to a record high NT$417.0 billion (US$13.2 B), as AI momentum continued to rise amid robust global demand.\n\nThe previous all-time high was NT$415.2 billion in March.\n\nTSMC did not provide a US$ figure. The figure is based on its forex guidance for the 2nd quarter. 1/3 $TSM $AAPL $NVDA $AMD $AVGO $QCOM #semiconductors #semiconductor",
-      "views": 28405,
+      "views": 29552,
       "has_media": false,
       "media_urls": [],
-      "summary": "TSMC May revenue NT$417.0B (+30.1% YoY), record high; prior high was NT$415.2B in March.",
+      "summary": "TSMC May revenue +30.1% YoY to record NT$417B; AI momentum strong.",
       "sentiment": "positive",
       "themes": [
         "digital-semis"
       ],
       "tickers": [
+        "AAPL",
+        "AMD",
+        "AVGO",
+        "NVDA",
+        "QCOM",
         "TSM"
       ],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064569350108115102",
@@ -3020,17 +5308,17 @@
       "author_name": "Austin Lyons",
       "posted_at": "2026-06-10T01:56:39Z",
       "text": "\u201cEveryone has inherent bias in shaping narratives\u201d\n\nWell said",
-      "views": 855,
+      "views": 872,
       "has_media": false,
       "media_urls": [],
-      "summary": "Notes everyone has inherent bias in shaping narratives.",
+      "summary": "Everyone has inherent bias in shaping narratives.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064521485591724059",
@@ -3039,19 +5327,19 @@
       "author_name": "Vikram Sekar",
       "posted_at": "2026-06-10T01:34:13Z",
       "text": "I mean, its a logical middle step. Dunno why there was all the CPO hype.\n\nBaby steps towards optical integration.",
-      "views": 10709,
+      "views": 11004,
       "has_media": false,
       "media_urls": [],
-      "summary": "NPO logical middle step; pluggables proven as power per rack increases.",
+      "summary": "NPO logical middle step; pluggables viable as power rises.",
       "sentiment": "neutral",
       "themes": [
-        "hardware-components"
+        "digital-semis"
       ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064519924765389021",
@@ -3272,17 +5560,19 @@
       "author_name": "Bill Gurley",
       "posted_at": "2026-06-10T00:01:02Z",
       "text": "Here is the analysis of the most sophisticated open-source strategies. Need to watch this one.\n\nhttps://p3institute.substack.com/p/from-open-source-software-to-open",
-      "views": 14185,
+      "views": 14955,
       "has_media": false,
       "media_urls": [],
-      "summary": "Links to analysis of sophisticated open-source strategies worth watching.",
+      "summary": "Analysis of sophisticated open-source strategies worth watching.",
       "sentiment": "neutral",
-      "themes": [],
+      "themes": [
+        "software-infrastructure"
+      ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064498032868003891",
@@ -3291,17 +5581,17 @@
       "author_name": "Bill Gurley",
       "posted_at": "2026-06-10T00:01:02Z",
       "text": "In my recent substack (link in next post) I spoke of sophisticated, and quite evolved \"open\" corporate strategies. Interestingly, Unitree's top competitor in China just open-sourced a massive training data set. Read here for how and why...\n\nhttps://crossingriver.substack.com/p/agibot-open-sourced-a-million-robot",
-      "views": 28287,
+      "views": 29453,
       "has_media": false,
       "media_urls": [],
-      "summary": "Unitree's China competitor open-sourced massive training dataset; links to details.",
+      "summary": "Chinese competitor open-sourced massive robot training dataset.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-11",
-      "last_seen": "2026-06-11",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064497175585857574",
@@ -3386,16 +5676,16 @@
       "author_name": "Nicolas Bustamante",
       "posted_at": "2026-06-09T23:42:25Z",
       "text": "Most tasks people throw at chatbots like translation, email rewrites, explaining concepts were already maxed out 3 generations ago. \n\nSo when Claude Fable scores 100% on the same workflow that GPT-4o also scored 100% on, the natural conclusion is: nothing improved and thus models have \"plateaued.\" \n\nThe plateau isn't in the model but in the benchmark, people are using to judge it. Intelligence is task-dependent and progress happen at the frontier only. But few of us run complicated, long-horizon tasks so we don't see the frontier improving. I mean who is trying to solve Erdos math problems with a consumer chatbot? \n\nIt's a bit like measuring a rocket's speed with a car speedometer and thinking rockets don't go faster than cars.",
-      "views": 16381,
+      "views": 17049,
       "has_media": false,
-      "summary": "Plateau perception stems from saturated benchmarks; frontier tasks continue advancing rapidly.",
+      "summary": "Plateau perception is benchmark-limited; frontier tasks still improving.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064493130163118520",
@@ -3476,16 +5766,16 @@
       "author_name": "COATUE",
       "posted_at": "2026-06-09T23:19:30Z",
       "text": "The Coatue framework for how @SpaceX's value per launch scales with cadence.\n\nMore launches means more constellations, more subscribers, and more recurring revenue. Companies, governments, and militaries are increasingly looking to own their own infrastructure.\n\nThomas Laffont (@coatue_thomas) at the All-In Liquidity Summit. \u2b07\ufe0f",
-      "views": 11899,
+      "views": 12698,
       "has_media": false,
-      "summary": "Coatue framework shows SpaceX value per launch scales with cadence and constellation growth.",
+      "summary": "Coatue framework: SpaceX value per launch scales with cadence.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064487572206993681",
@@ -4171,16 +6461,16 @@
       "author_name": "Nicolas Bustamante",
       "posted_at": "2026-06-09T21:24:33Z",
       "text": "Your daily reminder that there is no plateau, only fast acceleration to AGI.",
-      "views": 2465,
+      "views": 2708,
       "has_media": false,
-      "summary": "Daily reminder: no plateau, only fast acceleration to AGI.",
+      "summary": "Daily reminder: no plateau, fast acceleration to AGI.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064457213880701301",
@@ -4337,9 +6627,9 @@
       "author_name": "Gavin Baker",
       "posted_at": "2026-06-09T20:30:04Z",
       "text": "383 days from company formation to first PO for a hardware company was impressive.\n\nAria can help optimize Nvidia clusters for unified front-end/scale-out networking use cases especially around observability.\n\nBut Mansour, you still have a lot of wood to chop. Keep chopping!",
-      "views": 6159,
+      "views": 6605,
       "has_media": false,
-      "summary": "Aria achieved first PO in 383 days; optimizes Nvidia clusters for networking observability.",
+      "summary": "Aria hardware company achieved first PO 383 days from formation.",
       "sentiment": "positive",
       "themes": [
         "digital-semis"
@@ -4349,8 +6639,8 @@
       ],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064444885919539242",
@@ -4359,16 +6649,16 @@
       "author_name": "COATUE",
       "posted_at": "2026-06-09T20:29:50Z",
       "text": "The shift from manual optimization to verified, automated improvement is a meaningful step for enterprise AI. Congrats to the @DecagonAI team.",
-      "views": 1527,
+      "views": 1547,
       "has_media": false,
-      "summary": "Shift from manual to verified automated improvement is meaningful for enterprise AI; praises Decagon.",
+      "summary": "DecagonAI shift to verified automated improvement meaningful for enterprise AI.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064444354689691988",
@@ -4377,16 +6667,16 @@
       "author_name": "The Inflection Economy",
       "posted_at": "2026-06-09T20:27:44Z",
       "text": "What a wild market. People are seeing growing concentration, massive capex and a handful of dominant AI names and assume we must be near the end. We think the obituaries may be coming out early. This looks more like 1997 than 2000. It ain't over 'til it's over...",
-      "views": 2198,
+      "views": 2382,
       "has_media": true,
-      "summary": "Current AI concentration and capex resemble 1997 more than 2000 bubble peak.",
+      "summary": "Current AI concentration looks like 1997 not 2000.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2,
+      "last_seen": "2026-06-12",
+      "seen_count": 3,
       "media_urls": [
         "https://pbs.twimg.com/media/HKZg7HtWoAA8JCO.jpg"
       ]
@@ -4416,16 +6706,16 @@
       "author_name": "Nicolas Bustamante",
       "posted_at": "2026-06-09T20:25:27Z",
       "text": "What I find fascinating with Claude Fable 5 is it proves once again that large generalist models will outperform vertical ones. \n\nOn ProofBench (graduate-level formal math benchmark in Lean, where a proof either compiles or it doesn't) Fable 5 beat Harmonic's Aristotle, 77% vs 71%. \n\nAristotle is a system built specifically for formal math + run on its own internal harness, so the generalist beat the specialist on the specialist's home turf.\n\nIt's the Richard Sutton's \"The Bitter Lesson\". His whole argument is that across 70 years of machine intelligence research, the methods that win are the general ones that scale with compute. Not the ones where we hand-encode human expertise. Building our own knowledge into the system feels good and helps short term gains but long term it always gets overtaken by bigger model.\n\nYou can look at Chess, Go, speech, vision, same story every time. First the specialized model wins, then the general one takes over.\n\nand btw this is the whole premise of AGI. You don't build one model for math, one for code, one for law. you build a single general model that scales with compute and it learns to do everything",
-      "views": 63585,
+      "views": 65205,
       "has_media": true,
-      "summary": "Claude Fable 5 beats specialist Aristotle 77% vs 71% on ProofBench, confirming Bitter Lesson.",
+      "summary": "Claude Fable 5 beats specialist on formal math benchmark per Bitter Lesson.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2,
+      "last_seen": "2026-06-12",
+      "seen_count": 3,
       "media_urls": [
         "https://pbs.twimg.com/media/HKZgBB6aoAAi0yP.jpg"
       ]
@@ -4509,9 +6799,9 @@
       "author_name": "Austin Lyons",
       "posted_at": "2026-06-09T20:06:31Z",
       "text": "Multipatterning is a clever way to extend DUV\nNot great for throughput or cost\nBut if you're SMIC, it doesn't matter, can't get EUV\nQuad-patterning it is",
-      "views": 1287,
+      "views": 1300,
       "has_media": false,
-      "summary": "Multipatterning extends DUV but hurts throughput; SMIC uses quad-patterning without EUV.",
+      "summary": "Multipatterning extends DUV; SMIC uses quad-patterning without EUV.",
       "sentiment": "neutral",
       "themes": [
         "digital-semis"
@@ -4521,8 +6811,8 @@
       ],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064435691925262824",
@@ -4852,16 +7142,16 @@
       "author_name": "Rihard Jarc",
       "posted_at": "2026-06-09T18:32:56Z",
       "text": "Recursive self-improvement around the corner?\n\nAnthropic limiting Claude\u2019s ability to help with frontier LLM development.",
-      "views": 9871,
+      "views": 10258,
       "has_media": false,
-      "summary": "Anthropic limiting Claude's help with frontier LLM development signals recursive improvement nearing.",
+      "summary": "Anthropic limiting Claude help on frontier LLM development.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2,
+      "last_seen": "2026-06-12",
+      "seen_count": 3,
       "media_summary": "Anthropic policy text on AI safeguards limiting Claude for frontier LLM development."
     },
     {
@@ -4946,7 +7236,7 @@
       "author_name": "SouthernValue",
       "posted_at": "2026-06-09T18:24:07Z",
       "text": "Offset: post 2027, Ant / OAI use AVGO to bypass CSPs",
-      "views": 2526,
+      "views": 2575,
       "has_media": false,
       "summary": "Post-2027 Ant/OAI may use AVGO to bypass CSPs.",
       "sentiment": "neutral",
@@ -4958,8 +7248,8 @@
       ],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064412408144134381",
@@ -4967,17 +7257,17 @@
       "handle": "similarweb",
       "author_name": "Similarweb",
       "posted_at": "2026-06-09T18:20:47Z",
-      "text": "The release of Claude Mythos comes on the back of another strong month for Claude (May 2026):\n\n\u2192 952.5M website visits\n\u2192 Up 15.67% from April\n\u2192 Up 855.57% from May 2025\n\u2192 Fifth consecutive month of growth",
-      "views": 2806,
+      "text": "The release of Claude Mythos comes on the back of another strong month for Claude (May 2026):\n\n 952.5M website visits\n\u2192 Up 15.67% from April\n\u2192 Up 855.57% from May 2025\n\u2192 Fifth consecutive month of growth",
+      "views": 3048,
       "has_media": true,
-      "summary": "Claude May 2026: 952.5M visits, +15.67% MoM, +855.57% YoY; fifth straight growth month.",
+      "summary": "Claude May visits 952.5M, +16% MoM, +856% YoY.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2,
+      "last_seen": "2026-06-12",
+      "seen_count": 3,
       "media_urls": [
         "https://pbs.twimg.com/media/HKZCP8uWwAAtxRb.png"
       ]
@@ -5080,18 +7370,18 @@
       "author_name": "Vikram Sekar",
       "posted_at": "2026-06-09T17:59:05Z",
       "text": "So much of the CPO/NPO discussion here aligns with what I posted in my Computex note.\n\nI\u2019m pleasantly surprised, although I don\u2019t have access to the whole institutional note from SA. \n\nCurious what I\u2019m missing now.\n\nMy Computex note:\nhttps://www.viksnewsletter.com/p/computex-2026-debrief?r=222kot&utm_medium=ios&triedRedirect=true",
-      "views": 30836,
+      "views": 31071,
       "has_media": false,
-      "summary": "Computex note aligns with SA institutional report on CPO/NPO.",
+      "summary": "CPO/NPO discussion aligns with prior Computex note.",
       "sentiment": "neutral",
       "themes": [
-        "hardware-components"
+        "digital-semis"
       ],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064404934276391206",
@@ -5154,16 +7444,16 @@
       "author_name": "Bill Gurley",
       "posted_at": "2026-06-09T17:46:00Z",
       "text": "Could still hedge. People feel the weight of this being like a federal law or SEC rule. It\u2019s not.",
-      "views": 5815,
+      "views": 6178,
       "has_media": false,
-      "summary": "Could still hedge. People feel the weight of this being like a federal law or SEC rule. It\u2019s not.",
+      "summary": "Could still hedge; not federal law or SEC rule.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
+      "last_seen": "2026-06-12",
+      "seen_count": 2
     },
     {
       "id": "2064403353879380171",
@@ -5248,9 +7538,9 @@
       "author_name": "Satya Nadella",
       "posted_at": "2026-06-09T17:12:38Z",
       "text": "Today in @naturemethods, we shared research on how AI can help us better understand cell behavior, offering new insights into why cancer medicines do not work the same for everyone.\n\nBy learning more about cell state \u2014 how individual cancer cells respond to their surroundings \u2014 we have the potential to match therapies more precisely to each patient and improve outcomes.",
-      "views": 73332,
+      "views": 95536,
       "has_media": false,
-      "summary": "MSFT research in Nature Methods shows AI insights into cancer cell behavior for personalized therapies.",
+      "summary": "Microsoft research: AI maps cancer cell states for personalized therapy.",
       "sentiment": "positive",
       "themes": [
         "software-application"
@@ -5262,8 +7552,8 @@
         "MSFT"
       ],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064395078328861180",
@@ -5308,16 +7598,16 @@
       "author_name": "Claude",
       "posted_at": "2026-06-09T17:08:17Z",
       "text": "Claude Fable 5 is available everywhere today. Claude Mythos 5 is restricted to Glasswing partners until we expand our trusted access program.\n\nhttps://www.anthropic.com/news/claude-fable-5-mythos-5",
-      "views": 753033,
+      "views": 797473,
       "has_media": false,
-      "summary": "Claude Fable 5 available everywhere; Mythos 5 restricted to Glasswing partners initially.",
+      "summary": "Claude Fable 5 available everywhere; Mythos 5 restricted to partners.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064394159318782217",
@@ -5326,16 +7616,16 @@
       "author_name": "Claude",
       "posted_at": "2026-06-09T17:08:16Z",
       "text": "Soon, we intend to expand access to Mythos 5 through a broader trusted access program, both for defensive cybersecurity work and biomedical research.",
-      "views": 708581,
+      "views": 736193,
       "has_media": false,
-      "summary": "Plans to expand Mythos 5 access via trusted access program for cyber and biomedical uses.",
+      "summary": "Plans to expand Mythos 5 access for cybersecurity and biomedical use.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064394158056386684",
@@ -5344,16 +7634,16 @@
       "author_name": "Claude",
       "posted_at": "2026-06-09T17:08:16Z",
       "text": "For a small group of cyber defenders and critical infrastructure providers, we are also launching Claude Mythos 5.\n\nMythos 5 shares the same underlying model as Fable 5, but with the safeguards lifted in some areas.",
-      "views": 639751,
+      "views": 663600,
       "has_media": false,
-      "summary": "Launches Claude Mythos 5 for select cyber defenders with safeguards lifted.",
+      "summary": "Claude Mythos 5 launched for cyber defenders with safeguards lifted.",
       "sentiment": "positive",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064394156735172627",
@@ -6039,16 +8329,16 @@
       "author_name": "The Inflection Economy",
       "posted_at": "2026-06-09T10:56:13Z",
       "text": "SpaceX looking to go at 100x revenue. \n\nSome relevant comps: \nTesla (2021 peak) 25\u201330x\nSnowflake IPO: 70\u2013100x\nPalantir peak: 40\u201350x\nCrowdStrike peak: 45\u201350x\n\nRemarkable part is that Snowflake, CrowdStrike, etc. were software businesses with 70\u2013100% gross margins and very little capital intensity. SpaceX a bit different\u2026",
-      "views": 301,
+      "views": 303,
       "has_media": false,
-      "summary": "SpaceX at 100x revenue vs Snowflake IPO 70-100x, CrowdStrike 45-50x; notes hardware intensity difference.",
+      "summary": "SpaceX targeting 100x revenue; compares to Snowflake, CrowdStrike peaks.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064298772662734883",
@@ -6075,9 +8365,9 @@
       "author_name": "Similarweb",
       "posted_at": "2026-06-09T10:49:14Z",
       "text": "Google's zero-click search growth over the past decade (Source: new research from @randfish and @sparktoro).\n\n>>",
-      "views": 2995,
+      "views": 3176,
       "has_media": true,
-      "summary": "Shares research on Google's decade-long zero-click search growth.",
+      "summary": "Google zero-click search growth over decade per new research.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [
@@ -6085,8 +8375,8 @@
       ],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2,
+      "last_seen": "2026-06-12",
+      "seen_count": 3,
       "media_urls": [
         "https://pbs.twimg.com/media/HKXbaiMX0AAxxTJ.png"
       ]
@@ -6116,16 +8406,16 @@
       "author_name": "Similarweb",
       "posted_at": "2026-06-09T09:05:14Z",
       "text": "Ranking of leading Gen AI websites in the list of top-visited sites, May 2026:  \n        \n#5 ChatGPT (no change from April)     \n#12 Gemini (+3)     \n#36 Claude (no change from April)  \n#75 DeepSeek (+3) \n#122 Grok (-10)    \n#235 Perplexity (-28)",
-      "views": 5197,
+      "views": 5399,
       "has_media": false,
-      "summary": "May 2026 GenAI site rankings: ChatGPT #5, Gemini #12, Claude #36, DeepSeek #75, Grok #122.",
+      "summary": "May 2026 rankings: ChatGPT #5, Gemini #12, Claude #36.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064260619235373516",
@@ -6274,16 +8564,16 @@
       "author_name": "Vikram Sekar",
       "posted_at": "2026-06-09T06:45:38Z",
       "text": "Solar panel is 5x larger than the radiator panels.\n\nInteresting because I didnt know relative sizes before.",
-      "views": 8140,
+      "views": 8175,
       "has_media": false,
-      "summary": "Solar panel 5x larger than radiator panels; interesting size comparison.",
+      "summary": "Solar panel 5x larger than radiator panels.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2
+      "last_seen": "2026-06-12",
+      "seen_count": 3
     },
     {
       "id": "2064229521654739215",
@@ -6730,17 +9020,17 @@
       "author_name": "COATUE",
       "posted_at": "2026-06-09T01:48:24Z",
       "text": "The power law paradox.",
-      "views": 25759,
+      "views": 26121,
       "has_media": true,
-      "summary": "Mentions the power law paradox.",
+      "summary": "The power law paradox.",
       "sentiment": "neutral",
       "themes": [],
       "tickers": [],
       "media_summary": "Bar chart shows 10x valuation likelihood rising with scale: 8% (unicorns) to 13% (decacorns) to 31% (centacorns). Takeaway: bigger firms more likely to 10x.",
       "portfolio": [],
       "first_seen": "2026-06-10",
-      "last_seen": "2026-06-11",
-      "seen_count": 2,
+      "last_seen": "2026-06-12",
+      "seen_count": 3,
       "media_urls": [
         "https://pbs.twimg.com/media/HKVhAA-awAERqIA.jpg"
       ]
@@ -22198,193 +24488,6 @@
         "software-infrastructure"
       ],
       "tickers": [],
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054257336839995737",
-      "url": "https://x.com/claudeai/status/2054257336839995737",
-      "handle": "claudeai",
-      "author_name": "Claude",
-      "posted_at": "2026-05-12T17:48:10Z",
-      "text": "What are you building at home?",
-      "views": 195383,
-      "has_media": false,
-      "summary": "Claude asked followers what they are building at home.",
-      "sentiment": "neutral",
-      "themes": [],
-      "tickers": [],
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054257335497838795",
-      "url": "https://x.com/claudeai/status/2054257335497838795",
-      "handle": "claudeai",
-      "author_name": "Claude",
-      "posted_at": "2026-05-12T17:48:09Z",
-      "text": "Oregon Trail: A survival game where your choices shape your fate.",
-      "views": 129613,
-      "has_media": false,
-      "summary": "Oregon Trail survival game example built with Claude.",
-      "sentiment": "neutral",
-      "themes": [],
-      "tickers": [],
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054257333727863156",
-      "url": "https://x.com/claudeai/status/2054257333727863156",
-      "handle": "claudeai",
-      "author_name": "Claude",
-      "posted_at": "2026-05-12T17:48:09Z",
-      "text": "Synthesizer: Play music through the cardputer\u2019s built-in speaker.",
-      "views": 16010,
-      "has_media": false,
-      "summary": "Synthesizer music project built on cardputer with Claude.",
-      "sentiment": "neutral",
-      "themes": [],
-      "tickers": [],
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054257332008157607",
-      "url": "https://x.com/claudeai/status/2054257332008157607",
-      "handle": "claudeai",
-      "author_name": "Claude",
-      "posted_at": "2026-05-12T17:48:08Z",
-      "text": "Tilt: A motion-controlled maze game where you guide a marble.",
-      "views": 17249,
-      "has_media": false,
-      "summary": "Tilt motion-controlled marble maze game built with Claude.",
-      "sentiment": "neutral",
-      "themes": [],
-      "tickers": [],
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054257327612522693",
-      "url": "https://x.com/claudeai/status/2054257327612522693",
-      "handle": "claudeai",
-      "author_name": "Claude",
-      "posted_at": "2026-05-12T17:48:07Z",
-      "text": "Hazy Daisy: A spelling game a dad built for his daughter.",
-      "views": 31342,
-      "has_media": true,
-      "summary": "Hazy Daisy spelling game built by dad for daughter using Claude.",
-      "sentiment": "neutral",
-      "themes": [],
-      "tickers": [],
-      "media_summary": "Laptop shows \"Hazy Daisy\" kids' typing game with pixel art. Non-finance image.",
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054257326035464448",
-      "url": "https://x.com/claudeai/status/2054257326035464448",
-      "handle": "claudeai",
-      "author_name": "Claude",
-      "posted_at": "2026-05-12T17:48:07Z",
-      "text": "Magic Wand: Shake to change between light and dark mode.",
-      "views": 114686,
-      "has_media": false,
-      "summary": "Magic Wand shake-to-toggle light/dark mode demo built with Claude.",
-      "sentiment": "neutral",
-      "themes": [],
-      "tickers": [],
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054257324278132893",
-      "url": "https://x.com/claudeai/status/2054257324278132893",
-      "handle": "claudeai",
-      "author_name": "Claude",
-      "posted_at": "2026-05-12T17:48:07Z",
-      "text": "We gave people tiny computers at Code with Claude. Here are some of the small, delightful things they built:",
-      "views": 558241,
-      "has_media": false,
-      "summary": "Code with Claude event produced several small delightful hardware projects.",
-      "sentiment": "positive",
-      "themes": [],
-      "tickers": [],
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054234919887573292",
-      "url": "https://x.com/artificialanlys/status/2054234919887573292",
-      "handle": "artificialanlys",
-      "author_name": "Artificial Analysis",
-      "posted_at": "2026-05-12T16:19:05.000Z",
-      "text": "Announcing agentic performance benchmarking for Speech to Speech models on Artificial Analysis. We use \ud835\udf0f-Voice to measure tool calling and customer interaction voice agent capabilities in realistic customer service scenarios\n\nEven the strongest Speech to Speech (S2S) models today resolve only about half of realistic customer service scenarios end-to-end - a meaningful gap relative to frontier text-based agents on the same tasks. Voice channels introduce significant complexity: challenging accents, background noise, and packet loss, all while requiring fast responses, consistency across long multi-turn conversations, and reliable tool use. Performance also varies considerably by audio condition: in clean audio some models perform notably better, but realistic conditions continue to pose a challenge. Conversation duration also varies meaningfully across models, with implications for both customer experience and operational cost.\n\nAbout \ud835\udf0f-Voice:\nOur Agentic Performance benchmark is based on \ud835\udf0f-Voice (Ray, Dhandhania, Barres & Narasimhan, 2026), which extends \ud835\udf0f\u00b2-bench into the voice modality to evaluate S2S models on realistic customer service tasks. It measures multi-turn instruction following, support of a simulated customer through a complete interaction, and tool use against simulated customer service systems. The simulated user combines an LLM-driven decision model with realistic audio synthesis: diverse accents, background noise, and packet loss modelled on real network conditions.\n\nThis complements our Big Bench Audio benchmark measuring intelligence and Conversational Dynamics (Full Duplex Bench subset) benchmark measuring conversational naturalness. Scores are the average of three independent pass@1 trials. We evaluate under realistic audio conditions using the \ud835\udf0f\u00b2-bench base task split across three domains:\n\u27a4 Airline (50 scenarios): e.g., changing a flight, rebooking under policy constraints\n\u27a4 Retail (114 scenarios): e.g., disputing a charge, processing a return\n\u27a4 Telecom (114 scenarios): e.g., resolving a billing issue, troubleshooting a service problem\n\nTask success is determined by deterministic checks against expected actions and final database state, consistent with the \ud835\udf0f\u00b2-bench evaluator.\n\nKey results:\nxAI's Grok Voice Think Fast 1.0 is the clear leader at 52.1%, averaging 5.6 minutes per conversation, the second-longest overall. OpenAI's GPT-Realtime-2 (High) (39.8%, 3.0 min) and GPT-Realtime-1.5 (38.8%, 4.8 min) follow, with Gemini 3.1 Flash Live Preview - High close behind at 37.7% (3.8 min).\n\nSpeech to Speech is a fast evolving modality and we expect movement in rankings as we continue to add new models with these capabilities, and model robustness improves.\n\nCongratulations @xAI @elonmusk! See below for further detail \u2b07\ufe0f",
-      "views": 8489668,
-      "has_media": true,
-      "summary": "New agentic benchmark for Speech-to-Speech models on realistic customer service tasks launched.",
-      "sentiment": "neutral",
-      "themes": [],
-      "tickers": [],
-      "media_summary": "AI voice agent benchmark: Grok leads overall (~52%) & by domain (Airline/Retail/Telecom). Non-finance.",
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054063509869306204",
-      "url": "https://x.com/kevinweil/status/2054063509869306204",
-      "handle": "kevinweil",
-      "author_name": "Kevin Weil \ud83c\uddfa\ud83c\uddf8",
-      "posted_at": "2026-05-12T04:57:58Z",
-      "text": "This from @tdrobbo is gold.",
-      "views": 28503,
-      "has_media": false,
-      "summary": "TDrobbo post called gold.",
-      "sentiment": "positive",
-      "themes": [],
-      "tickers": [],
-      "portfolio": [],
-      "first_seen": "2026-06-10",
-      "last_seen": "2026-06-10",
-      "seen_count": 1
-    },
-    {
-      "id": "2054003457900581240",
-      "url": "https://x.com/austinsemis/status/2054003457900581240",
-      "handle": "austinsemis",
-      "author_name": "Austin Lyons",
-      "posted_at": "2026-05-12T00:59:20.000Z",
-      "text": "Intel EMIB and TSMC CoWoS-L compared. \n\nTried to make it very easy to understand. Pictures help!\n\n$INTC $TSM",
-      "views": 39180,
-      "has_media": false,
-      "summary": "Intel EMIB and TSMC CoWoS-L advanced packaging compared with diagrams. $INTC $TSM",
-      "sentiment": "neutral",
-      "themes": [
-        "design-semicap"
-      ],
-      "tickers": [
-        "INTC",
-        "TSM"
-      ],
       "portfolio": [],
       "first_seen": "2026-06-10",
       "last_seen": "2026-06-10",
