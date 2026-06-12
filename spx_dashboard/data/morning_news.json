@@ -1,5 +1,179 @@
 [
   {
+    "date": "2026-06-12",
+    "one_liner": "SpaceX's record $75B IPO trades today amid a surging equity supply wave, Anthropic is alienating partners and customers (including ours), and energy-driven inflation stays hot.",
+    "top_themes": [
+      {
+        "headline": "SpaceX debut caps a surge in equity supply",
+        "points": [
+          {
+            "text": "SpaceX priced its IPO at $135, raising $75B at a ~$1.77T valuation; shares start trading on Nasdaq today as SPCX.",
+            "details": [
+              "Demand was 4x the 555.6M shares offered; retail alone submitted >$100B in orders.",
+              "At the IPO price, SpaceX is worth ~60% of Microsoft's market cap on a fraction of the revenue."
+            ]
+          },
+          {
+            "text": "New equity issuance is at near-record levels and could erode the buyback-driven supply tailwind that has supported the market for two decades.",
+            "details": [
+              "Fed data: $389B of new equity hit the market in Q1, the largest quarter ex the 2021 SPAC froth.",
+              "AI capex is the driver \u2014 Oracle and Alphabet both plan large stock sales; mega-cap buybacks are slowing.",
+              "Goldman argues supply is still modest relative to total market cap and won't derail the bull market."
+            ]
+          },
+          {
+            "text": "A heavy IPO pipeline (Anthropic, OpenAI, Sierra Space, Axiom) raises the question of whether retail money is a finite resource.",
+            "details": [
+              "Vanda flagged three straight days of retail net selling of single stocks, first time since March 2020.",
+              "JPMorgan sees the selling as loss-cutting on tech weakness rather than raising cash for IPOs."
+            ]
+          }
+        ],
+        "sources": [
+          "Axios Pro Rata",
+          "Axios Markets",
+          "Axios Closer",
+          "The Information AM",
+          "The Information Dealmaker",
+          "TLDR"
+        ],
+        "chart": {
+          "type": "bar",
+          "title": "Quarterly net US equity issuance",
+          "unit": "$B",
+          "series": [
+            {
+              "label": "Q4 2023",
+              "value": -964.75
+            },
+            {
+              "label": "Q2 2021 peak",
+              "value": 464
+            },
+            {
+              "label": "Q1 2026",
+              "value": 389
+            }
+          ]
+        }
+      },
+      {
+        "headline": "Anthropic turns on its partners and customers",
+        "points": [
+          {
+            "text": "Anthropic blindsided Figma and Canva by repositioning Claude Design to compete directly with them days before launch; Figma pulled out and Krieger left Figma's board.",
+            "details": []
+          },
+          {
+            "text": "Claude Fable adoption is being slowed by Anthropic's new 30-day data retention policy, which is deterring enterprise customers including Microsoft and UiPath.",
+            "details": [
+              "Retained data can sit outside customers' configured cloud, raising GDPR and security questions.",
+              "Anthropic is effectively raising prices on Fable even as customers hesitate."
+            ]
+          },
+          {
+            "text": "OpenAI is weighing significant price cuts to take share from Anthropic, per WSJ \u2014 a model-layer price war is forming.",
+            "details": []
+          },
+          {
+            "text": "Anthropic is simultaneously scaling enterprise distribution, partnering with TCS for deployments.",
+            "details": []
+          }
+        ],
+        "sources": [
+          "The Information",
+          "The Information AI Agenda",
+          "Axios AI+",
+          "TLDR IT"
+        ],
+        "chart": null
+      },
+      {
+        "headline": "AI infrastructure reality check; TSMC lock loosens",
+        "points": [
+          {
+            "text": "Nvidia's scale-up roadmap is slipping: NVL144 cancelled/delayed, NVL576 at risk, and CPO inflection pushed toward 2029.",
+            "details": [
+              "Demand is intact \u2014 pluggable 1.6T is very strong and NPO is snowballing among non-Nvidia hyperscalers.",
+              "800VDC single-ended is pushed to 2028+; \u00b1400VDC stays on track for 2H26."
+            ]
+          },
+          {
+            "text": "Google ordered 3M+ TPUs from Intel for 2028 and Nvidia is evaluating Intel 18A \u2014 real second-sourcing away from a capacity-constrained TSMC.",
+            "details": [
+              "Intel jumped ~13% premarket on the report and closed +9.3% after a BofA upgrade."
+            ]
+          },
+          {
+            "text": "The AI buildout is causing a structural DRAM/NAND shortage that is upending corporate IT budgets.",
+            "details": []
+          },
+          {
+            "text": "Capital keeps flooding in: KKR and Nvidia are launching a $10B data center financing company.",
+            "details": []
+          }
+        ],
+        "sources": [
+          "SemiAnalysis",
+          "TLDR IT",
+          "The Information AM",
+          "Axios Closer"
+        ],
+        "chart": null
+      },
+      {
+        "headline": "Inflation hot, energy-driven; ECB hikes",
+        "points": [
+          {
+            "text": "CPI ran 4.2% y/y through May, the fastest since April 2023, driven by Iran-war energy prices; real wages are now flat since January 2025.",
+            "details": [
+              "Inflation looks contained to energy-related categories so far."
+            ]
+          },
+          {
+            "text": "The ECB hiked 25bps to keep the energy spike out of core, but Lagarde signaled no further hikes this summer.",
+            "details": []
+          },
+          {
+            "text": "Risk rallied anyway: S&P 500 closed +1.8% as Trump said the U.S. and Iran are close to a deal to extend the ceasefire and reopen the Strait of Hormuz.",
+            "details": []
+          }
+        ],
+        "sources": [
+          "Axios Macro",
+          "Axios Closer"
+        ],
+        "chart": null
+      }
+    ],
+    "positions": [
+      {
+        "ticker": "META",
+        "name": "Meta Platforms",
+        "notes": "The Information (11 sources inside the company): six months post-close, the Rivos acquisition is failing to accelerate Meta's in-house AI chip effort \u2014 strategy churn, shifting leadership priorities, and tensions between Rivos and the incumbent chips team. Separately, Meta cut operational ties with Manus, and SemiAnalysis confirms Meta is deploying \u00b1400VDC for VR200 racks with Lite-On as a third sidecar vendor.",
+        "claude_take": "The custom-silicon cost-curve story is slipping right as Google scales TPUs to a second foundry. That means Meta stays a price-taker on Nvidia for longer, so capex efficiency and incremental ROIC on the AI buildout lag the bull case. Ad revenue strength has to carry the spend; watch for any sign management resets the in-house silicon timeline at the next print."
+      },
+      {
+        "ticker": "MSFT",
+        "name": "Microsoft",
+        "notes": "Microsoft is among the enterprises holding off on internal use of Claude Fable over Anthropic's new 30-day data retention policy, which stores customer inputs \u2014 sometimes outside the customer's configured cloud boundary. Side note: SpaceX's $1.75T IPO valuation equals ~60% of MSFT's market cap, a marker of how much mega-cap money the new supply wave could compete for.",
+        "claude_take": "The data-governance friction at Anthropic is a free advert for Azure and Copilot's enterprise-trust pitch \u2014 first-party models inside the customer's compliance boundary. It reinforces Microsoft's distribution moat with regulated buyers and supports pricing on the AI stack. The model-layer price war (OpenAI cutting to fight Anthropic) lowers Microsoft's input costs over time."
+      },
+      {
+        "ticker": "AMZN",
+        "name": "Amazon",
+        "notes": "AWS explicitly warned customers that opting into Anthropic's Fable data retention means data 'will leave AWS's data and security boundary' \u2014 notable given AWS both hosts Anthropic and resells its models. Separately, SemiAnalysis flags accelerating ARM server adoption including Graviton.",
+        "claude_take": "Near-term friction: the retention issue could slow Fable consumption on Bedrock. But AWS drawing a hard security boundary protects its core enterprise trust moat, which matters more than one model cycle. Graviton momentum extends AWS's unit-cost advantage and margin durability as AI workloads scale."
+      },
+      {
+        "ticker": "LSEG LN",
+        "name": "London Stock Exchange Group",
+        "notes": "Axios Pro Rata flags another company abandoning a London listing \u2014 the LSE attrition story continues even as global issuance booms and the record SpaceX IPO lands on Nasdaq.",
+        "claude_take": "Listings are a small slice of revenue; the thesis rests on data, analytics, and Workspace, which are unaffected. But persistent listing losses are a slow bleed to the franchise's ecosystem and a recurring sentiment overhang on the stock. The global primary-issuance wave bypassing London underlines that capital formation has moved to the US."
+      }
+    ]
+  },
+  {
     "date": "2026-06-11",
     "one_liner": "Hot CPI and a rate-sensitive tape dominate the macro picture, while Anthropic's Fable 5 launch reshapes the enterprise AI cost and data-security debate that touches our software names.",
     "top_themes": [
