@@ -29,130 +29,6 @@ import { dbGetAllEdits, equitiesEnabled } from "@/lib/equitiesDb";
 
 export const dynamic = "force-dynamic";
 
-// Columns A..V, mirroring the on-screen Summary view.
-const N_COLS = 22;
-
-function summarySheet(
-  companies: Company[],
-  quotes: Awaited<ReturnType<typeof loadQuotes>>,
-  today: Date,
-  asOfNote: string,
-): string {
-  const years = displayYears(today);
-  const [y0, y1, y2, y3, y4] = years;
-  const yr = (y: number) => String(y).slice(2); // "27"
-  const rows: string[] = [];
-
-  // Title + subtitle band. No merged cells anywhere — the title is centered
-  // across the table via "Center Across Selection" (a styled run of cells),
-  // which looks merged but keeps every cell independently selectable/copyable.
-  rows.push(new Row(1).span("Equities Dashboard — Summary", S.TITLE_BAND, N_COLS).xml());
-  rows.push(new Row(2).str(asOfNote, S.SUBTITLE).xml());
-  rows.push(new Row(3).xml()); // spacer
-
-  // Group header (row 4) + column header (row 5). Each band is centered across
-  // its columns (Center Across Selection) so the brand highlight spans the
-  // whole group like a merged header.
-  const gh = new Row(4)
-    .span("Company", S.GROUP_HEAD, 1)
-    .span("Price", S.GROUP_HEAD, 1)
-    .span("EV / GP", S.GROUP_HEAD, 2)
-    .span("Mendo P/E", S.GROUP_HEAD, 5)
-    .span("Target Mult", S.GROUP_HEAD, 3)
-    .span("IRR", S.GROUP_HEAD, 3)
-    .span("MoM", S.GROUP_HEAD, 4)
-    .span("Recent Perf", S.GROUP_HEAD, 3);
-  rows.push(gh.xml());
-
-  const ch = new Row(5)
-    .skip(2) // A/B covered by the merged group header
-    .str(`'${yr(y0)}`, S.COL_HEAD).str(`'${yr(y1)}`, S.COL_HEAD) // EV/GP
-    .str(`'${yr(y0)}`, S.COL_HEAD).str(`'${yr(y1)}`, S.COL_HEAD).str(`'${yr(y2)}`, S.COL_HEAD)
-    .str(`'${yr(y3)}`, S.COL_HEAD).str(`'${yr(y4)}`, S.COL_HEAD) // Mendo P/E
-    .str(`'${yr(y1)}`, S.COL_HEAD).str(`'${yr(y2)}`, S.COL_HEAD).str(`'${yr(y3)}`, S.COL_HEAD) // Target
-    .str(`'${yr(y1)}`, S.COL_HEAD).str(`'${yr(y2)}`, S.COL_HEAD).str(`'${yr(y3)}`, S.COL_HEAD) // IRR
-    .str(`'${yr(y0)}`, S.COL_HEAD).str(`'${yr(y1)}`, S.COL_HEAD).str(`'${yr(y2)}`, S.COL_HEAD)
-    .str(`'${yr(y3)}`, S.COL_HEAD) // MoM
-    .str("1M", S.COL_HEAD).str("3M", S.COL_HEAD).str("6M", S.COL_HEAD);
-  rows.push(ch.xml());
-
-  let r = 6;
-  const sectorBand = (label: string) => {
-    rows.push(new Row(r).str(label, S.SECTOR).xml());
-    r++;
-  };
-
-  const perfOf = (c: Company) => {
-    const q = c.yahoo ? quotes[c.yahoo] : undefined;
-    return { m1: q?.m1 ?? c.perf.m1, m3: q?.m3 ?? c.perf.m3, m6: q?.m6 ?? c.perf.m6 };
-  };
-
-  const companyRow = (c: Company) => {
-    const q = c.yahoo ? quotes[c.yahoo] : undefined;
-    const d = compute(c, q?.price ?? null, today);
-    const pf = perfOf(c);
-    const row = new Row(r)
-      .str(c.ticker, c.port === 1 ? S.TICKER_OWN : S.TICKER)
-      .num(d.price, currencyStyle(c.currency))
-      .num(d.evGp[y0], S.MULTIPLE).num(d.evGp[y1], S.MULTIPLE)
-      .num(d.mendoPe[y0], S.MULTIPLE).num(d.mendoPe[y1], S.MULTIPLE)
-      .num(d.mendoPe[y2], S.MULTIPLE).num(d.mendoPe[y3], S.MULTIPLE).num(d.mendoPe[y4], S.MULTIPLE)
-      .num(c.model.target_mult[String(y1)] ?? null, S.MULTIPLE)
-      .num(c.model.target_mult[String(y2)] ?? null, S.MULTIPLE)
-      .num(c.model.target_mult[String(y3)] ?? null, S.MULTIPLE)
-      .num(d.irr[y1], S.PERCENT).num(d.irr[y2], S.PERCENT).num(d.irr[y3], S.PERCENT)
-      .num(d.mom[y0], S.MULTIPLE).num(d.mom[y1], S.MULTIPLE)
-      .num(d.mom[y2], S.MULTIPLE).num(d.mom[y3], S.MULTIPLE)
-      .num(pf.m1, S.PERCENT).num(pf.m3, S.PERCENT).num(pf.m6, S.PERCENT);
-    rows.push(row.xml());
-    r++;
-  };
-
-  // Sector groups (same ordering the API returns: grp_order, row_order).
-  const seen = new Set<string>();
-  const order: string[] = [];
-  for (const c of companies) {
-    if (c.is_index || c.removed) continue;
-    if (!seen.has(c.grp)) {
-      seen.add(c.grp);
-      order.push(c.grp);
-    }
-  }
-  for (const grp of order) {
-    sectorBand(grp);
-    for (const c of companies) {
-      if (!c.is_index && !c.removed && c.grp === grp) companyRow(c);
-    }
-  }
-
-  // Index rows (Px + P/E only).
-  const indexRows = companies.filter((c) => c.is_index && !c.removed);
-  if (indexRows.length) {
-    sectorBand("Index");
-    for (const c of indexRows) {
-      const q = c.yahoo ? quotes[c.yahoo] : undefined;
-      const d = compute(c, q?.price ?? null, today);
-      const pf = perfOf(c);
-      const row = new Row(r)
-        .str(c.ticker, S.TICKER)
-        .num(d.price, currencyStyle(c.currency))
-        .skip(2); // no EV/GP
-      for (const y of years) row.num(c.best_pe?.[String(y)] ?? null, S.MULTIPLE);
-      row.skip(10); // no target / IRR / MoM
-      row.num(pf.m1, S.PERCENT).num(pf.m3, S.PERCENT).num(pf.m6, S.PERCENT);
-      rows.push(row.xml());
-      r++;
-    }
-  }
-
-  const cols = [
-    { min: 1, max: 1, width: 16 },
-    { min: 2, max: 2, width: 11 },
-    { min: 3, max: N_COLS, width: 8.5 },
-  ];
-  return sheetXml(rows, { cols, freezeRows: 5, freezeCols: 1 });
-}
-
 function editLogSheet(edits: EditRecord[]): string {
   const rows: string[] = [];
   rows.push(new Row(1).span("Equities Dashboard — Edit Log", S.TITLE_BAND, 6).xml());
@@ -456,7 +332,6 @@ export async function GET() {
 
   const buf = await buildWorkbook([
     { name: "Live Model", xml: modelSheet(companies, quotes, today, asOfNote) },
-    { name: "Summary", xml: summarySheet(companies, quotes, today, asOfNote) },
     { name: "Edit Log", xml: editLogSheet(edits) },
   ]);
 
