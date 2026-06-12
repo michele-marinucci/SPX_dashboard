@@ -42,6 +42,7 @@ all touched pipeline files.
 | 8 | Low | Stale comment: equities Excel export claimed a "Summary" tab that no longer exists | Comment corrected (two tabs) |
 | 9 | Low | `fetch_gmail.py` used inline `__import__("time")` | Normal top-level import |
 | 10 | Low | Dead code: `components/Commentary.tsx` (never imported), `data/commentary.json` and `data/detailed_dashboard_template.xlsx` (never read) | Deleted |
+| 11 | **Critical** | `next@14.2.15` is vulnerable to **GHSA-f82v-jwr5-mffw / CVE-2025-29927** (middleware authorization bypass via `x-middleware-subrequest`) — and this app's entire auth is middleware-enforced | Upgraded to `next@14.2.35` (same minor line, no behavior change; `next build` verified) |
 
 ## Known limitations — deliberately NOT changed
 
@@ -80,16 +81,34 @@ design or because "fixing" them would change behavior:
 10. **Middleware matcher is prefix-based**: a hypothetical route named
     `/login-foo` or `/api/login2` would bypass auth. None exist; worth
     remembering when adding routes.
-11. **No ESLint config / no test runner.** `tsconfig` has `strict: true` and
-    the codebase has no `any`/`@ts-ignore`, which covers a lot. Adding
-    `eslint-config-next` + a few unit tests around `calc.ts` and the xlsx/pptx
-    builders would be the highest-value follow-up.
+11. **Remaining `npm audit` advisories against Next 14** are only fixed in
+    Next 15/16 (breaking upgrade). They are DoS/cache-poisoning issues, and
+    several don't apply to this deployment (no i18n Pages Router, no WebSocket
+    upgrades, no CSP nonces, no `beforeInteractive` scripts with untrusted
+    input). The one critical that did apply — the middleware auth bypass —
+    is patched (fix #11 above). The `glob` advisory is a dev-only CLI
+    dependency of `eslint-config-next`, not shipped at runtime.
+
+## Tooling added during the audit
+
+- **ESLint**: `.eslintrc.json` extending `next/core-web-vitals`
+  (`npm run lint`). The codebase passed with zero warnings on first run.
+- **Tests**: `vitest` (`npm test`) with 29 unit tests:
+  - `lib/equities/calc.test.ts` — hand-computed expectations for EV, EV/GP,
+    Mendo P/E, all four target-price variants, IRR/MoM with pro-rata
+    dividends (including the leap-day horizon subtlety), all four
+    decomposition modes, 3-year CAGRs, and null-propagation on empty models.
+  - `lib/equities/xlsxBuild.test.ts` — XML escaping of cell text, formulas
+    and sheet names; the formula-injection guard (strings emitted as inline
+    strings, never formulas); column addressing; Excel serial dates; and a
+    full zip round-trip via JSZip.
 
 ## Recommended follow-ups (in priority order)
 
-1. Unit tests for `lib/equities/calc.ts` (pure functions, trivial to test) and
-   the xlsx escaping path.
-2. `eslint-config-next` with `react-hooks` rules.
+1. Run `npm test` and `npm run lint` in CI (a small GitHub Actions workflow
+   on push/PR).
+2. Plan a Next.js 15 upgrade to clear the remaining (non-applicable) audit
+   advisories.
 3. Shared-store rate limiting on `/api/login` if the deployment is
    multi-instance.
 4. Stagger `morning-news` and `refresh-themes` crons a few minutes apart to
