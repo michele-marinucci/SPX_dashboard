@@ -36,6 +36,12 @@ const MODEL_SERIES = new Set([
 const MODEL_SCALARS = new Set(["shares", "cash", "debt", "min_int"]);
 const TOP_FIELDS = new Set(["port", "grp", "yield_input"]);
 
+// Free-text fields end up inside Excel formulas (bbg → =BDP("…")) and XML, so
+// strip quote/angle characters and cap the length before they reach the DB.
+function cleanStr(v: unknown, max: number): string {
+  return String(v ?? "").replace(/["<>]/g, "").trim().slice(0, max);
+}
+
 export async function GET(req: NextRequest) {
   const { enabled, companies } = await loadCompanies();
   const force = req.nextUrl.searchParams.get("refresh") === "1";
@@ -83,8 +89,8 @@ function applyChange(
   if (TOP_FIELDS.has(head) && !year) {
     const old = c[head as "port" | "grp" | "yield_input"] as number | string | null;
     if (head === "grp") {
-      if (typeof value !== "string" || !value.trim()) return undefined;
-      c.grp = value.trim();
+      if (typeof value !== "string" || !cleanStr(value, 60)) return undefined;
+      c.grp = cleanStr(value, 60);
     } else if (head === "port") {
       if (value !== null && value !== 1 && value !== 2) return undefined;
       c.port = value;
@@ -121,8 +127,8 @@ export async function POST(req: NextRequest) {
       const edits = await dbGetAllEdits();
       return NextResponse.json({ ok: true, edits });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Database error.";
-      return NextResponse.json({ error: msg }, { status: 502 });
+      console.error("equities logAll failed", e);
+      return NextResponse.json({ error: "Database error." }, { status: 502 });
     }
   }
 
@@ -184,16 +190,16 @@ export async function POST(req: NextRequest) {
       if (existing) {
         return NextResponse.json({ error: "Ticker already exists." }, { status: 409 });
       }
-      const grp = String(body.grp ?? "").trim() || "Other sectors";
+      const grp = cleanStr(body.grp, 60) || "Other sectors";
       const inGroup = companies.filter((x) => x.grp === grp);
       const grpOrder = inGroup.length
         ? inGroup[0].grp_order
         : Math.max(0, ...companies.filter((x) => !x.is_index).map((x) => x.grp_order)) + 1;
       const row: Company = {
         ticker,
-        bbg: String(body.bbg ?? "").trim() || `${ticker} US EQUITY`,
-        yahoo: String(body.yahoo ?? "").trim() || ticker,
-        currency: String(body.currency ?? "$"),
+        bbg: cleanStr(body.bbg, 40) || `${ticker} US EQUITY`,
+        yahoo: cleanStr(body.yahoo, 24) || ticker,
+        currency: cleanStr(body.currency, 6) || "$",
         px_scale: 1,
         grp,
         grp_order: grpOrder,
@@ -231,7 +237,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ error: "Unknown action." }, { status: 400 });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Database error.";
-    return NextResponse.json({ error: msg }, { status: 502 });
+    console.error("equities POST failed", e);
+    return NextResponse.json({ error: "Database error." }, { status: 502 });
   }
 }

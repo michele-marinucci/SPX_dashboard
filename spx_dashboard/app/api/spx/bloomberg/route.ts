@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     await dbUpsertSpxQuotes(rows);
     return NextResponse.json({ ok: true, quotes: rows.length });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Database error.";
-    return NextResponse.json({ error: msg }, { status: 502 });
+    console.error("spx bloomberg POST failed", e);
+    return NextResponse.json({ error: "Database error." }, { status: 502 });
   }
 }

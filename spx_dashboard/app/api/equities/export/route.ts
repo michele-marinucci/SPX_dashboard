@@ -1,16 +1,14 @@
 // "Export Excel" for the Equities Dashboard.
 //
 // Builds a clean, self-contained workbook of exactly what the site shows right
-// now — every analyst edit included — across three tabs:
+// now — every analyst edit included — across two tabs:
 //   1. "Live Model" — the full editable model laid out as cells, with the price
 //                     pulled live from Bloomberg (=BDP) and every derived column
 //                     (EV, EV/GP, Mendo P/E, target price, IRR, MoM) written as
 //                     a live Excel formula off those inputs. Opens showing the
 //                     same numbers as the site (cached); recalculates on a
 //                     Bloomberg terminal.
-//   2. "Summary"    — the Summary-view table as a flat, number-formatted values
-//                     snapshot for quick sharing.
-//   3. "Edit Log"   — every change ever made, newest first, one row per field.
+//   2. "Edit Log"   — every change ever made, newest first, one row per field.
 import { NextResponse } from "next/server";
 import { compute, displayYears } from "@/lib/equities/calc";
 import { fieldLabel, fmtEditValue } from "@/lib/equities/editLog";
