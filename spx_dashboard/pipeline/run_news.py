@@ -3,8 +3,11 @@ Morning news pipeline:
 
     1. Fetch newsletters from the last 24 h via IMAP (72 h on Mondays, to span
        the weekend).
-    2. Load positions from data/dashboard.json.
-    3. Send everything to Claude; get back a structured morning note.
+    2. Send ONLY the newsletters to Claude; get back a neutral, themes-only
+       morning note. No holdings information is ever included in the prompt.
+    3. Match the firm's holdings against the newsletter text LOCALLY to build
+       the "Portfolio Mentions" section. Holdings never leave this process, so
+       the LLM provider never learns what the fund owns (compliance requirement).
     4. Write data/morning_news.json (appending to existing archive).
     5. Send the summary by email to MORNING_NEWS_RECIPIENTS.
 
@@ -25,6 +28,7 @@ import datetime as dt
 import base64
 import json
 import os
+import re
 import smtplib
 import sys
 from zoneinfo import ZoneInfo
@@ -64,22 +68,84 @@ def _default_lookback_hours() -> int:
 
 
 # ---------------------------------------------------------------------------
-# Position list
+# Holdings — loaded and matched LOCALLY. Compliance requirement: the list of
+# names the fund owns must never be sent to the LLM provider. We therefore load
+# holdings here, ask Claude only for a neutral newsletter digest, and match the
+# holdings against the newsletter text ourselves (see _match_positions).
 # ---------------------------------------------------------------------------
 
-def _get_positions() -> list[str]:
+# Extra name variants beyond the display name in portfolio.json, so a
+# newsletter that says "AWS" or "Facebook" still counts as a holding mention.
+# Keyed by display ticker; the company name itself is always matched too.
+_POSITION_ALIASES: dict[str, list[str]] = {
+    "AMZN": ["aws"],
+    "META": ["facebook", "instagram"],
+    "LSEG LN": ["lseg", "london stock exchange"],
+    "SPGI": ["s&p global"],
+}
+
+
+def _get_positions() -> list[dict]:
     # The team's actual portfolio, maintained in data/portfolio.json (also the
     # source for the Equities Dashboard page). NOT the SPX monitor universe.
     try:
         with open(PORTFOLIO_JSON) as f:
             data = json.load(f)
-        return [
-            f"{p['ticker']} ({p['name']})" if p.get("name") else p["ticker"]
-            for p in data.get("positions", [])
-            if p.get("ticker")
-        ]
-    except Exception:
+    except (OSError, json.JSONDecodeError):
         return []
+    return [
+        {"ticker": p["ticker"], "name": p.get("name", "")}
+        for p in data.get("positions", [])
+        if p.get("ticker")
+    ]
+
+
+def _snippet(text: str, start: int, end: int, width: int = 160) -> str:
+    """A whitespace-collapsed window around text[start:end] for context."""
+    lo, hi = max(0, start - width), min(len(text), end + width)
+    frag = " ".join(text[lo:hi].split())
+    if lo > 0:
+        frag = "… " + frag
+    if hi < len(text):
+        frag = frag + " …"
+    return frag
+
+
+def _term_regex(term: str) -> re.Pattern:
+    """Word-bounded matcher for a name/ticker. All-caps terms (initialisms like
+    SAP, MSCI, the bare ticker) match case-SENSITIVELY so they don't collide
+    with ordinary prose ("maple sap"); mixed-case names match any case."""
+    flags = 0 if term.isupper() else re.IGNORECASE
+    return re.compile(r"\b" + re.escape(term) + r"\b", flags)
+
+
+def _match_positions(newsletters: list[dict], positions: list[dict]) -> list[dict]:
+    """Build the "Portfolio Mentions" section locally — no holdings are sent to
+    the LLM. For each owned name found in today's newsletters, record which
+    newsletters mentioned it and a short snippet of the first mention."""
+    matched: list[dict] = []
+    for pos in positions:
+        disp = pos["ticker"]
+        base = disp.split()[0]  # 'LSEG LN' -> 'LSEG'
+        # Company name + aliases + the bare ticker.
+        terms = [pos["name"], *_POSITION_ALIASES.get(disp, []), base]
+        patterns = [_term_regex(t.strip()) for t in terms if t and t.strip()]
+
+        sources: list[str] = []
+        snippet: str | None = None
+        for nl in newsletters:
+            text = nl.get("text") or ""
+            hit = next((m for m in (rx.search(text) for rx in patterns) if m), None)
+            if hit:
+                sources.append(nl.get("sender", "a newsletter"))
+                if snippet is None:
+                    snippet = _snippet(text, hit.start(), hit.end())
+        if not sources:
+            continue
+        srcs = list(dict.fromkeys(sources))  # de-dup, preserve order
+        notes = f'"{snippet}" — {", ".join(srcs)}.' if snippet else f'Mentioned in {", ".join(srcs)}.'
+        matched.append({"ticker": disp, "name": pos["name"], "notes": notes})
+    return matched
 
 
 # ---------------------------------------------------------------------------
@@ -87,28 +153,21 @@ def _get_positions() -> list[str]:
 # ---------------------------------------------------------------------------
 
 _SYSTEM = """\
-You are a senior analyst writing the daily morning note for a small team of professional investors at a long-only equity fund.
-Your readers are sophisticated and run the portfolio listed below. Write for them.
+You are a senior markets analyst writing a concise daily digest of this morning's investment newsletters for a sophisticated, professional audience.
 
 AUDIENCE & TONE:
-- They are investors. NEVER explain basic finance concepts (e.g. what an IPO, an index fund, a buyback, or a P/E ratio is). No definitions of common terms.
-- Assume deep familiarity with the portfolio positions. Do not explain what the companies do.
+- Your readers are professional investors. NEVER explain basic finance concepts (e.g. what an IPO, an index fund, a buyback, or a P/E ratio is). No definitions of common terms.
 - Be concise. Short, simple sentences — one idea each. Avoid long or complex sentences.
 - Avoid unnecessary jargon and buzzwords, but ordinary financial terms are completely fine and expected.
 - Be factual and specific. No hype, no filler.
 
 PRIORITIES:
-- Portfolio positions come FIRST. Lead with anything material to the names we own and give them the most space.
-- Then the broad themes that recur across MULTIPLE newsletters. Repetition = signal. Ignore ads, promos, and one-off market colour.
+- Lead with the broad themes that recur across MULTIPLE newsletters. Repetition = signal. Ignore ads, promos, and one-off market colour.
 
 FORMAT (built to be skimmed):
 - Every key takeaway is its own numbered bullet (1, 2, 3 …).
 - Supporting detail goes in lettered sub-bullets (a, b, c …) under the relevant takeaway.
 - A busy reader should get the whole gist from the numbered bullets alone.
-
-PORTFOLIO POSITIONS — "Claude's take":
-- The fund is LONG every position. For each position you mention, after stating what happened, add your own read called "Claude's take".
-- "Claude's take" = the implications for our long thesis: competitive moat, durability, future revenue growth, earnings power, pricing, competitive threats. Be specific to that name. 1-3 short sentences. It is analysis, not a recap of the news.
 
 Structure the output as JSON exactly matching this schema:
 
@@ -138,32 +197,21 @@ Structure the output as JSON exactly matching this schema:
         ]
       }
     }
-  ],
-  "positions": [
-    {
-      "ticker": "MSFT",
-      "name": "Microsoft",
-      "notes": "The key takeaway about this name — what happened and why it matters. Concise.",
-      "claude_take": "Your read on the implications for our long position: moat, growth, earnings power. Specific. 1-3 short sentences."
-    }
   ]
 }
 
 Field rules:
-- positions: list every owned name with something specific and material in today's mail — these are the priority, so put them first. Order by materiality. Omit names with nothing meaningful; do not pad. Always include "claude_take" for each name you list.
-- top_themes: up to 5 items, most cross-cited first. Only include a theme if >=2 sources touched it, OR if it is highly material to a portfolio position.
+- top_themes: up to 5 items, most cross-cited first. Only include a theme if >=2 sources touched it.
 - points: 2-5 per theme. "text" is the key takeaway (numbered bullet); "details" is 0-3 short supporting sub-bullets (lettered). Omit "details" or use an empty list when the takeaway stands alone.
 - chart: include ONLY when the newsletters contain concrete, comparable numbers worth visualising (e.g. several index moves, a set of values across names, a trend). Provide 2-8 labeled numeric values in "series". Use "bar" for comparisons and "line" for a time trend. Set "unit" to the measure (e.g. "%", "$", "bps"). If there is nothing meaningful to chart, set "chart" to null.
 - Output ONLY the JSON object, no markdown fences, no preamble.
 """
 
 
-def _summarize(newsletters: list[dict], positions: list[str]) -> dict:
+def _summarize(newsletters: list[dict]) -> dict:
     import anthropic
 
     client = anthropic.Anthropic(api_key=_env("ANTHROPIC_API_KEY"))
-
-    pos_str = ", ".join(positions) if positions else "(no positions loaded)"
 
     newsletter_blocks = []
     for i, nl in enumerate(newsletters, 1):
@@ -178,7 +226,6 @@ def _summarize(newsletters: list[dict], positions: list[str]) -> dict:
 
     user_content = (
         f"Today's date: {dt.date.today().isoformat()}\n\n"
-        f"Portfolio positions to watch for: {pos_str}\n\n"
         + "\n\n".join(newsletter_blocks)
     )
 
@@ -202,7 +249,18 @@ def _summarize(newsletters: list[dict], positions: list[str]) -> dict:
         if raw.startswith("json"):
             raw = raw[4:]
         raw = raw.strip()
-    return json.loads(raw)
+    summary = json.loads(raw)
+    # Fail loudly (workflow goes red) rather than archiving a malformed note.
+    if not isinstance(summary, dict):
+        raise ValueError(f"LLM summary is not a JSON object: {type(summary).__name__}")
+    if not isinstance(summary.get("date"), str):
+        summary["date"] = dt.date.today().isoformat()
+    if not isinstance(summary.get("top_themes"), list):
+        raise ValueError("LLM summary field 'top_themes' is missing or not a list")
+    # The LLM is never told the holdings; "Portfolio Mentions" are matched
+    # locally and attached after this returns (see main / _match_positions).
+    summary.pop("positions", None)
+    return summary
 
 
 # ---------------------------------------------------------------------------
@@ -440,9 +498,13 @@ def _load_archive() -> list[dict]:
 
 
 def _save_archive(entries: list[dict]) -> None:
+    # Atomic write: a crash mid-dump would otherwise leave invalid JSON, and
+    # the next run's _load_archive() would silently reset the whole archive.
     os.makedirs(DATA_DIR, exist_ok=True)
-    with open(MORNING_NEWS_JSON, "w") as f:
+    tmp = MORNING_NEWS_JSON + ".tmp"
+    with open(tmp, "w") as f:
         json.dump(entries, f, indent=2)
+    os.replace(tmp, MORNING_NEWS_JSON)
 
 
 # ---------------------------------------------------------------------------
@@ -472,8 +534,13 @@ def main() -> int:
             print("Missing ANTHROPIC_API_KEY", file=sys.stderr)
             return 4
 
+        # Claude sees ONLY the newsletters — never the holdings.
         print("Summarizing with Claude…", file=sys.stderr)
-        summary = _summarize(newsletters, positions)
+        summary = _summarize(newsletters)
+
+        # "Portfolio Mentions" are matched locally so holdings never leave here.
+        summary["positions"] = _match_positions(newsletters, positions)
+        print(f"Matched {len(summary['positions'])} holding(s) in today's mail.", file=sys.stderr)
 
     # Prepend to archive (newest first), keeping last 90 days
     archive = _load_archive()

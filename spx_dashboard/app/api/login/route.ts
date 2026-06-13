@@ -1,25 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, SESSION_COOKIE, SESSION_MAX_AGE } from "@/lib/auth";
+import { clearFailures, recordFailure, tooManyFailures } from "@/lib/loginThrottle";
 
-// In-memory brute-force throttle: per-IP sliding window of failed attempts.
-// Per-instance only on serverless, but still raises the cost of password
-// guessing substantially for a single shared password.
-const MAX_FAILURES = 10;
-const WINDOW_MS = 15 * 60 * 1000;
-const failures = new Map<string, number[]>();
-
-function tooManyFailures(ip: string): boolean {
-  const now = Date.now();
-  const recent = (failures.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  failures.set(ip, recent);
-  return recent.length >= MAX_FAILURES;
-}
-
-function recordFailure(ip: string) {
-  const list = failures.get(ip) ?? [];
-  list.push(Date.now());
-  failures.set(ip, list);
-}
+// Always run on the server at request time; never cache or statically optimize.
+export const dynamic = "force-dynamic";
 
 // Constant-time-ish comparison to avoid trivial timing leaks.
 function safeEqual(a: string, b: string): boolean {
@@ -40,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (tooManyFailures(ip)) {
+  if (await tooManyFailures(ip)) {
     return NextResponse.json(
       { error: "Too many attempts. Try again later." },
       { status: 429 },
@@ -56,10 +40,11 @@ export async function POST(req: NextRequest) {
   }
 
   if (!password || !safeEqual(password, expected)) {
-    recordFailure(ip);
+    await recordFailure(ip);
     return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
   }
 
+  await clearFailures(ip);
   const token = await createSessionToken();
   const res = NextResponse.json({ ok: true });
   res.cookies.set(SESSION_COOKIE, token, {

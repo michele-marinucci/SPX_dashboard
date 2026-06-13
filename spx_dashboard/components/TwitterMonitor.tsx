@@ -94,12 +94,14 @@ export function TwitterMonitor({
   const isMobile = useIsMobile();
 
   useEffect(() => {
+    let cancelled = false;
     setAdded(loadList(ADD_KEY));
     setRemoved(loadList(REMOVE_KEY));
 
     fetch("/api/feed")
       .then((r) => r.json())
       .then((d) => {
+        if (cancelled) return;
         if (d?.enabled && Array.isArray(d.tweets) && d.tweets.length) {
           setData((prev) => ({
             ...prev,
@@ -116,9 +118,14 @@ export function TwitterMonitor({
     fetch("/api/followed")
       .then((r) => r.json())
       .then((d) => {
+        if (cancelled) return;
         if (d?.enabled && Array.isArray(d.handles)) setDbFollowed(d.handles.map(norm));
       })
       .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const persist = (key: string, list: string[]) => {

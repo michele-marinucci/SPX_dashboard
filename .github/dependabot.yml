@@ -1,0 +1,34 @@
+# Dependabot: GitHub watches these dependency manifests and opens automatic
+# PRs when a security fix or new version is available. The CI workflow
+# (lint + typecheck + tests) runs on every PR, so an update that breaks
+# something shows up red before it's merged.
+version: 2
+updates:
+  # The Next.js app (npm) — this is what caught fire with CVE-2025-29927.
+  - package-ecosystem: npm
+    directory: /spx_dashboard
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # One combined PR for routine minor/patch bumps; security PRs and
+      # major-version bumps still arrive individually.
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  # Python pipelines (morning news, tweets, Bloomberg push).
+  - package-ecosystem: pip
+    directory: /spx_dashboard/pipeline
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+
+  # The GitHub Actions used by the workflows themselves.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
