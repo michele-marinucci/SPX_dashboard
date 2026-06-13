@@ -5193,7 +5193,11 @@ th.tw-link-col { text-align: center; }
     width: 100dvh;
     height: 100dvw;
     max-width: none;
-    transform-origin: bottom left;
+    /* rotate pivots on the top-left corner; translateY(-100%) then drops the
+       rotated landscape box back onto the viewport. A bottom-left origin sent
+       it entirely off-screen to the right — the dialog opened but was never
+       visible (the "Full table does nothing" bug). */
+    transform-origin: top left;
     transform: rotate(90deg) translateY(-100%);
     /* Ensure desktop chrome (sidebar, content-header) is invisible inside. */
     overflow: hidden;
