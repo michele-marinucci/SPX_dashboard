@@ -1,7 +1,8 @@
 """
 Morning news pipeline:
 
-    1. Fetch newsletters from the last 24 h via IMAP.
+    1. Fetch newsletters from the last 24 h via IMAP (72 h on Mondays, to span
+       the weekend).
     2. Send ONLY the newsletters to Claude; get back a neutral, themes-only
        morning note. No holdings information is ever included in the prompt.
     3. Match the firm's holdings against the newsletter text LOCALLY to build
@@ -15,7 +16,7 @@ Usage:
 Env:
     GMAIL_ADDRESS / GMAIL_APP_PASSWORD  — shared with fetch_gmail.py
     NEWS_SENDER_FILTER                  — comma-sep sender substrings
-    NEWS_LOOKBACK_HOURS                 — default 24
+    NEWS_LOOKBACK_HOURS                 — override; default 24 (72 on Mondays)
     ANTHROPIC_API_KEY                   — Claude API key
     MORNING_NEWS_RECIPIENTS             — comma-sep email addresses to mail
     MORNING_NEWS_FROM                   — from address (defaults to GMAIL_ADDRESS)
@@ -49,6 +50,21 @@ from fetch_news import fetch_recent_newsletters  # noqa: E402
 def _env(name: str, default: str | None = None) -> str | None:
     v = os.environ.get(name, default)
     return v.strip() if isinstance(v, str) else v
+
+
+def _default_lookback_hours() -> int:
+    """Hours of inbox to pull when NEWS_LOOKBACK_HOURS isn't set explicitly.
+
+    Normally 24h (yesterday morning → now). On Mondays we reach back 72h so the
+    note spans the weekend. Friday's emailed note ends at ~Friday 9am ET, and
+    the Saturday/Sunday runs save but never email, so a flat 24h on Monday would
+    silently drop every Friday-afternoon, Saturday, and pre-9am Sunday
+    newsletter. 72h from Monday ~9am ET lands back at ~Friday 9am ET, exactly
+    closing that gap. Evaluated in US Eastern so it tracks the 9am-ET schedule
+    regardless of the runner's UTC clock.
+    """
+    weekday_et = dt.datetime.now(ZoneInfo("America/New_York")).weekday()  # Mon=0 … Sun=6
+    return 72 if weekday_et == 0 else 24
 
 
 # ---------------------------------------------------------------------------
@@ -497,7 +513,8 @@ def _save_archive(entries: list[dict]) -> None:
 
 def main() -> int:
     print("Fetching newsletters…", file=sys.stderr)
-    newsletters = fetch_recent_newsletters()
+    # Weekend-aware default; NEWS_LOOKBACK_HOURS (manual runs) still overrides.
+    newsletters = fetch_recent_newsletters(lookback_hours=_default_lookback_hours())
     if not newsletters:
         print("NO_NEWSLETTERS: nothing to summarize.", file=sys.stderr)
         # Write a placeholder so the site always has something to render

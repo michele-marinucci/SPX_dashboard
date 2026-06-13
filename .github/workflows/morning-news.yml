@@ -12,9 +12,9 @@ on:
   workflow_dispatch:
     inputs:
       lookback_hours:
-        description: "How many hours of inbox mail to pull (manual runs only)"
+        description: "Hours of inbox mail to pull. Blank = auto (24h, or 72h on Mondays to span the weekend)."
         required: false
-        default: "24"
+        default: ""
 
 concurrency:
   group: morning-news
@@ -42,7 +42,9 @@ jobs:
         env:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          NEWS_LOOKBACK_HOURS: ${{ github.event.inputs.lookback_hours || '24' }}
+          # Blank on scheduled runs → run_news.py picks the weekend-aware default
+          # (24h, or 72h on Mondays). A non-empty manual input overrides it.
+          NEWS_LOOKBACK_HOURS: ${{ github.event.inputs.lookback_hours }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           MORNING_NEWS_RECIPIENTS: ${{ secrets.MORNING_NEWS_RECIPIENTS }}
           MORNING_NEWS_FROM: ${{ secrets.GMAIL_ADDRESS }}
